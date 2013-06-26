@@ -1,7 +1,6 @@
 tls = require("tls")
 fs = require("fs") 
 fileops = require("fileops")
-validate = require('json-schema').validate
 http = require("http")
 boltjson = require('./commonfunction')
 
@@ -23,7 +22,7 @@ class cloudflashbolt
         console.log 'boltlib initialized'       
 
     # Read from bolt.json config file and start bolt client or server accordingly.
-    configure: ->
+    configure: (callback) ->
 
         boltContent = boltjson.readBoltJson()       
         @boltJsonObj = boltContent        
@@ -34,12 +33,14 @@ class cloudflashbolt
                 options =
                     key: fs.readFileSync("#{@boltJsonObj.key}")
                     cert: fs.readFileSync("#{@boltJsonObj.cert}")
+                    requestCert: true
+                    rejectUnauthorized: false
                 console.log "bolt server" 
                 @boltServer()
             else
                 options =
                     cert: fs.readFileSync("#{@boltJsonObj.cert}")
-                    ca: fs.readFileSync("#{@boltJsonObj.ca}")
+                    key: fs.readFileSync("#{@boltJsonObj.key}")
                 console.log "bolt client"
                 remoteHosts = @boltJsonObj.remote
                 listen =  @boltJsonObj.listen    
@@ -48,10 +49,10 @@ class cloudflashbolt
                     for host in remoteHosts
                         serverHost = host.split(":")[0]
                         serverPort = host.split(":")[1]
-                        @boltClient serverHost, serverPort  
+                        @boltClient serverHost, serverPort   
                 
         else
-            return new Error "Invalid bolt JSON!"
+            callback new Error "Invalid bolt JSON!"
                         
     listBoltClients: (callback) ->
         res = []        
@@ -73,11 +74,16 @@ class cloudflashbolt
                 finalResp = ''
                 console.log "connection from client :" + socket.remoteAddress
                 console.log "Data received: " + data
+
                 result = JSON.parse data
-                if result.cname
+                if result.port
+                    certObj = socket.getPeerCertificate()
+                    console.log 'certObj: ' + JSON.stringify certObj
+                    cname = certObj.subject.CN
+                    result.cname = cname
                     result.clientaddr = socket.remoteAddress
                     result.socketId = socket.id                    
-                    console.log 'cname result : ' + result     
+                    console.log 'cname result : ' + JSON.stringify result     
                     boltClientData.push result
                 else
                     finalResp = data 
@@ -117,7 +123,7 @@ class cloudflashbolt
                             break
         
                     console.log "server conn address :" + boltClientSocket.remoteAddress
-                     
+                   
                     serverRequest.body = request.body
                     serverRequest.header = request.header('content-type')
                     serverRequest.target = request.header('cloudflash-bolt-target')
@@ -126,7 +132,7 @@ class cloudflashbolt
                         boltClientSocket.write JSON.stringify(serverRequest)
                     else
                         boltClientSocket.write serverRequest
-
+                    
                     setTimeout (->
                         if finalResp
                             console.log 'finalResp in settimeout: ' + finalResp
@@ -137,7 +143,7 @@ class cloudflashbolt
                 else
                     return callback new Error "bolt cname entry not found!" 
         else
-                return callback new Error "bolt target missing!"
+            return callback new Error "bolt target missing!"
         
       
     #Method to start bolt client
@@ -146,19 +152,17 @@ class cloudflashbolt
         client.socket = tls.connect(port, host, options, ->
             if client.socket.authorized
                 console.log "Successfully connected to bolt server"
-                certObj = client.socket.getPeerCertificate()               
-                cname = certObj.subject.CN
-                console.log 'cname: ' + cname
-                result = {}; result.cname = cname; result.port = forwardingPorts
+                result = {}; result.port = forwardingPorts
                 client.socket.write JSON.stringify result
             else
                 #Something may be wrong with your certificates
-                console.log "Failed to authorize TLS connection. Could not connect to bolt server "
-                console.log client.socket.authorizationError
-                return new Error "Failed to authorize TLS connection!"
+                result = {}; result.port = forwardingPorts
+                client.socket.write JSON.stringify result
+                console.log "Failed to authorize TLS connection. Could not connect to bolt server"                
         )
 
         client.socket.addListener "data", (data) ->
+            res = {}
             console.log "Data received from server: " + data            
             recvData = JSON.parse data
             
@@ -175,30 +179,37 @@ class cloudflashbolt
                     portexists = true
                     break
 
-            if portexists        
+            if portexists                      
                 request = new http.ClientRequest(
                     hostname: "localhost"
                     port: boltTargetPort
                     path: recvData.body.path
                     method: recvData.body.type
-                )  
+                )                
                 request.setHeader("Content-Type",recvData.header)
                 if recvData.header.search "application/json" == 0 
                     request.write JSON.stringify(recvData.body.body)
                 else
                     request.write recvData.body.body  
-    
-                request.end()
-                request.on "response", (response) ->
+                request.end()                
+                request.on "error", (err) ->
+                    console.log "error: " + err                    
+                    res.error = err                    
+                    client.socket.write JSON.stringify(res)
+                request.on "response", (response) ->                    
                     console.log "STATUS: " + response.statusCode
                     response.setEncoding "utf8"
                     response.on "data", (resFromCF) ->
-                        console.log "response from cloudflash: " + resFromCF  
-                        client.socket.write resFromCF 
+                        console.log "response from cloudflash: " + resFromCF
+                        if response.statusCode == 200
+                            client.socket.write resFromCF
+                        else                            
+                            res.error = resFromCF
+                            client.socket.write JSON.stringify(res)                        
 
             else
-                console.log "Bolt Target Port is not part of local forwarding ports managed by the client"
-        
+                res.error = "Bolt Target Port is not part of local forwarding ports managed by the client"
+                client.socket.write JSON.stringify(res)
                   
 module.exports = cloudflashbolt
 

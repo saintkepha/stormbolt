@@ -1,8 +1,10 @@
 @include = ->
 
     cloudflashbolt = require('./boltlib')
-    bolt = new cloudflashbolt
-    bolt.configure()
+    bolt = new cloudflashbolt    
+    bolt.configure (res) =>
+        if res instanceof Error
+             console.log 'error: ' + res            
 
     @post '/boltserver': ->        
         console.log 'IN POST'
@@ -18,4 +20,5 @@
             unless res instanceof Error
                 @send res
             else
-                @next res   
+                @next res
+    
