@@ -73,13 +73,15 @@ class cloudflashbolt
             socket.addListener "data", (data) =>
                 finalResp = ''
                 console.log "connection from client :" + socket.remoteAddress
-                console.log "Data received: " + data
-
-                result = JSON.parse data
-                if result.port
+                console.log "Data received: " + data                
+                 
+                if data.search('forwardingPorts') == 0 
+                    result = {}             
                     certObj = socket.getPeerCertificate()
                     console.log 'certObj: ' + JSON.stringify certObj
                     cname = certObj.subject.CN
+                    
+                    result.forwardingports = data.split(':')[1]
                     result.cname = cname
                     result.clientaddr = socket.remoteAddress
                     result.socketId = socket.id                    
@@ -144,20 +146,19 @@ class cloudflashbolt
                     return callback new Error "bolt cname entry not found!" 
         else
             return callback new Error "bolt target missing!"
-        
-      
+    
     #Method to start bolt client
     boltClient: (host, port) ->
         # try to connect to the server
         client.socket = tls.connect(port, host, options, ->
             if client.socket.authorized
                 console.log "Successfully connected to bolt server"
-                result = {}; result.port = forwardingPorts
-                client.socket.write JSON.stringify result
+                result = "forwardingPorts:#{forwardingPorts}"
+                client.socket.write result
             else
-                #Something may be wrong with your certificates
-                result = {}; result.port = forwardingPorts
-                client.socket.write JSON.stringify result
+                #using self signed certs for intergration testing
+                result = "forwardingPorts:#{forwardingPorts}"
+                client.socket.write result
                 console.log "Failed to authorize TLS connection. Could not connect to bolt server"                
         )
 
@@ -186,19 +187,22 @@ class cloudflashbolt
                     path: recvData.body.path
                     method: recvData.body.type
                 )                
-                request.setHeader("Content-Type",recvData.header)
-                if recvData.header.search "application/json" == 0 
-                    request.write JSON.stringify(recvData.body.body)
-                else
-                    request.write recvData.body.body  
+                request.setHeader("Content-Type",recvData.header)                
+                if recvData.body.body
+                    if recvData.header.search "application/json" == 0 
+                        request.write JSON.stringify(recvData.body.body)
+                    else
+                        request.write recvData.body.body                
+
                 request.end()                
                 request.on "error", (err) ->
                     console.log "error: " + err                    
                     res.error = err                    
                     client.socket.write JSON.stringify(res)
+
                 request.on "response", (response) ->                    
                     console.log "STATUS: " + response.statusCode
-                    response.setEncoding "utf8"
+                    response.setEncoding "utf8"                    
                     response.on "data", (resFromCF) ->
                         console.log "response from cloudflash: " + resFromCF
                         if response.statusCode == 200
