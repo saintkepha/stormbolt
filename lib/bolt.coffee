@@ -4,7 +4,7 @@
     bolt = new cloudflashbolt
     bolt.configure()
 
-    @post '/boltserver': ->        
+    @post '/boltserver': ->
         console.log 'IN POST'
         console.log 'header' + @req.header('content-type')
         console.log 'body: ' + JSON.stringify @body
@@ -13,9 +13,9 @@
                 @send res
             else
                 @next res
-    @get '/cname': ->        
+    @get '/cname': ->
         bolt.listBoltClients (res) =>
             unless res instanceof Error
                 @send res
             else
-                @next res   
+                @next res
