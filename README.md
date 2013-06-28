@@ -27,16 +27,16 @@ url = any request path to bolt client like /modules in case of cloudflash.
     <th>Verb</th><th>URI</th><th>Description</th>
   </tr>
   <tr>
-    <td>POST</td><td>/{url}</td><td>To configure cloudflash with config requests</td>
+    <td>POST</td><td>/{url}</td><td>To configure cloudflash/salt bolt client from bolt server. </td>
   </tr>
   <tr>
-    <td>GET</td><td>/{url}</td><td>get list of bolt clients managed by the bolt server</td>
+    <td>GET</td><td>/{url}</td><td>get list config cloudflash/salt bolt client from bolt server.</td>
   </tr>
   <tr>
-    <td>PUT</td><td>/{url}</td><td>To configure cloudflash with config requests</td>
+    <td>PUT</td><td>/{url}</td><td>To update config cloudflash/salt bolt client from bolt server.</td>
   </tr>
   <tr>
-    <td>DELETE</td><td>/{url}</td><td>get list of bolt clients managed by the bolt server</td>
+    <td>DELETE</td><td>/{url}</td><td>To delete config cloudflash/salt bolt client from bolt server.</td>
   </tr>
 </table>
 
