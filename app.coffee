@@ -1,4 +1,4 @@
-boltjson = require('./lib/commonfunction')
+boltjson = require('./lib/boltutil')
 
 listenPort = ''; 
 boltJsonObj = boltjson.readBoltJson()
