@@ -61,17 +61,28 @@ Bolt client functionality:
 
 
 List of Bolt Server APIs*
+<<<<<<< HEAD
 -------------------------
+=======
+========================
+url = any request path to bolt client like /modules in case of cloudflash.
+>>>>>>> feature/bolttest
 
 <table>
   <tr>
     <th>Verb</th><th>URI</th><th>Description</th>
   </tr>
   <tr>
-    <td>POST</td><td>/boltserver</td><td>To configure cloudflash with config requests</td>
+    <td>POST</td><td>/{url}</td><td>To configure cloudflash/salt bolt client from bolt server. </td>
   </tr>
   <tr>
-    <td>GET</td><td>/cname</td><td>get list of bolt clients managed by the bolt server</td>
+    <td>GET</td><td>/{url}</td><td>get list config cloudflash/salt bolt client from bolt server.</td>
+  </tr>
+  <tr>
+    <td>PUT</td><td>/{url}</td><td>To update config cloudflash/salt bolt client from bolt server.</td>
+  </tr>
+  <tr>
+    <td>DELETE</td><td>/{url}</td><td>To delete config cloudflash/salt bolt client from bolt server.</td>
   </tr>
 </table>
 
@@ -81,21 +92,24 @@ Configure VCG
 -------------------------
 
     Verb          URI                     Description
-    POST        /boltserver             To configure cloudflash with config requests
+    POST        /modules             To configure cloudflash with config requests
 
 ## Request JSON For all config posts on VCG (cloudflash)
     Request
     {
-      "type":"", -- should be of HTTP request Type (GET/POST/PUT/DELETE)
-      "path":"", -- should be the end point URI
-      "body":”” -- should be the JSON content
+        "name": "cloudflash-openvpn",
+        "version": "0.1.6"
     }
 	
 ### Request JSON  - To configure /modules endpoint on VCG
 
-{
-  "type":"POST",
-  "path":"/modules",
-  "body":{"type":"POST","path":"/modules","body":{"name":"cloudflash-openvpn","version":"0.1.6"}}
-}
-	
+    {
+    "id": "b2cc1a38-4beb-4792-8b01-afd622d056e6",
+    "description": {
+        "name": "cloudflash-openvpn",
+        "version": "0.1.6"
+    },
+    "status": {
+        "installed": true
+    }
+    }
