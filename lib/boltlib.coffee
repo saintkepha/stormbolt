@@ -3,11 +3,13 @@ fs = require("fs")
 fileops = require("fileops")
 http = require("http")
 boltjson = require('./boltutil')
+util = require('util')
 
 class cloudflashbolt
     
     boltClientList = []; boltClientData = []; boltClientSocket = ''
-    options = ''; clientResponse = []; socketIdCounter = 0        
+    options = ''; clientResponse = []
+    #socketIdCounter = 0        
     client = this    
 
     constructor: ->
@@ -57,7 +59,7 @@ class cloudflashbolt
         console.log "server port:" + serverPort 
         tls.createServer(options, (socket) =>
             console.log "TLS connection established with VCG client"
-            socket.id  = socketIdCounter++
+            #socket.id  = socketIdCounter++
             
             socket.setEncoding "utf8"
             boltClientList.push socket          
@@ -73,13 +75,15 @@ class cloudflashbolt
                     cname = certObj.subject.CN                                
                     result.forwardingports = data.split(':')[1]
                     result.cname = cname
-                    result.clientaddr = socket.remoteAddress
-                    result.socketId = socket.id                    
+                    socket.name = cname
+                    #result.clientaddr = socket.remoteAddress
+                    result.sockName = cname 
+                    #result.socketId = socket.name                    
                     console.log 'cname result : ' + JSON.stringify result     
                     boltClientData.push result
                 else
                     # Handel response from webservice                    
-                    console.log 'socket.id: ' + socket.id
+                    console.log 'socket.name: ' + socket.name
                     respData = {}
                     respData.id  = socket.getPeerCertificate().subject.CN
                     respData.data = data
@@ -87,11 +91,11 @@ class cloudflashbolt
                     console.log "final res length in listener :" + clientResponse.length
 
             socket.addListener "close",  =>
-                console.log "bolt client is closed :" + socket.id                
+                console.log "bolt client is closed :" + socket.name                
                 boltClientDataTemp = []
                 console.log "bolt client list size before disconnect " + boltClientData.length
                 for clientData in boltClientData
-                    if clientData.socketId != socket.id
+                    if clientData.sockName != socket.name
                         boltClientDataTemp.push clientData
                 
                 boltClientData = boltClientDataTemp
@@ -100,10 +104,11 @@ class cloudflashbolt
         ).listen serverPort               
 
     #Method to forward equests to bolt clients
-    sendDataToClient: (request, callback) ->        
-        boltTarget = request.header('cloudflash-bolt-target')
-        boltTarget = boltTarget.split(":")[0]
-        if boltTarget
+    sendDataToClient: (request, callback) ->
+        #console.log 'request object server: ' + util.inspect(request)       
+        if request.header('cloudflash-bolt-target')
+                boltTarget = request.header('cloudflash-bolt-target')
+                boltTarget = boltTarget.split(":")[0]
                 entry = ''; serverRequest = {}
                 # check for cname existence
                 for clientData in boltClientData
@@ -113,25 +118,30 @@ class cloudflashbolt
                 # if cname exist process request   
                 if entry
                     for socket in boltClientList
-                        if socket.remoteAddress == entry.clientaddr
+                        #if socket.remoteAddress == entry.clientaddr
+                        if socket.name == entry.sockName
                             boltClientSocket = socket
                             console.log "client exists"
                             break
         
-                    console.log "server conn address :" + boltClientSocket.remoteAddress                   
-                    serverRequest.body = request.body
+                    console.log "server conn address :" + boltClientSocket.remoteAddress  
+                    if request.method == "POST" || request.method == "PUT"                 
+                        serverRequest.body = request.body
+                        serverRequest.header = request.header('content-type')
+                        serverRequest.length = request.header('Content-Length')
+                        if  request.header('Accept')
+                            serverRequest.accept = request.header('Accept')
+
+                    
                     serverRequest.path = request.path
                     serverRequest.method = request.method
-                    serverRequest.header = request.header('content-type')
                     serverRequest.target = request.header('cloudflash-bolt-target')
                     
-                    if serverRequest.header.search "application/json" == 0 
-                        boltClientSocket.write JSON.stringify(serverRequest)
-                    else
-                        boltClientSocket.write serverRequest
+                    boltClientSocket.write JSON.stringify(serverRequest)
+                      
                     
                     setTimeout (->
-                        console.log 'boltTarget id:' + boltClientSocket.id
+                        console.log 'boltTarget name:' + boltClientSocket.name
                         tempBuffer = []; result = new Error "delay in receiving response!"
                         console.log "final res length in settimeout :" + clientResponse.length
                         for res in clientResponse
@@ -143,7 +153,7 @@ class cloudflashbolt
                         console.log 'clientResponse: ' + JSON.stringify clientResponse
                         clientResponse = tempBuffer                        
                         callback result                        
-                    ), 1000
+                    ), 10000
                 else
                     return callback new Error "bolt cname entry not found!" 
         else
@@ -189,26 +199,33 @@ class cloudflashbolt
                     port: boltTargetPort
                     path: recvData.path
                     method: recvData.method
-                )                
-                request.setHeader("Content-Type",recvData.header)                
-                if recvData.body
+                )
+
+                if recvData.method == "POST" || recvData.method == "PUT" 
+                    request.setHeader("Content-Type",recvData.header)
+                    request.setHeader("Content-Length",recvData.length)
+                    if recvData.accept
+                        request.setHeader("Accept",recvData.accept)
+
                     if recvData.header.search "application/json" == 0 
                         request.write JSON.stringify(recvData.body)
                     else
                         request.write recvData.body              
 
+                
                 request.end()                
                 request.on "error", (err) ->
                     console.log "error: " + err                    
                     res.error = err                    
                     client.socket.write JSON.stringify(res)
-
+                #console.log 'request object client: ' + util.inspect(request)  
                 request.on "response", (response) ->                    
                     console.log "STATUS: " + response.statusCode
                     response.setEncoding "utf8"                    
                     response.on "data", (resFromCF) ->
                         console.log "response from cloudflash: " + resFromCF
                         if response.statusCode == 200 || response.statusCode == 204
+                            #console.log 'response object client: ' + util.inspect(response)  
                             client.socket.write resFromCF
                         else                            
                             res.error = resFromCF
