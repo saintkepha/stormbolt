@@ -4,6 +4,7 @@ fileops = require("fileops")
 http = require("http")
 boltjson = require('./boltutil')
 util = require('util')
+querystring = require('querystring')
 
 class cloudflashbolt
     
@@ -100,6 +101,16 @@ class cloudflashbolt
                 
                 boltClientData = boltClientDataTemp
                 console.log "bolt client list size after disconnect " + boltClientData.length                   
+
+                console.log "boltclientlist socket size before disconnect " + boltClientList.length
+                #remove socket data from local memory
+                boltClientListTemp = []
+                for socket1 in boltClientList
+                    if socket  != socket1
+                        boltClientListTemp.push socket1
+                
+                boltClientList = boltClientListTemp
+                console.log "boltclientlist socket size after disconnect " + boltClientList.length
                 
         ).listen serverPort               
 
@@ -125,9 +136,11 @@ class cloudflashbolt
                             break
         
                     console.log "server conn address :" + boltClientSocket.remoteAddress  
+                    console.log "request body :" + util.inspect(request.body)
                     if request.method == "POST" || request.method == "PUT"                 
                         serverRequest.body = request.body
-                        serverRequest.header = request.header('content-type')
+                        if request.header('content-type')
+                            serverRequest.header = request.header('content-type')
                         serverRequest.length = request.header('Content-Length')
                         if  request.header('Accept')
                             serverRequest.accept = request.header('Accept')
@@ -202,15 +215,17 @@ class cloudflashbolt
                 )
 
                 if recvData.method == "POST" || recvData.method == "PUT" 
-                    request.setHeader("Content-Type",recvData.header)
+                    if recvData.header
+                        request.setHeader("Content-Type",recvData.header)
                     request.setHeader("Content-Length",recvData.length)
                     if recvData.accept
                         request.setHeader("Accept",recvData.accept)
 
-                    if recvData.header.search "application/json" == 0 
+                    if recvData.header.indexOf("application/json") == 0 
                         request.write JSON.stringify(recvData.body)
                     else
-                        request.write recvData.body              
+                        console.log "http request data" + querystring.stringify(recvData.body)
+                        request.write querystring.stringify(recvData.body)
 
                 
                 request.end()                
@@ -221,6 +236,7 @@ class cloudflashbolt
                 #console.log 'request object client: ' + util.inspect(request)  
                 request.on "response", (response) ->                    
                     console.log "STATUS: " + response.statusCode
+                    console.log("HEADERS: " + JSON.stringify(response.headers))
                     response.setEncoding "utf8"                    
                     response.on "data", (resFromCF) ->
                         console.log "response from cloudflash: " + resFromCF
