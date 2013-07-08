@@ -141,7 +141,8 @@ class cloudflashbolt
                         serverRequest.length = request.header('Content-Length')
                         if  request.header('Accept')
                             serverRequest.accept = request.header('Accept')
-
+                        if  request.header('X-Auth-Token')
+                            serverRequest.authorization = request.header('X-Auth-Token')
                    
                     serverRequest.path = request.path
                     serverRequest.method = request.method
@@ -217,6 +218,8 @@ class cloudflashbolt
                     request.setHeader("Content-Length",recvData.length)
                     if recvData.accept
                         request.setHeader("Accept",recvData.accept)
+                    if recvData.authorization
+                        request.setHeader("X-Auth-Token",recvData.authorization)                    
 
                     if recvData.header.indexOf("application/json") == 0 
                         request.write JSON.stringify(recvData.body)
