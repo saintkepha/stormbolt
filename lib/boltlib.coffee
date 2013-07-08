@@ -10,7 +10,6 @@ class cloudflashbolt
     
     boltClientList = []; boltClientData = []; boltClientSocket = ''
     options = ''; clientResponse = []
-    #socketIdCounter = 0        
     client = this    
 
     constructor: ->
@@ -63,6 +62,7 @@ class cloudflashbolt
             #socket.id  = socketIdCounter++
             
             socket.setEncoding "utf8"
+            socket.setKeepAlive(true,1000)
             boltClientList.push socket          
             socket.addListener "data", (data) =>                               
                 console.log "connection from client :" + socket.remoteAddress
@@ -77,9 +77,7 @@ class cloudflashbolt
                     result.forwardingports = data.split(':')[1]
                     result.cname = cname
                     socket.name = cname
-                    #result.clientaddr = socket.remoteAddress
                     result.sockName = cname 
-                    #result.socketId = socket.name                    
                     console.log 'cname result : ' + JSON.stringify result     
                     boltClientData.push result
                 else
@@ -111,7 +109,7 @@ class cloudflashbolt
                 
                 boltClientList = boltClientListTemp
                 console.log "boltclientlist socket size after disconnect " + boltClientList.length
-                
+               
         ).listen serverPort               
 
     #Method to forward equests to bolt clients
@@ -129,14 +127,13 @@ class cloudflashbolt
                 # if cname exist process request   
                 if entry
                     for socket in boltClientList
-                        #if socket.remoteAddress == entry.clientaddr
                         if socket.name == entry.sockName
                             boltClientSocket = socket
                             console.log "client exists"
                             break
         
                     console.log "server conn address :" + boltClientSocket.remoteAddress  
-                    console.log "request body :" + util.inspect(request.body)
+                    #console.log "request body :" + util.inspect(request.body)
                     if request.method == "POST" || request.method == "PUT"                 
                         serverRequest.body = request.body
                         if request.header('content-type')
@@ -145,7 +142,7 @@ class cloudflashbolt
                         if  request.header('Accept')
                             serverRequest.accept = request.header('Accept')
 
-                    
+                   
                     serverRequest.path = request.path
                     serverRequest.method = request.method
                     serverRequest.target = request.header('cloudflash-bolt-target')
@@ -166,7 +163,7 @@ class cloudflashbolt
                         console.log 'clientResponse: ' + JSON.stringify clientResponse
                         clientResponse = tempBuffer                        
                         callback result                        
-                    ), 10000
+                    ), 1000
                 else
                     return callback new Error "bolt cname entry not found!" 
         else
@@ -239,7 +236,7 @@ class cloudflashbolt
                     console.log("HEADERS: " + JSON.stringify(response.headers))
                     response.setEncoding "utf8"                    
                     response.on "data", (resFromCF) ->
-                        console.log "response from cloudflash: " + resFromCF
+                        console.log "response from cloudflash: " + resFromCF 
                         if response.statusCode == 200 || response.statusCode == 204
                             #console.log 'response object client: ' + util.inspect(response)  
                             client.socket.write resFromCF
