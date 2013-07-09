@@ -164,7 +164,7 @@ class cloudflashbolt
                         console.log 'clientResponse: ' + JSON.stringify clientResponse
                         clientResponse = tempBuffer                        
                         callback result                        
-                    ), 1000
+                    ), 15000
                 else
                     return callback new Error "bolt cname entry not found!" 
         else
@@ -240,7 +240,7 @@ class cloudflashbolt
                     response.setEncoding "utf8"                    
                     response.on "data", (resFromCF) ->
                         console.log "response from cloudflash: " + resFromCF 
-                        if response.statusCode == 200 || response.statusCode == 204
+                        if response.statusCode == 200 || response.statusCode == 204 || response.statusCode == 202
                             #console.log 'response object client: ' + util.inspect(response)  
                             client.socket.write resFromCF
                         else                            
