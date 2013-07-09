@@ -143,6 +143,10 @@ class cloudflashbolt
                             serverRequest.accept = request.header('Accept')
                         if  request.header('X-Auth-Token')
                             serverRequest.authorization = request.header('X-Auth-Token')
+
+                    if request.method == "GET"
+                        if  request.header('X-Auth-Token')
+                            serverRequest.authorization = request.header('X-Auth-Token')
                    
                     serverRequest.path = request.path
                     serverRequest.method = request.method
@@ -227,6 +231,9 @@ class cloudflashbolt
                         console.log "http request data" + querystring.stringify(recvData.body)
                         request.write querystring.stringify(recvData.body)
 
+                if recvData.method == "GET"
+                    if recvData.authorization
+                        request.setHeader("X-Auth-Token",recvData.authorization)
                 
                 request.end()                
                 request.on "error", (err) ->
