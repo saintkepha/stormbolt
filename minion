@@ -1,0 +1,2876 @@
+2013-07-09 16:37:31,639 [salt             ][INFO    ] Setting up the Salt Minion "fd4c9349-dd07-41d9-b12e-0783dd5474e8"
+2013-07-09 16:37:31,652 [salt.utils.process    ][DEBUG   ] Created pidfile: /var/run/salt-minion.pid
+2013-07-09 16:37:31,653 [salt.utils.process    ][DEBUG   ] Chowned pidfile: /var/run/salt-minion.pid to user: root
+2013-07-09 16:37:31,653 [salt.config           ][DEBUG   ] Reading configuration from /etc/salt/minion
+2013-07-09 16:37:31,664 [salt.loader           ][DEBUG   ] loading grain in ['/var/cache/salt/minion/extmods/grains', '/usr/lib/python2.7/site-packages/salt/grains']
+2013-07-09 16:37:31,665 [salt.loader           ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/grains, it is not a directory
+2013-07-09 16:37:31,696 [salt.loaded.int.grain.core][DEBUG   ] Unexpected lspci output: '/bin/sh: lspci: not found'
+2013-07-09 16:37:31,696 [salt.loaded.int.grain.core][WARNING ] Error loading grains, unexpected linux_gpu_data output, check that you have a valid shell configured and permissions to run lspci command
+2013-07-09 16:37:31,708 [salt.minion           ][DEBUG   ] Attempting to authenticate with the Salt Master at 192.168.253.3
+2013-07-09 16:37:31,709 [salt.crypt            ][INFO    ] Generating keys: /etc/salt/pki/minion
+2013-07-09 16:37:39,164 [salt.crypt            ][DEBUG   ] Decrypting the current master AES key
+2013-07-09 16:37:39,165 [salt.crypt            ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 16:37:39,444 [salt.minion           ][INFO    ] Authentication with master successful!
+2013-07-09 16:37:39,445 [salt.crypt            ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 16:37:39,550 [salt.crypt            ][DEBUG   ] Decrypting the current master AES key
+2013-07-09 16:37:39,551 [salt.crypt            ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 16:37:40,217 [salt.crypt            ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 16:37:40,512 [salt.config           ][DEBUG   ] Reading configuration from /etc/salt/minion
+2013-07-09 16:37:40,515 [salt.loader           ][DEBUG   ] loading grain in ['/var/cache/salt/minion/extmods/grains', '/usr/lib/python2.7/site-packages/salt/grains']
+2013-07-09 16:37:40,515 [salt.loader           ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/grains, it is not a directory
+2013-07-09 16:37:40,520 [salt.loaded.int.grain.core][DEBUG   ] Unexpected lspci output: '/bin/sh: lspci: not found'
+2013-07-09 16:37:40,520 [salt.loaded.int.grain.core][WARNING ] Error loading grains, unexpected linux_gpu_data output, check that you have a valid shell configured and permissions to run lspci command
+2013-07-09 16:37:40,529 [salt.loader           ][DEBUG   ] loading module in ['/var/cache/salt/minion/extmods/modules', '/usr/lib/python2.7/site-packages/salt/modules']
+2013-07-09 16:37:40,529 [salt.loader           ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/modules, it is not a directory
+2013-07-09 16:37:40,673 [salt.loader                          ][DEBUG   ] Loaded localemod as virtual locale
+2013-07-09 16:37:40,674 [salt.loader                          ][DEBUG   ] Loaded groupadd as virtual group
+2013-07-09 16:37:40,676 [salt.loader                          ][DEBUG   ] Loaded linux_sysctl as virtual sysctl
+2013-07-09 16:37:40,688 [salt.loader                          ][DEBUG   ] Loaded parted as virtual partition
+2013-07-09 16:37:40,689 [salt.loader                          ][DEBUG   ] Loaded sysmod as virtual sys
+2013-07-09 16:37:40,691 [salt.loader                          ][DEBUG   ] Loaded useradd as virtual user
+2013-07-09 16:37:40,701 [salt.loader                          ][DEBUG   ] Loaded djangomod as virtual django
+2013-07-09 16:37:40,704 [salt.loader                          ][DEBUG   ] Loaded cmdmod as virtual cmd
+2013-07-09 16:37:40,708 [salt.loader                          ][DEBUG   ] loading returner in ['/var/cache/salt/minion/extmods/returners', '/usr/lib/python2.7/site-packages/salt/returners']
+2013-07-09 16:37:40,708 [salt.loader                          ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/returners, it is not a directory
+2013-07-09 16:37:40,735 [salt.loader                                 ][DEBUG   ] Loaded syslog_return as virtual syslog
+2013-07-09 16:37:40,735 [salt.loader                                 ][DEBUG   ] Loaded carbon_return as virtual carbon
+2013-07-09 16:37:40,736 [salt.minion                                 ][INFO    ] Minion is starting as user 'root'
+2013-07-09 16:37:40,736 [salt.minion                                 ][DEBUG   ] Minion "fd4c9349-dd07-41d9-b12e-0783dd5474e8" trying to tune in
+2013-07-09 16:37:40,736 [salt.minion                                 ][DEBUG   ] Minion PUB socket URI: ipc:///var/run/salt/minion/minion_event_89e4e358afd4fb02464e13295b36c736_pub.ipc
+2013-07-09 16:37:40,736 [salt.minion                                 ][DEBUG   ] Minion PULL socket URI: ipc:///var/run/salt/minion/minion_event_89e4e358afd4fb02464e13295b36c736_pull.ipc
+2013-07-09 16:37:40,751 [salt.utils.schedule                         ][DEBUG   ] Running scheduled job: __mine_interval
+2013-07-09 16:37:40,757 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command 'ps -efH' in directory '/'
+2013-07-09 16:37:40,767 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 16:37:40,770 [salt.loaded.int.module.cmdmod               ][DEBUG   ] output: ps: invalid option -- e
+BusyBox v1.17.2 (2013-07-09 22:27:53 UTC) multi-call binary.
+
+Usage: ps 
+
+Show list of processes
+
+Options:
+	w	Wide output
+2013-07-09 16:37:40,772 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 16:37:40,877 [salt.crypt                                  ][DEBUG   ] Decrypting the current master AES key
+2013-07-09 16:37:40,878 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 16:38:50,847 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 16:38:50,954 [salt.crypt                                  ][DEBUG   ] Decrypting the current master AES key
+2013-07-09 16:38:50,955 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 16:38:51,509 [salt.config                                 ][DEBUG   ] Reading configuration from /etc/salt/minion
+2013-07-09 16:38:51,512 [salt.loader                                 ][DEBUG   ] loading grain in ['/var/cache/salt/minion/extmods/grains', '/usr/lib/python2.7/site-packages/salt/grains']
+2013-07-09 16:38:51,513 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/grains, it is not a directory
+2013-07-09 16:38:51,520 [salt.loaded.int.grain.core                  ][DEBUG   ] Unexpected lspci output: '/bin/sh: lspci: not found'
+2013-07-09 16:38:51,520 [salt.loaded.int.grain.core                  ][WARNING ] Error loading grains, unexpected linux_gpu_data output, check that you have a valid shell configured and permissions to run lspci command
+2013-07-09 16:38:51,529 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 16:38:51,636 [salt.crypt                                  ][DEBUG   ] Decrypting the current master AES key
+2013-07-09 16:38:51,636 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 16:38:52,330 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 16:38:52,615 [salt.state                                  ][INFO    ] Loading fresh modules for state activity
+2013-07-09 16:38:52,615 [salt.loader                                 ][DEBUG   ] loading module in ['/var/cache/salt/minion/extmods/modules', '/usr/lib/python2.7/site-packages/salt/modules']
+2013-07-09 16:38:52,615 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/modules, it is not a directory
+2013-07-09 16:38:52,659 [salt.loader                                 ][DEBUG   ] Loaded localemod as virtual locale
+2013-07-09 16:38:52,660 [salt.loader                                 ][DEBUG   ] Loaded groupadd as virtual group
+2013-07-09 16:38:52,663 [salt.loader                                 ][DEBUG   ] Loaded linux_sysctl as virtual sysctl
+2013-07-09 16:38:52,675 [salt.loader                                 ][DEBUG   ] Loaded parted as virtual partition
+2013-07-09 16:38:52,676 [salt.loader                                 ][DEBUG   ] Loaded sysmod as virtual sys
+2013-07-09 16:38:52,678 [salt.loader                                 ][DEBUG   ] Loaded useradd as virtual user
+2013-07-09 16:38:52,689 [salt.loader                                 ][DEBUG   ] Loaded djangomod as virtual django
+2013-07-09 16:38:52,692 [salt.loader                                 ][DEBUG   ] Loaded cmdmod as virtual cmd
+2013-07-09 16:38:52,702 [salt.loader                                 ][DEBUG   ] loading states in ['/var/cache/salt/minion/extmods/states', '/usr/lib/python2.7/site-packages/salt/states']
+2013-07-09 16:38:52,703 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/states, it is not a directory
+2013-07-09 16:38:52,719 [salt.loader                                 ][DEBUG   ] loading render in ['/var/cache/salt/minion/extmods/renderers', '/usr/lib/python2.7/site-packages/salt/renderers']
+2013-07-09 16:38:52,719 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/renderers, it is not a directory
+2013-07-09 16:38:52,738 [salt.loader                                 ][DEBUG   ] loading module in ['/var/cache/salt/minion/extmods/modules', '/usr/lib/python2.7/site-packages/salt/modules']
+2013-07-09 16:38:52,738 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/modules, it is not a directory
+2013-07-09 16:38:52,775 [salt.loader                                 ][DEBUG   ] Loaded localemod as virtual locale
+2013-07-09 16:38:52,775 [salt.loader                                 ][DEBUG   ] Loaded groupadd as virtual group
+2013-07-09 16:38:52,778 [salt.loader                                 ][DEBUG   ] Loaded linux_sysctl as virtual sysctl
+2013-07-09 16:38:52,790 [salt.loader                                 ][DEBUG   ] Loaded parted as virtual partition
+2013-07-09 16:38:52,792 [salt.loader                                 ][DEBUG   ] Loaded sysmod as virtual sys
+2013-07-09 16:38:52,794 [salt.loader                                 ][DEBUG   ] Loaded useradd as virtual user
+2013-07-09 16:38:52,804 [salt.loader                                 ][DEBUG   ] Loaded djangomod as virtual django
+2013-07-09 16:38:52,807 [salt.loader                                 ][DEBUG   ] Loaded cmdmod as virtual cmd
+2013-07-09 16:38:52,818 [salt.fileclient                             ][INFO    ] Fetching file 'salt://top.sls'
+2013-07-09 16:38:52,825 [salt.utils.jinja                            ][DEBUG   ] Jinja search path: '['/var/cache/salt/minion/files/base']'
+2013-07-09 16:38:52,831 [salt.template                               ][DEBUG   ] Rendered data from file: /var/cache/salt/minion/files/base/top.sls:
+base:
+  'os:cloudnode':
+    - match: grain
+    - cloudflash_node
+  'os:Ubuntu':
+    - match: grain
+    - cloudflash_ubuntu
+
+2013-07-09 16:38:52,836 [salt.minion                                 ][DEBUG   ] grains target: os:Ubuntu
+2013-07-09 16:38:52,837 [salt.minion                                 ][DEBUG   ] grains target: os:cloudnode
+2013-07-09 16:38:52,841 [root                                        ][DEBUG   ] Syncing all
+2013-07-09 16:38:52,842 [salt.loaded.int.module.saltutil             ][INFO    ] Creating module dir '/var/cache/salt/minion/extmods/modules'
+2013-07-09 16:38:52,842 [salt.loaded.int.module.saltutil             ][INFO    ] Syncing modules for environment 'base'
+2013-07-09 16:38:52,842 [salt.loaded.int.module.saltutil             ][INFO    ] Loading cache from salt://_modules, for base)
+2013-07-09 16:38:52,844 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 16:38:52,952 [salt.crypt                                  ][DEBUG   ] Decrypting the current master AES key
+2013-07-09 16:38:52,953 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 16:38:53,501 [salt.fileclient                             ][INFO    ] Caching directory '_modules/' for environment 'base'
+2013-07-09 16:38:53,505 [salt.fileclient                             ][INFO    ] Fetching file 'salt://_modules/cmd_minion.py'
+2013-07-09 16:38:53,510 [salt.loaded.int.module.saltutil             ][DEBUG   ] Local cache dir: '/var/cache/salt/minion/files/base/_modules'
+2013-07-09 16:38:53,510 [salt.loaded.int.module.saltutil             ][INFO    ] Copying '/var/cache/salt/minion/files/base/_modules/cmd_minion.py' to '/var/cache/salt/minion/extmods/modules/cmd_minion.py'
+2013-07-09 16:38:53,511 [salt.loaded.int.module.saltutil             ][INFO    ] Creating module dir '/var/cache/salt/minion/extmods/states'
+2013-07-09 16:38:53,511 [salt.loaded.int.module.saltutil             ][INFO    ] Syncing states for environment 'base'
+2013-07-09 16:38:53,511 [salt.loaded.int.module.saltutil             ][INFO    ] Loading cache from salt://_states, for base)
+2013-07-09 16:38:53,512 [salt.fileclient                             ][INFO    ] Caching directory '_states/' for environment 'base'
+2013-07-09 16:38:53,515 [salt.loaded.int.module.saltutil             ][DEBUG   ] Local cache dir: '/var/cache/salt/minion/files/base/_states'
+2013-07-09 16:38:53,515 [salt.loaded.int.module.saltutil             ][INFO    ] Creating module dir '/var/cache/salt/minion/extmods/grains'
+2013-07-09 16:38:53,515 [salt.loaded.int.module.saltutil             ][INFO    ] Syncing grains for environment 'base'
+2013-07-09 16:38:53,516 [salt.loaded.int.module.saltutil             ][INFO    ] Loading cache from salt://_grains, for base)
+2013-07-09 16:38:53,516 [salt.fileclient                             ][INFO    ] Caching directory '_grains/' for environment 'base'
+2013-07-09 16:38:53,519 [salt.loaded.int.module.saltutil             ][DEBUG   ] Local cache dir: '/var/cache/salt/minion/files/base/_grains'
+2013-07-09 16:38:53,520 [salt.loaded.int.module.saltutil             ][INFO    ] Creating module dir '/var/cache/salt/minion/extmods/renderers'
+2013-07-09 16:38:53,520 [salt.loaded.int.module.saltutil             ][INFO    ] Syncing renderers for environment 'base'
+2013-07-09 16:38:53,520 [salt.loaded.int.module.saltutil             ][INFO    ] Loading cache from salt://_renderers, for base)
+2013-07-09 16:38:53,520 [salt.fileclient                             ][INFO    ] Caching directory '_renderers/' for environment 'base'
+2013-07-09 16:38:53,523 [salt.loaded.int.module.saltutil             ][DEBUG   ] Local cache dir: '/var/cache/salt/minion/files/base/_renderers'
+2013-07-09 16:38:53,524 [salt.loaded.int.module.saltutil             ][INFO    ] Creating module dir '/var/cache/salt/minion/extmods/returners'
+2013-07-09 16:38:53,524 [salt.loaded.int.module.saltutil             ][INFO    ] Syncing returners for environment 'base'
+2013-07-09 16:38:53,524 [salt.loaded.int.module.saltutil             ][INFO    ] Loading cache from salt://_returners, for base)
+2013-07-09 16:38:53,524 [salt.fileclient                             ][INFO    ] Caching directory '_returners/' for environment 'base'
+2013-07-09 16:38:53,528 [salt.loaded.int.module.saltutil             ][DEBUG   ] Local cache dir: '/var/cache/salt/minion/files/base/_returners'
+2013-07-09 16:38:53,528 [salt.loaded.int.module.saltutil             ][INFO    ] Creating module dir '/var/cache/salt/minion/extmods/outputters'
+2013-07-09 16:38:53,528 [salt.loaded.int.module.saltutil             ][INFO    ] Syncing outputters for environment 'base'
+2013-07-09 16:38:53,529 [salt.loaded.int.module.saltutil             ][INFO    ] Loading cache from salt://_outputters, for base)
+2013-07-09 16:38:53,529 [salt.fileclient                             ][INFO    ] Caching directory '_outputters/' for environment 'base'
+2013-07-09 16:38:53,533 [salt.loaded.int.module.saltutil             ][DEBUG   ] Local cache dir: '/var/cache/salt/minion/files/base/_outputters'
+2013-07-09 16:38:53,533 [salt.utils.event                            ][DEBUG   ] MinionEvent PUB socket URI: ipc:///var/run/salt/minion/minion_event_89e4e358afd4fb02464e13295b36c736_pub.ipc
+2013-07-09 16:38:53,534 [salt.utils.event                            ][DEBUG   ] MinionEvent PULL socket URI: ipc:///var/run/salt/minion/minion_event_89e4e358afd4fb02464e13295b36c736_pull.ipc
+2013-07-09 16:38:53,535 [salt.state                                  ][INFO    ] Loading fresh modules for state activity
+2013-07-09 16:38:53,535 [salt.loader                                 ][DEBUG   ] loading module in ['/var/cache/salt/minion/extmods/modules', '/usr/lib/python2.7/site-packages/salt/modules']
+2013-07-09 16:38:53,579 [salt.loader                                 ][DEBUG   ] Loaded localemod as virtual locale
+2013-07-09 16:38:53,580 [salt.loader                                 ][DEBUG   ] Loaded groupadd as virtual group
+2013-07-09 16:38:53,583 [salt.loader                                 ][DEBUG   ] Loaded linux_sysctl as virtual sysctl
+2013-07-09 16:38:53,595 [salt.loader                                 ][DEBUG   ] Loaded parted as virtual partition
+2013-07-09 16:38:53,597 [salt.loader                                 ][DEBUG   ] Loaded sysmod as virtual sys
+2013-07-09 16:38:53,599 [salt.loader                                 ][DEBUG   ] Loaded useradd as virtual user
+2013-07-09 16:38:53,610 [salt.loader                                 ][DEBUG   ] Loaded djangomod as virtual django
+2013-07-09 16:38:53,612 [salt.loader                                 ][DEBUG   ] Loaded cmdmod as virtual cmd
+2013-07-09 16:38:53,623 [salt.loader                                 ][DEBUG   ] loading states in ['/var/cache/salt/minion/extmods/states', '/usr/lib/python2.7/site-packages/salt/states']
+2013-07-09 16:38:53,623 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/states, it is not a directory
+2013-07-09 16:38:53,638 [salt.loader                                 ][DEBUG   ] loading render in ['/var/cache/salt/minion/extmods/renderers', '/usr/lib/python2.7/site-packages/salt/renderers']
+2013-07-09 16:38:53,638 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/renderers, it is not a directory
+2013-07-09 16:38:53,643 [salt.fileclient                             ][INFO    ] Fetching file 'salt://cloudflash_node.sls'
+2013-07-09 16:38:53,649 [salt.utils.jinja                            ][DEBUG   ] Jinja search path: '['/var/cache/salt/minion/files/base']'
+2013-07-09 16:38:53,651 [salt.template                               ][DEBUG   ] Rendered data from file: /var/cache/salt/minion/files/base/cloudflash_node.sls:
+saltutil.sync_grains:
+  module.run:
+      - order: 1
+
+include:
+    - nodejs
+    - nodemon
+    - cloudflash-bolt
+
+cloudflash:
+  npm:
+    - installed
+    - require:
+      - pkg: nodejs
+      - npm: nodemon
+      - npm: cloudflash-bolt
+
+check_for_coffee:
+  cmd.run:
+    - name: echo foo > /tmp/.test
+    - require:
+      - npm: cloudflash
+    - unless: ps | grep app.coffee | grep -v grep
+ 
+cmd_minion.start_cloudflash:
+  module.wait:
+    - require:
+      - npm: cloudflash
+    - watch:
+      - cmd: check_for_coffee
+
+2013-07-09 16:38:53,664 [salt.fileclient                             ][INFO    ] Fetching file 'salt://nodejs.sls'
+2013-07-09 16:38:53,670 [salt.utils.jinja                            ][DEBUG   ] Jinja search path: '['/var/cache/salt/minion/files/base']'
+2013-07-09 16:38:53,671 [salt.template                               ][DEBUG   ] Rendered data from file: /var/cache/salt/minion/files/base/nodejs.sls:
+nodejs:
+  pkg:
+    - installed
+    - skip_verify: True 
+    - name: 
+       - require:
+          - pkg: nodejs
+
+2013-07-09 16:38:53,675 [salt.fileclient                             ][INFO    ] Fetching file 'salt://nodemon.sls'
+2013-07-09 16:38:53,681 [salt.utils.jinja                            ][DEBUG   ] Jinja search path: '['/var/cache/salt/minion/files/base']'
+2013-07-09 16:38:53,683 [salt.template                               ][DEBUG   ] Rendered data from file: /var/cache/salt/minion/files/base/nodemon.sls:
+include:
+ - nodemonignore
+
+nodemon:
+  npm:
+    - installed
+
+ulimit -n 9000:
+ cmd.run:
+   - require_in:
+     - npm: nodemon 
+
+
+echo 9000 > /proc/sys/fs/inotify/max_user_instances:
+ cmd.run:
+   - require_in:
+     - npm: nodemon
+
+2013-07-09 16:38:53,693 [salt.fileclient                             ][INFO    ] Fetching file 'salt://nodemonignore.sls'
+2013-07-09 16:38:53,699 [salt.utils.jinja                            ][DEBUG   ] Jinja search path: '['/var/cache/salt/minion/files/base']'
+2013-07-09 16:38:53,700 [salt.template                               ][DEBUG   ] Rendered data from file: /var/cache/salt/minion/files/base/nodemonignore.sls:
+/lib/node_modules/.nodemonignore:      
+  file:                       
+    - managed             
+    - source: salt://.nodemonignore
+    - require_in:            
+      - npm: nodemon       
+
+2013-07-09 16:38:53,703 [salt.fileclient                             ][INFO    ] Fetching file 'salt://cloudflash-bolt.sls'
+2013-07-09 16:38:53,709 [salt.utils.jinja                            ][DEBUG   ] Jinja search path: '['/var/cache/salt/minion/files/base']'
+2013-07-09 16:38:53,711 [salt.template                               ][DEBUG   ] Rendered data from file: /var/cache/salt/minion/files/base/cloudflash-bolt.sls:
+include:
+    - nodejs
+    - bolt_json
+
+cloudflash-bolt:
+  npm:
+    - installed
+    - require:
+      - pkg: nodejs
+
+check_for_bolt_coffee:
+  cmd.run:
+    - name: echo foo > /tmp/.test
+    - require:
+      - npm: cloudflash-bolt
+    - unless: ps | grep app.coffee | grep -v grep
+ 
+cmd_minion.start_cloudflash_bolt:
+  module.wait:
+    - require:
+      - npm: cloudflash-bolt
+    - watch:
+      - cmd: check_for_bolt_coffee
+
+2013-07-09 16:38:53,723 [salt.fileclient                             ][INFO    ] Fetching file 'salt://bolt_json.sls'
+2013-07-09 16:38:53,729 [salt.utils.jinja                            ][DEBUG   ] Jinja search path: '['/var/cache/salt/minion/files/base']'
+2013-07-09 16:38:53,730 [salt.template                               ][DEBUG   ] Rendered data from file: /var/cache/salt/minion/files/base/bolt_json.sls:
+/etc/bolt/bolt.json:      
+  file:                       
+    - managed             
+    - source: salt://bolt.json
+    - require_in:            
+      - npm: cloudflash-bolt       
+
+2013-07-09 16:38:53,737 [salt.state                                  ][INFO    ] Executing state module.run for saltutil.sync_grains
+2013-07-09 16:38:53,738 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 16:38:53,845 [salt.crypt                                  ][DEBUG   ] Decrypting the current master AES key
+2013-07-09 16:38:53,846 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 16:38:53,886 [salt.config                                 ][DEBUG   ] Reading configuration from /etc/salt/minion
+2013-07-09 16:38:53,888 [salt.loader                                 ][DEBUG   ] loading grain in ['/var/cache/salt/minion/extmods/grains', '/usr/lib/python2.7/site-packages/salt/grains']
+2013-07-09 16:38:53,888 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/grains, it is not a directory
+2013-07-09 16:38:53,902 [salt.loaded.int.grain.core                  ][DEBUG   ] Unexpected lspci output: '/bin/sh: lspci: not found'
+2013-07-09 16:38:53,902 [salt.loaded.int.grain.core                  ][WARNING ] Error loading grains, unexpected linux_gpu_data output, check that you have a valid shell configured and permissions to run lspci command
+2013-07-09 16:38:53,915 [salt.loader                                 ][DEBUG   ] loading module in ['/var/cache/salt/minion/extmods/modules', '/usr/lib/python2.7/site-packages/salt/modules']
+2013-07-09 16:38:53,997 [salt.loader                                 ][DEBUG   ] Loaded localemod as virtual locale
+2013-07-09 16:38:54,002 [salt.loader                                 ][DEBUG   ] Loaded groupadd as virtual group
+2013-07-09 16:38:54,004 [salt.loader                                 ][DEBUG   ] Loaded linux_sysctl as virtual sysctl
+2013-07-09 16:38:54,028 [salt.loader                                 ][DEBUG   ] Loaded parted as virtual partition
+2013-07-09 16:38:54,034 [salt.loader                                 ][DEBUG   ] Loaded sysmod as virtual sys
+2013-07-09 16:38:54,037 [salt.loader                                 ][DEBUG   ] Loaded useradd as virtual user
+2013-07-09 16:38:54,059 [salt.loader                                 ][DEBUG   ] Loaded djangomod as virtual django
+2013-07-09 16:38:54,066 [salt.loader                                 ][DEBUG   ] Loaded cmdmod as virtual cmd
+2013-07-09 16:38:54,085 [salt.loader                                 ][DEBUG   ] loading returner in ['/var/cache/salt/minion/extmods/returners', '/usr/lib/python2.7/site-packages/salt/returners']
+2013-07-09 16:38:54,085 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/returners, it is not a directory
+2013-07-09 16:38:54,092 [salt.loader                                 ][DEBUG   ] Loaded syslog_return as virtual syslog
+2013-07-09 16:38:54,093 [salt.loader                                 ][DEBUG   ] Loaded carbon_return as virtual carbon
+2013-07-09 16:38:54,513 [salt.config                                 ][DEBUG   ] Reading configuration from /etc/salt/minion
+2013-07-09 16:38:54,517 [salt.loader                                 ][DEBUG   ] loading grain in ['/var/cache/salt/minion/extmods/grains', '/usr/lib/python2.7/site-packages/salt/grains']
+2013-07-09 16:38:54,517 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/grains, it is not a directory
+2013-07-09 16:38:54,525 [salt.loaded.int.grain.core                  ][DEBUG   ] Unexpected lspci output: '/bin/sh: lspci: not found'
+2013-07-09 16:38:54,525 [salt.loaded.int.grain.core                  ][WARNING ] Error loading grains, unexpected linux_gpu_data output, check that you have a valid shell configured and permissions to run lspci command
+2013-07-09 16:38:54,534 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 16:38:54,643 [salt.crypt                                  ][DEBUG   ] Decrypting the current master AES key
+2013-07-09 16:38:54,644 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 16:38:55,289 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 16:38:55,569 [salt.state                                  ][INFO    ] Loading fresh modules for state activity
+2013-07-09 16:38:55,570 [salt.loader                                 ][DEBUG   ] loading module in ['/var/cache/salt/minion/extmods/modules', '/usr/lib/python2.7/site-packages/salt/modules']
+2013-07-09 16:38:55,612 [salt.loader                                 ][DEBUG   ] Loaded localemod as virtual locale
+2013-07-09 16:38:55,612 [salt.loader                                 ][DEBUG   ] Loaded groupadd as virtual group
+2013-07-09 16:38:55,615 [salt.loader                                 ][DEBUG   ] Loaded linux_sysctl as virtual sysctl
+2013-07-09 16:38:55,627 [salt.loader                                 ][DEBUG   ] Loaded parted as virtual partition
+2013-07-09 16:38:55,628 [salt.loader                                 ][DEBUG   ] Loaded sysmod as virtual sys
+2013-07-09 16:38:55,631 [salt.loader                                 ][DEBUG   ] Loaded useradd as virtual user
+2013-07-09 16:38:55,641 [salt.loader                                 ][DEBUG   ] Loaded djangomod as virtual django
+2013-07-09 16:38:55,643 [salt.loader                                 ][DEBUG   ] Loaded cmdmod as virtual cmd
+2013-07-09 16:38:55,654 [salt.loader                                 ][DEBUG   ] loading states in ['/var/cache/salt/minion/extmods/states', '/usr/lib/python2.7/site-packages/salt/states']
+2013-07-09 16:38:55,654 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/states, it is not a directory
+2013-07-09 16:38:55,669 [salt.loader                                 ][DEBUG   ] loading render in ['/var/cache/salt/minion/extmods/renderers', '/usr/lib/python2.7/site-packages/salt/renderers']
+2013-07-09 16:38:55,669 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/renderers, it is not a directory
+2013-07-09 16:38:55,673 [salt.loader                                 ][DEBUG   ] loading module in ['/var/cache/salt/minion/extmods/modules', '/usr/lib/python2.7/site-packages/salt/modules']
+2013-07-09 16:38:55,711 [salt.loader                                 ][DEBUG   ] Loaded localemod as virtual locale
+2013-07-09 16:38:55,712 [salt.loader                                 ][DEBUG   ] Loaded groupadd as virtual group
+2013-07-09 16:38:55,715 [salt.loader                                 ][DEBUG   ] Loaded linux_sysctl as virtual sysctl
+2013-07-09 16:38:55,726 [salt.loader                                 ][DEBUG   ] Loaded parted as virtual partition
+2013-07-09 16:38:55,728 [salt.loader                                 ][DEBUG   ] Loaded sysmod as virtual sys
+2013-07-09 16:38:55,730 [salt.loader                                 ][DEBUG   ] Loaded useradd as virtual user
+2013-07-09 16:38:55,740 [salt.loader                                 ][DEBUG   ] Loaded djangomod as virtual django
+2013-07-09 16:38:55,743 [salt.loader                                 ][DEBUG   ] Loaded cmdmod as virtual cmd
+2013-07-09 16:38:55,754 [salt.fileclient                             ][INFO    ] Fetching file 'salt://top.sls'
+2013-07-09 16:38:55,760 [salt.utils.jinja                            ][DEBUG   ] Jinja search path: '['/var/cache/salt/minion/files/base']'
+2013-07-09 16:38:55,762 [salt.template                               ][DEBUG   ] Rendered data from file: /var/cache/salt/minion/files/base/top.sls:
+base:
+  'os:cloudnode':
+    - match: grain
+    - cloudflash_node
+  'os:Ubuntu':
+    - match: grain
+    - cloudflash_ubuntu
+
+2013-07-09 16:38:55,765 [salt.minion                                 ][DEBUG   ] grains target: os:Ubuntu
+2013-07-09 16:38:55,766 [salt.minion                                 ][DEBUG   ] grains target: os:cloudnode
+2013-07-09 16:38:55,770 [salt.loaded.int.module.saltutil             ][INFO    ] Creating module dir '/var/cache/salt/minion/extmods/grains'
+2013-07-09 16:38:55,770 [salt.loaded.int.module.saltutil             ][INFO    ] Syncing grains for environment 'base'
+2013-07-09 16:38:55,770 [salt.loaded.int.module.saltutil             ][INFO    ] Loading cache from salt://_grains, for base)
+2013-07-09 16:38:55,772 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 16:38:55,880 [salt.crypt                                  ][DEBUG   ] Decrypting the current master AES key
+2013-07-09 16:38:55,881 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 16:38:56,430 [salt.fileclient                             ][INFO    ] Caching directory '_grains/' for environment 'base'
+2013-07-09 16:38:56,437 [salt.loaded.int.module.saltutil             ][DEBUG   ] Local cache dir: '/var/cache/salt/minion/files/base/_grains'
+2013-07-09 16:38:56,438 [salt.utils.event                            ][DEBUG   ] MinionEvent PUB socket URI: ipc:///var/run/salt/minion/minion_event_89e4e358afd4fb02464e13295b36c736_pub.ipc
+2013-07-09 16:38:56,438 [salt.utils.event                            ][DEBUG   ] MinionEvent PULL socket URI: ipc:///var/run/salt/minion/minion_event_89e4e358afd4fb02464e13295b36c736_pull.ipc
+2013-07-09 16:38:56,439 [salt.state                                  ][INFO    ] No changes made for saltutil.sync_grains
+2013-07-09 16:38:56,439 [salt.state                                  ][INFO    ] Executing state cmd.run for echo 9000 > /proc/sys/fs/inotify/max_user_instances
+2013-07-09 16:38:56,440 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command 'echo 9000 > /proc/sys/fs/inotify/max_user_instances' in directory '/'
+2013-07-09 16:38:56,443 [salt.state                                  ][INFO    ] {'pid': 4550, 'retcode': 0, 'stderr': '', 'stdout': ''}
+2013-07-09 16:38:56,444 [salt.state                                  ][INFO    ] Executing state pkg.installed for nodejs
+2013-07-09 16:38:56,445 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command "dpkg-query --showformat='${Status} ${Package} ${Version}\n' -W" in directory '/'
+2013-07-09 16:38:56,450 [salt.loaded.int.module.cmdmod               ][DEBUG   ] stdout: install ok installed apt 0.9.7.2
+install ok installed bouncer 0.0.0
+install ok installed busybox 1.17.2
+install ok installed condexec 0.1.1
+install ok installed curl 7.27.0
+install ok installed dirwatch 0.1
+install ok installed dpkg 1.15.8.12
+install ok installed dropbear 0.51
+install ok installed gettext 0.18.1.1
+install ok installed gmp 4.3.2
+install ok installed ifplugd 0.28
+install ok installed iproute2 2.6.26
+install ok installed iptables 1.4.2
+install ok installed jailer 0.1
+install ok installed libiconv 1.14
+install ok installed ntp 4.2.4p5
+install ok installed openssl 1.0.1c
+install ok installed ppp 2.4.5
+install ok installed uclibc 0.9.32
+install ok installed udev 167
+install ok installed zlib 1.2.3
+2013-07-09 16:38:56,451 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command 'apt-get -q update' in directory '/'
+2013-07-09 16:38:56,480 [salt.loaded.int.module.cmdmod               ][DEBUG   ] stdout: Ign http://repo.dev.intercloud.net cloudnode InRelease
+Ign http://repo.dev.intercloud.net cloudnode Release.gpg
+Ign http://repo.dev.intercloud.net cloudnode Release
+Ign http://repo.dev.intercloud.net cloudnode/release i386 Packages/DiffIndex
+Hit http://repo.dev.intercloud.net cloudnode/release i386 Packages
+Ign http://repo.dev.intercloud.net cloudnode/release Translation-en
+Reading package lists...
+2013-07-09 16:38:56,480 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command "dpkg-query --showformat='${Status} ${Package} ${Version}\n' -W" in directory '/'
+2013-07-09 16:38:56,486 [salt.loaded.int.module.cmdmod               ][DEBUG   ] stdout: install ok installed apt 0.9.7.2
+install ok installed bouncer 0.0.0
+install ok installed busybox 1.17.2
+install ok installed condexec 0.1.1
+install ok installed curl 7.27.0
+install ok installed dirwatch 0.1
+install ok installed dpkg 1.15.8.12
+install ok installed dropbear 0.51
+install ok installed gettext 0.18.1.1
+install ok installed gmp 4.3.2
+install ok installed ifplugd 0.28
+install ok installed iproute2 2.6.26
+install ok installed iptables 1.4.2
+install ok installed jailer 0.1
+install ok installed libiconv 1.14
+install ok installed ntp 4.2.4p5
+install ok installed openssl 1.0.1c
+install ok installed ppp 2.4.5
+install ok installed uclibc 0.9.32
+install ok installed udev 167
+install ok installed zlib 1.2.3
+2013-07-09 16:38:56,488 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command 'apt-get -q -y -o DPkg::Options::=--force-confold -o DPkg::Options::=--force-confdef --allow-unauthenticated  install nodejs' in directory '/'
+2013-07-09 16:38:56,730 [salt.loaded.int.module.cmdmod               ][ERROR   ] Command 'apt-get -q -y -o DPkg::Options::=--force-confold -o DPkg::Options::=--force-confdef --allow-unauthenticated  install nodejs' failed with return code: 100
+2013-07-09 16:38:56,730 [salt.loaded.int.module.cmdmod               ][ERROR   ] stdout: Reading package lists...
+Building dependency tree...
+The following NEW packages will be installed:
+  nodejs
+0 upgraded, 1 newly installed, 0 to remove and 1 not upgraded.
+Need to get 3038 kB of archives.
+After this operation, 11.2 MB of additional disk space will be used.
+WARNING: The following packages cannot be authenticated!
+  nodejs
+Authentication warning overridden.
+Get:1 http://repo.dev.intercloud.net/ cloudnode/release nodejs i386 0.6.19 [3038 kB]
+Fetched 3038 kB in 0s (14.2 MB/s)
+2013-07-09 16:38:56,731 [salt.loaded.int.module.cmdmod               ][ERROR   ] stderr: dpkg: warning: 'start-stop-daemon' not found in PATH or not executable.
+dpkg: 1 expected program not found in PATH or not executable.
+NB: root's PATH should usually contain /usr/local/sbin, /usr/sbin and /sbin.
+E: Sub-process /usr/bin/dpkg returned an error code (2)
+2013-07-09 16:38:56,731 [salt.loaded.int.rawmodule.apt               ][ERROR   ] Error:  dpkg: warning: 'start-stop-daemon' not found in PATH or not executable.
+dpkg: 1 expected program not found in PATH or not executable.
+NB: root's PATH should usually contain /usr/local/sbin, /usr/sbin and /sbin.
+E: Sub-process /usr/bin/dpkg returned an error code (2)
+2013-07-09 16:38:56,731 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command "dpkg-query --showformat='${Status} ${Package} ${Version}\n' -W" in directory '/'
+2013-07-09 16:38:56,737 [salt.loaded.int.module.cmdmod               ][DEBUG   ] stdout: install ok installed apt 0.9.7.2
+install ok installed bouncer 0.0.0
+install ok installed busybox 1.17.2
+install ok installed condexec 0.1.1
+install ok installed curl 7.27.0
+install ok installed dirwatch 0.1
+install ok installed dpkg 1.15.8.12
+install ok installed dropbear 0.51
+install ok installed gettext 0.18.1.1
+install ok installed gmp 4.3.2
+install ok installed ifplugd 0.28
+install ok installed iproute2 2.6.26
+install ok installed iptables 1.4.2
+install ok installed jailer 0.1
+install ok installed libiconv 1.14
+install ok installed ntp 4.2.4p5
+install ok installed openssl 1.0.1c
+install ok installed ppp 2.4.5
+install ok installed uclibc 0.9.32
+install ok installed udev 167
+install ok installed zlib 1.2.3
+2013-07-09 16:38:56,737 [salt.state                                  ][ERROR   ] No changes made for nodejs
+2013-07-09 16:38:56,738 [salt.state                                  ][INFO    ] Executing state file.managed for /etc/bolt/bolt.json
+2013-07-09 16:38:56,742 [salt.fileclient                             ][INFO    ] Fetching file 'salt://bolt.json'
+2013-07-09 16:38:56,748 [salt.state                                  ][INFO    ] File changed:
+New file
+2013-07-09 16:38:56,753 [salt.state                                  ][INFO    ] Executing state cmd.run for ulimit -n 9000
+2013-07-09 16:38:56,754 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command 'ulimit -n 9000' in directory '/'
+2013-07-09 16:38:56,756 [salt.state                                  ][INFO    ] {'pid': 4573, 'retcode': 0, 'stderr': '', 'stdout': ''}
+2013-07-09 16:38:56,757 [salt.state                                  ][INFO    ] Executing state file.managed for /lib/node_modules/.nodemonignore
+2013-07-09 16:38:56,760 [salt.fileclient                             ][INFO    ] Fetching file 'salt://.nodemonignore'
+2013-07-09 16:38:56,767 [salt.state                                  ][INFO    ] File changed:
+New file
+2013-07-09 16:38:56,768 [salt.state                                  ][INFO    ] Executing state npm.installed for nodemon
+2013-07-09 16:38:56,768 [salt.state                                  ][ERROR   ] No changes made for nodemon
+2013-07-09 16:38:56,775 [salt.minion                                 ][INFO    ] Returning information for job: req
+2013-07-09 16:38:57,274 [salt.config                                 ][DEBUG   ] Reading configuration from /etc/salt/minion
+2013-07-09 16:38:57,278 [salt.loader                                 ][DEBUG   ] loading grain in ['/var/cache/salt/minion/extmods/grains', '/usr/lib/python2.7/site-packages/salt/grains']
+2013-07-09 16:38:57,279 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/grains, it is not a directory
+2013-07-09 16:38:57,285 [salt.loaded.int.grain.core                  ][DEBUG   ] Unexpected lspci output: '/bin/sh: lspci: not found'
+2013-07-09 16:38:57,286 [salt.loaded.int.grain.core                  ][WARNING ] Error loading grains, unexpected linux_gpu_data output, check that you have a valid shell configured and permissions to run lspci command
+2013-07-09 16:38:57,294 [salt.loader                                 ][DEBUG   ] loading module in ['/var/cache/salt/minion/extmods/modules', '/usr/lib/python2.7/site-packages/salt/modules']
+2013-07-09 16:38:57,335 [salt.loader                                 ][DEBUG   ] Loaded localemod as virtual locale
+2013-07-09 16:38:57,336 [salt.loader                                 ][DEBUG   ] Loaded groupadd as virtual group
+2013-07-09 16:38:57,339 [salt.loader                                 ][DEBUG   ] Loaded linux_sysctl as virtual sysctl
+2013-07-09 16:38:57,350 [salt.loader                                 ][DEBUG   ] Loaded parted as virtual partition
+2013-07-09 16:38:57,352 [salt.loader                                 ][DEBUG   ] Loaded sysmod as virtual sys
+2013-07-09 16:38:57,354 [salt.loader                                 ][DEBUG   ] Loaded useradd as virtual user
+2013-07-09 16:38:57,364 [salt.loader                                 ][DEBUG   ] Loaded djangomod as virtual django
+2013-07-09 16:38:57,367 [salt.loader                                 ][DEBUG   ] Loaded cmdmod as virtual cmd
+2013-07-09 16:38:57,378 [salt.loader                                 ][DEBUG   ] loading returner in ['/var/cache/salt/minion/extmods/returners', '/usr/lib/python2.7/site-packages/salt/returners']
+2013-07-09 16:38:57,378 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/returners, it is not a directory
+2013-07-09 16:38:57,382 [salt.loader                                 ][DEBUG   ] Loaded syslog_return as virtual syslog
+2013-07-09 16:38:57,382 [salt.loader                                 ][DEBUG   ] Loaded carbon_return as virtual carbon
+2013-07-09 17:06:07,734 [salt.minion                                 ][INFO    ] User sudo_sbusa Executing command test.ping with jid 20130710000607726686
+2013-07-09 17:06:07,735 [salt.minion                                 ][DEBUG   ] Command details {'tgt_type': 'glob', 'jid': '20130710000607726686', 'tgt': '*', 'ret': '', 'user': 'sudo_sbusa', 'arg': [], 'fun': 'test.ping'}
+2013-07-09 17:06:07,740 [salt.minion                                 ][INFO    ] Returning information for job: 20130710000607726686
+2013-07-09 17:09:22,840 [salt.minion                                 ][INFO    ] User sudo_sbusa Executing command test.ping with jid 20130710000922836400
+2013-07-09 17:09:22,841 [salt.minion                                 ][DEBUG   ] Command details {'tgt_type': 'glob', 'jid': '20130710000922836400', 'tgt': '*', 'ret': '', 'user': 'sudo_sbusa', 'arg': [], 'fun': 'test.ping'}
+2013-07-09 17:09:22,850 [salt.minion                                 ][INFO    ] Returning information for job: 20130710000922836400
+2013-07-09 17:12:37,950 [salt.minion                                 ][INFO    ] User sudo_sbusa Executing command test.ping with jid 20130710001237947128
+2013-07-09 17:12:37,950 [salt.minion                                 ][DEBUG   ] Command details {'tgt_type': 'glob', 'jid': '20130710001237947128', 'tgt': '*', 'ret': '', 'user': 'sudo_sbusa', 'arg': [], 'fun': 'test.ping'}
+2013-07-09 17:12:37,955 [salt.minion                                 ][INFO    ] Returning information for job: 20130710001237947128
+2013-07-09 17:15:53,076 [salt.minion                                 ][INFO    ] User sudo_sbusa Executing command test.ping with jid 20130710001553073963
+2013-07-09 17:15:53,077 [salt.minion                                 ][DEBUG   ] Command details {'tgt_type': 'glob', 'jid': '20130710001553073963', 'tgt': '*', 'ret': '', 'user': 'sudo_sbusa', 'arg': [], 'fun': 'test.ping'}
+2013-07-09 17:15:53,083 [salt.minion                                 ][INFO    ] Returning information for job: 20130710001553073963
+2013-07-09 17:37:40,003 [salt.utils.schedule                         ][DEBUG   ] Running scheduled job: __mine_interval
+2013-07-09 17:37:40,014 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 17:37:40,123 [salt.crypt                                  ][DEBUG   ] Decrypting the current master AES key
+2013-07-09 17:37:40,124 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 17:42:05,659 [salt             ][INFO    ] Setting up the Salt Minion "fd4c9349-dd07-41d9-b12e-0783dd5474e8"
+2013-07-09 17:42:05,673 [salt.utils.process    ][DEBUG   ] Created pidfile: /var/run/salt-minion.pid
+2013-07-09 17:42:05,673 [salt.utils.process    ][DEBUG   ] Chowned pidfile: /var/run/salt-minion.pid to user: root
+2013-07-09 17:42:05,673 [salt.config           ][DEBUG   ] Reading configuration from /etc/salt/minion
+2013-07-09 17:42:05,684 [salt.loader           ][DEBUG   ] loading grain in ['/var/cache/salt/minion/extmods/grains', '/usr/lib/python2.7/site-packages/salt/grains']
+2013-07-09 17:42:05,684 [salt.loader           ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/grains, it is not a directory
+2013-07-09 17:42:05,705 [salt.loaded.int.grain.core][DEBUG   ] Unexpected lspci output: '/bin/ash: lspci: not found'
+2013-07-09 17:42:05,705 [salt.loaded.int.grain.core][WARNING ] Error loading grains, unexpected linux_gpu_data output, check that you have a valid shell configured and permissions to run lspci command
+2013-07-09 17:42:05,727 [salt.minion           ][DEBUG   ] Attempting to authenticate with the Salt Master at 192.168.253.3
+2013-07-09 17:42:05,728 [salt.crypt            ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 17:42:05,842 [salt.crypt            ][DEBUG   ] Decrypting the current master AES key
+2013-07-09 17:42:05,843 [salt.crypt            ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 17:42:06,387 [salt.minion           ][INFO    ] Authentication with master successful!
+2013-07-09 17:42:06,389 [salt.crypt            ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 17:42:06,498 [salt.crypt            ][DEBUG   ] Decrypting the current master AES key
+2013-07-09 17:42:06,499 [salt.crypt            ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 17:42:07,150 [salt.crypt            ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 17:42:07,425 [salt.config           ][DEBUG   ] Reading configuration from /etc/salt/minion
+2013-07-09 17:42:07,427 [salt.loader           ][DEBUG   ] loading grain in ['/var/cache/salt/minion/extmods/grains', '/usr/lib/python2.7/site-packages/salt/grains']
+2013-07-09 17:42:07,428 [salt.loader           ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/grains, it is not a directory
+2013-07-09 17:42:07,433 [salt.loaded.int.grain.core][DEBUG   ] Unexpected lspci output: '/bin/ash: lspci: not found'
+2013-07-09 17:42:07,433 [salt.loaded.int.grain.core][WARNING ] Error loading grains, unexpected linux_gpu_data output, check that you have a valid shell configured and permissions to run lspci command
+2013-07-09 17:42:07,445 [salt.loader           ][DEBUG   ] loading module in ['/var/cache/salt/minion/extmods/modules', '/usr/lib/python2.7/site-packages/salt/modules']
+2013-07-09 17:42:07,512 [salt.loader                          ][DEBUG   ] Loaded localemod as virtual locale
+2013-07-09 17:42:07,513 [salt.loader                          ][DEBUG   ] Loaded groupadd as virtual group
+2013-07-09 17:42:07,516 [salt.loader                          ][DEBUG   ] Loaded linux_sysctl as virtual sysctl
+2013-07-09 17:42:07,527 [salt.loader                          ][DEBUG   ] Loaded parted as virtual partition
+2013-07-09 17:42:07,529 [salt.loader                          ][DEBUG   ] Loaded sysmod as virtual sys
+2013-07-09 17:42:07,531 [salt.loader                          ][DEBUG   ] Loaded useradd as virtual user
+2013-07-09 17:42:07,541 [salt.loader                          ][DEBUG   ] Loaded djangomod as virtual django
+2013-07-09 17:42:07,544 [salt.loader                          ][DEBUG   ] Loaded cmdmod as virtual cmd
+2013-07-09 17:42:07,548 [salt.loader                          ][DEBUG   ] loading returner in ['/var/cache/salt/minion/extmods/returners', '/usr/lib/python2.7/site-packages/salt/returners']
+2013-07-09 17:42:07,548 [salt.loader                          ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/returners, it is not a directory
+2013-07-09 17:42:07,557 [salt.loader                                 ][DEBUG   ] Loaded syslog_return as virtual syslog
+2013-07-09 17:42:07,557 [salt.loader                                 ][DEBUG   ] Loaded carbon_return as virtual carbon
+2013-07-09 17:42:07,558 [salt.minion                                 ][INFO    ] Minion is starting as user 'snap-admin'
+2013-07-09 17:42:07,558 [salt.minion                                 ][DEBUG   ] Minion "fd4c9349-dd07-41d9-b12e-0783dd5474e8" trying to tune in
+2013-07-09 17:42:07,558 [salt.minion                                 ][DEBUG   ] Minion PUB socket URI: ipc:///var/run/salt/minion/minion_event_89e4e358afd4fb02464e13295b36c736_pub.ipc
+2013-07-09 17:42:07,559 [salt.minion                                 ][DEBUG   ] Minion PULL socket URI: ipc:///var/run/salt/minion/minion_event_89e4e358afd4fb02464e13295b36c736_pull.ipc
+2013-07-09 17:42:07,567 [salt.utils.schedule                         ][DEBUG   ] Running scheduled job: __mine_interval
+2013-07-09 17:42:07,573 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command 'ps -efH' in directory '/'
+2013-07-09 17:42:07,579 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 17:42:07,586 [salt.loaded.int.module.cmdmod               ][DEBUG   ] output: ps: invalid option -- e
+BusyBox v1.17.2 (2013-07-09 22:27:53 UTC) multi-call binary.
+
+Usage: ps 
+
+Show list of processes
+
+Options:
+	w	Wide output
+2013-07-09 17:42:07,588 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 17:42:07,689 [salt.crypt                                  ][DEBUG   ] Decrypting the current master AES key
+2013-07-09 17:42:07,690 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 17:43:17,667 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 17:43:17,778 [salt.crypt                                  ][DEBUG   ] Decrypting the current master AES key
+2013-07-09 17:43:17,779 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 17:43:18,337 [salt.config                                 ][DEBUG   ] Reading configuration from /etc/salt/minion
+2013-07-09 17:43:18,341 [salt.loader                                 ][DEBUG   ] loading grain in ['/var/cache/salt/minion/extmods/grains', '/usr/lib/python2.7/site-packages/salt/grains']
+2013-07-09 17:43:18,341 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/grains, it is not a directory
+2013-07-09 17:43:18,348 [salt.loaded.int.grain.core                  ][DEBUG   ] Unexpected lspci output: '/bin/ash: lspci: not found'
+2013-07-09 17:43:18,349 [salt.loaded.int.grain.core                  ][WARNING ] Error loading grains, unexpected linux_gpu_data output, check that you have a valid shell configured and permissions to run lspci command
+2013-07-09 17:43:18,363 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 17:43:18,475 [salt.crypt                                  ][DEBUG   ] Decrypting the current master AES key
+2013-07-09 17:43:18,476 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 17:43:19,120 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 17:43:19,395 [salt.state                                  ][INFO    ] Loading fresh modules for state activity
+2013-07-09 17:43:19,396 [salt.loader                                 ][DEBUG   ] loading module in ['/var/cache/salt/minion/extmods/modules', '/usr/lib/python2.7/site-packages/salt/modules']
+2013-07-09 17:43:19,439 [salt.loader                                 ][DEBUG   ] Loaded localemod as virtual locale
+2013-07-09 17:43:19,440 [salt.loader                                 ][DEBUG   ] Loaded groupadd as virtual group
+2013-07-09 17:43:19,443 [salt.loader                                 ][DEBUG   ] Loaded linux_sysctl as virtual sysctl
+2013-07-09 17:43:19,455 [salt.loader                                 ][DEBUG   ] Loaded parted as virtual partition
+2013-07-09 17:43:19,456 [salt.loader                                 ][DEBUG   ] Loaded sysmod as virtual sys
+2013-07-09 17:43:19,459 [salt.loader                                 ][DEBUG   ] Loaded useradd as virtual user
+2013-07-09 17:43:19,469 [salt.loader                                 ][DEBUG   ] Loaded djangomod as virtual django
+2013-07-09 17:43:19,472 [salt.loader                                 ][DEBUG   ] Loaded cmdmod as virtual cmd
+2013-07-09 17:43:19,483 [salt.loader                                 ][DEBUG   ] loading states in ['/var/cache/salt/minion/extmods/states', '/usr/lib/python2.7/site-packages/salt/states']
+2013-07-09 17:43:19,483 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/states, it is not a directory
+2013-07-09 17:43:19,499 [salt.loader                                 ][DEBUG   ] loading render in ['/var/cache/salt/minion/extmods/renderers', '/usr/lib/python2.7/site-packages/salt/renderers']
+2013-07-09 17:43:19,499 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/renderers, it is not a directory
+2013-07-09 17:43:19,509 [salt.loader                                 ][DEBUG   ] loading module in ['/var/cache/salt/minion/extmods/modules', '/usr/lib/python2.7/site-packages/salt/modules']
+2013-07-09 17:43:19,547 [salt.loader                                 ][DEBUG   ] Loaded localemod as virtual locale
+2013-07-09 17:43:19,548 [salt.loader                                 ][DEBUG   ] Loaded groupadd as virtual group
+2013-07-09 17:43:19,551 [salt.loader                                 ][DEBUG   ] Loaded linux_sysctl as virtual sysctl
+2013-07-09 17:43:19,563 [salt.loader                                 ][DEBUG   ] Loaded parted as virtual partition
+2013-07-09 17:43:19,565 [salt.loader                                 ][DEBUG   ] Loaded sysmod as virtual sys
+2013-07-09 17:43:19,567 [salt.loader                                 ][DEBUG   ] Loaded useradd as virtual user
+2013-07-09 17:43:19,578 [salt.loader                                 ][DEBUG   ] Loaded djangomod as virtual django
+2013-07-09 17:43:19,580 [salt.loader                                 ][DEBUG   ] Loaded cmdmod as virtual cmd
+2013-07-09 17:43:19,591 [salt.fileclient                             ][INFO    ] Fetching file 'salt://top.sls'
+2013-07-09 17:43:19,597 [salt.utils.jinja                            ][DEBUG   ] Jinja search path: '['/var/cache/salt/minion/files/base']'
+2013-07-09 17:43:19,604 [salt.template                               ][DEBUG   ] Rendered data from file: /var/cache/salt/minion/files/base/top.sls:
+base:
+  'os:cloudnode':
+    - match: grain
+    - cloudflash_node
+  'os:Ubuntu':
+    - match: grain
+    - cloudflash_ubuntu
+
+2013-07-09 17:43:19,608 [salt.minion                                 ][DEBUG   ] grains target: os:Ubuntu
+2013-07-09 17:43:19,608 [salt.minion                                 ][DEBUG   ] grains target: os:cloudnode
+2013-07-09 17:43:19,612 [root                                        ][DEBUG   ] Syncing all
+2013-07-09 17:43:19,613 [salt.loaded.int.module.saltutil             ][INFO    ] Syncing modules for environment 'base'
+2013-07-09 17:43:19,613 [salt.loaded.int.module.saltutil             ][INFO    ] Loading cache from salt://_modules, for base)
+2013-07-09 17:43:19,614 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 17:43:19,720 [salt.crypt                                  ][DEBUG   ] Decrypting the current master AES key
+2013-07-09 17:43:19,720 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 17:43:20,268 [salt.fileclient                             ][INFO    ] Caching directory '_modules/' for environment 'base'
+2013-07-09 17:43:20,274 [salt.fileclient                             ][INFO    ] Fetching file 'salt://_modules/cmd_minion.py'
+2013-07-09 17:43:20,279 [salt.loaded.int.module.saltutil             ][DEBUG   ] Local cache dir: '/var/cache/salt/minion/files/base/_modules'
+2013-07-09 17:43:20,280 [salt.loaded.int.module.saltutil             ][INFO    ] Copying '/var/cache/salt/minion/files/base/_modules/cmd_minion.py' to '/var/cache/salt/minion/extmods/modules/cmd_minion.py'
+2013-07-09 17:43:20,280 [salt.loaded.int.module.saltutil             ][INFO    ] Creating module dir '/var/cache/salt/minion/extmods/states'
+2013-07-09 17:43:20,280 [salt.loaded.int.module.saltutil             ][INFO    ] Syncing states for environment 'base'
+2013-07-09 17:43:20,280 [salt.loaded.int.module.saltutil             ][INFO    ] Loading cache from salt://_states, for base)
+2013-07-09 17:43:20,281 [salt.fileclient                             ][INFO    ] Caching directory '_states/' for environment 'base'
+2013-07-09 17:43:20,284 [salt.loaded.int.module.saltutil             ][DEBUG   ] Local cache dir: '/var/cache/salt/minion/files/base/_states'
+2013-07-09 17:43:20,284 [salt.loaded.int.module.saltutil             ][INFO    ] Creating module dir '/var/cache/salt/minion/extmods/grains'
+2013-07-09 17:43:20,285 [salt.loaded.int.module.saltutil             ][INFO    ] Syncing grains for environment 'base'
+2013-07-09 17:43:20,285 [salt.loaded.int.module.saltutil             ][INFO    ] Loading cache from salt://_grains, for base)
+2013-07-09 17:43:20,285 [salt.fileclient                             ][INFO    ] Caching directory '_grains/' for environment 'base'
+2013-07-09 17:43:20,289 [salt.loaded.int.module.saltutil             ][DEBUG   ] Local cache dir: '/var/cache/salt/minion/files/base/_grains'
+2013-07-09 17:43:20,290 [salt.loaded.int.module.saltutil             ][INFO    ] Creating module dir '/var/cache/salt/minion/extmods/renderers'
+2013-07-09 17:43:20,290 [salt.loaded.int.module.saltutil             ][INFO    ] Syncing renderers for environment 'base'
+2013-07-09 17:43:20,291 [salt.loaded.int.module.saltutil             ][INFO    ] Loading cache from salt://_renderers, for base)
+2013-07-09 17:43:20,291 [salt.fileclient                             ][INFO    ] Caching directory '_renderers/' for environment 'base'
+2013-07-09 17:43:20,295 [salt.loaded.int.module.saltutil             ][DEBUG   ] Local cache dir: '/var/cache/salt/minion/files/base/_renderers'
+2013-07-09 17:43:20,296 [salt.loaded.int.module.saltutil             ][INFO    ] Creating module dir '/var/cache/salt/minion/extmods/returners'
+2013-07-09 17:43:20,296 [salt.loaded.int.module.saltutil             ][INFO    ] Syncing returners for environment 'base'
+2013-07-09 17:43:20,296 [salt.loaded.int.module.saltutil             ][INFO    ] Loading cache from salt://_returners, for base)
+2013-07-09 17:43:20,297 [salt.fileclient                             ][INFO    ] Caching directory '_returners/' for environment 'base'
+2013-07-09 17:43:20,301 [salt.loaded.int.module.saltutil             ][DEBUG   ] Local cache dir: '/var/cache/salt/minion/files/base/_returners'
+2013-07-09 17:43:20,301 [salt.loaded.int.module.saltutil             ][INFO    ] Creating module dir '/var/cache/salt/minion/extmods/outputters'
+2013-07-09 17:43:20,302 [salt.loaded.int.module.saltutil             ][INFO    ] Syncing outputters for environment 'base'
+2013-07-09 17:43:20,302 [salt.loaded.int.module.saltutil             ][INFO    ] Loading cache from salt://_outputters, for base)
+2013-07-09 17:43:20,302 [salt.fileclient                             ][INFO    ] Caching directory '_outputters/' for environment 'base'
+2013-07-09 17:43:20,306 [salt.loaded.int.module.saltutil             ][DEBUG   ] Local cache dir: '/var/cache/salt/minion/files/base/_outputters'
+2013-07-09 17:43:20,307 [salt.utils.event                            ][DEBUG   ] MinionEvent PUB socket URI: ipc:///var/run/salt/minion/minion_event_89e4e358afd4fb02464e13295b36c736_pub.ipc
+2013-07-09 17:43:20,307 [salt.utils.event                            ][DEBUG   ] MinionEvent PULL socket URI: ipc:///var/run/salt/minion/minion_event_89e4e358afd4fb02464e13295b36c736_pull.ipc
+2013-07-09 17:43:20,308 [salt.state                                  ][INFO    ] Loading fresh modules for state activity
+2013-07-09 17:43:20,308 [salt.loader                                 ][DEBUG   ] loading module in ['/var/cache/salt/minion/extmods/modules', '/usr/lib/python2.7/site-packages/salt/modules']
+2013-07-09 17:43:20,347 [salt.loader                                 ][DEBUG   ] Loaded localemod as virtual locale
+2013-07-09 17:43:20,348 [salt.loader                                 ][DEBUG   ] Loaded groupadd as virtual group
+2013-07-09 17:43:20,351 [salt.loader                                 ][DEBUG   ] Loaded linux_sysctl as virtual sysctl
+2013-07-09 17:43:20,363 [salt.loader                                 ][DEBUG   ] Loaded parted as virtual partition
+2013-07-09 17:43:20,365 [salt.loader                                 ][DEBUG   ] Loaded sysmod as virtual sys
+2013-07-09 17:43:20,367 [salt.loader                                 ][DEBUG   ] Loaded useradd as virtual user
+2013-07-09 17:43:20,378 [salt.loader                                 ][DEBUG   ] Loaded djangomod as virtual django
+2013-07-09 17:43:20,381 [salt.loader                                 ][DEBUG   ] Loaded cmdmod as virtual cmd
+2013-07-09 17:43:20,392 [salt.loader                                 ][DEBUG   ] loading states in ['/var/cache/salt/minion/extmods/states', '/usr/lib/python2.7/site-packages/salt/states']
+2013-07-09 17:43:20,392 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/states, it is not a directory
+2013-07-09 17:43:20,408 [salt.loader                                 ][DEBUG   ] loading render in ['/var/cache/salt/minion/extmods/renderers', '/usr/lib/python2.7/site-packages/salt/renderers']
+2013-07-09 17:43:20,408 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/renderers, it is not a directory
+2013-07-09 17:43:20,413 [salt.fileclient                             ][INFO    ] Fetching file 'salt://cloudflash_node.sls'
+2013-07-09 17:43:20,419 [salt.utils.jinja                            ][DEBUG   ] Jinja search path: '['/var/cache/salt/minion/files/base']'
+2013-07-09 17:43:20,421 [salt.template                               ][DEBUG   ] Rendered data from file: /var/cache/salt/minion/files/base/cloudflash_node.sls:
+saltutil.sync_grains:
+  module.run:
+      - order: 1
+
+include:
+    - nodejs
+    - nodemon
+    - cloudflash-bolt
+
+cloudflash:
+  npm:
+    - installed
+    - require:
+      - pkg: nodejs
+      - npm: nodemon
+      - npm: cloudflash-bolt
+
+check_for_coffee:
+  cmd.run:
+    - name: echo foo > /tmp/.test
+    - require:
+      - npm: cloudflash
+    - unless: ps | grep app.coffee | grep -v grep
+ 
+cmd_minion.start_cloudflash:
+  module.wait:
+    - require:
+      - npm: cloudflash
+    - watch:
+      - cmd: check_for_coffee
+
+2013-07-09 17:43:20,432 [salt.fileclient                             ][INFO    ] Fetching file 'salt://nodejs.sls'
+2013-07-09 17:43:20,438 [salt.utils.jinja                            ][DEBUG   ] Jinja search path: '['/var/cache/salt/minion/files/base']'
+2013-07-09 17:43:20,439 [salt.template                               ][DEBUG   ] Rendered data from file: /var/cache/salt/minion/files/base/nodejs.sls:
+nodejs:
+  pkg:
+    - installed
+    - skip_verify: True 
+    - name: 
+       - require:
+          - pkg: nodejs
+
+2013-07-09 17:43:20,444 [salt.fileclient                             ][INFO    ] Fetching file 'salt://nodemon.sls'
+2013-07-09 17:43:20,449 [salt.utils.jinja                            ][DEBUG   ] Jinja search path: '['/var/cache/salt/minion/files/base']'
+2013-07-09 17:43:20,451 [salt.template                               ][DEBUG   ] Rendered data from file: /var/cache/salt/minion/files/base/nodemon.sls:
+include:
+ - nodemonignore
+
+nodemon:
+  npm:
+    - installed
+
+ulimit -n 9000:
+ cmd.run:
+   - require_in:
+     - npm: nodemon 
+
+
+echo 9000 > /proc/sys/fs/inotify/max_user_instances:
+ cmd.run:
+   - require_in:
+     - npm: nodemon
+
+2013-07-09 17:43:20,457 [salt.fileclient                             ][INFO    ] Fetching file 'salt://nodemonignore.sls'
+2013-07-09 17:43:20,462 [salt.utils.jinja                            ][DEBUG   ] Jinja search path: '['/var/cache/salt/minion/files/base']'
+2013-07-09 17:43:20,464 [salt.template                               ][DEBUG   ] Rendered data from file: /var/cache/salt/minion/files/base/nodemonignore.sls:
+/lib/node_modules/.nodemonignore:      
+  file:                       
+    - managed             
+    - source: salt://.nodemonignore
+    - require_in:            
+      - npm: nodemon       
+
+2013-07-09 17:43:20,468 [salt.fileclient                             ][INFO    ] Fetching file 'salt://cloudflash-bolt.sls'
+2013-07-09 17:43:20,473 [salt.utils.jinja                            ][DEBUG   ] Jinja search path: '['/var/cache/salt/minion/files/base']'
+2013-07-09 17:43:20,474 [salt.template                               ][DEBUG   ] Rendered data from file: /var/cache/salt/minion/files/base/cloudflash-bolt.sls:
+include:
+    - nodejs
+    - bolt_json
+
+cloudflash-bolt:
+  npm:
+    - installed
+    - require:
+      - pkg: nodejs
+
+check_for_bolt_coffee:
+  cmd.run:
+    - name: echo foo > /tmp/.test
+    - require:
+      - npm: cloudflash-bolt
+    - unless: ps | grep app.coffee | grep -v grep
+ 
+cmd_minion.start_cloudflash_bolt:
+  module.wait:
+    - require:
+      - npm: cloudflash-bolt
+    - watch:
+      - cmd: check_for_bolt_coffee
+
+2013-07-09 17:43:20,484 [salt.fileclient                             ][INFO    ] Fetching file 'salt://bolt_json.sls'
+2013-07-09 17:43:20,488 [salt.utils.jinja                            ][DEBUG   ] Jinja search path: '['/var/cache/salt/minion/files/base']'
+2013-07-09 17:43:20,489 [salt.template                               ][DEBUG   ] Rendered data from file: /var/cache/salt/minion/files/base/bolt_json.sls:
+/etc/bolt/bolt.json:      
+  file:                       
+    - managed             
+    - source: salt://bolt.json
+    - require_in:            
+      - npm: cloudflash-bolt       
+
+2013-07-09 17:43:20,494 [salt.state                                  ][INFO    ] Executing state module.run for saltutil.sync_grains
+2013-07-09 17:43:20,495 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 17:43:20,597 [salt.crypt                                  ][DEBUG   ] Decrypting the current master AES key
+2013-07-09 17:43:20,598 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 17:43:20,701 [salt.config                                 ][DEBUG   ] Reading configuration from /etc/salt/minion
+2013-07-09 17:43:20,704 [salt.loader                                 ][DEBUG   ] loading grain in ['/var/cache/salt/minion/extmods/grains', '/usr/lib/python2.7/site-packages/salt/grains']
+2013-07-09 17:43:20,704 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/grains, it is not a directory
+2013-07-09 17:43:20,722 [salt.loaded.int.grain.core                  ][DEBUG   ] Unexpected lspci output: '/bin/ash: lspci: not found'
+2013-07-09 17:43:20,722 [salt.loaded.int.grain.core                  ][WARNING ] Error loading grains, unexpected linux_gpu_data output, check that you have a valid shell configured and permissions to run lspci command
+2013-07-09 17:43:20,745 [salt.loader                                 ][DEBUG   ] loading module in ['/var/cache/salt/minion/extmods/modules', '/usr/lib/python2.7/site-packages/salt/modules']
+2013-07-09 17:43:20,829 [salt.loader                                 ][DEBUG   ] Loaded localemod as virtual locale
+2013-07-09 17:43:20,834 [salt.loader                                 ][DEBUG   ] Loaded groupadd as virtual group
+2013-07-09 17:43:20,837 [salt.loader                                 ][DEBUG   ] Loaded linux_sysctl as virtual sysctl
+2013-07-09 17:43:20,861 [salt.loader                                 ][DEBUG   ] Loaded parted as virtual partition
+2013-07-09 17:43:20,867 [salt.loader                                 ][DEBUG   ] Loaded sysmod as virtual sys
+2013-07-09 17:43:20,873 [salt.loader                                 ][DEBUG   ] Loaded useradd as virtual user
+2013-07-09 17:43:20,891 [salt.loader                                 ][DEBUG   ] Loaded djangomod as virtual django
+2013-07-09 17:43:20,898 [salt.loader                                 ][DEBUG   ] Loaded cmdmod as virtual cmd
+2013-07-09 17:43:20,922 [salt.loader                                 ][DEBUG   ] loading returner in ['/var/cache/salt/minion/extmods/returners', '/usr/lib/python2.7/site-packages/salt/returners']
+2013-07-09 17:43:20,922 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/returners, it is not a directory
+2013-07-09 17:43:20,929 [salt.loader                                 ][DEBUG   ] Loaded syslog_return as virtual syslog
+2013-07-09 17:43:20,930 [salt.loader                                 ][DEBUG   ] Loaded carbon_return as virtual carbon
+2013-07-09 17:43:21,267 [salt.config                                 ][DEBUG   ] Reading configuration from /etc/salt/minion
+2013-07-09 17:43:21,269 [salt.loader                                 ][DEBUG   ] loading grain in ['/var/cache/salt/minion/extmods/grains', '/usr/lib/python2.7/site-packages/salt/grains']
+2013-07-09 17:43:21,270 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/grains, it is not a directory
+2013-07-09 17:43:21,279 [salt.loaded.int.grain.core                  ][DEBUG   ] Unexpected lspci output: '/bin/ash: lspci: not found'
+2013-07-09 17:43:21,279 [salt.loaded.int.grain.core                  ][WARNING ] Error loading grains, unexpected linux_gpu_data output, check that you have a valid shell configured and permissions to run lspci command
+2013-07-09 17:43:21,295 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 17:43:21,404 [salt.crypt                                  ][DEBUG   ] Decrypting the current master AES key
+2013-07-09 17:43:21,405 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 17:43:22,057 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 17:43:22,348 [salt.state                                  ][INFO    ] Loading fresh modules for state activity
+2013-07-09 17:43:22,348 [salt.loader                                 ][DEBUG   ] loading module in ['/var/cache/salt/minion/extmods/modules', '/usr/lib/python2.7/site-packages/salt/modules']
+2013-07-09 17:43:22,392 [salt.loader                                 ][DEBUG   ] Loaded localemod as virtual locale
+2013-07-09 17:43:22,392 [salt.loader                                 ][DEBUG   ] Loaded groupadd as virtual group
+2013-07-09 17:43:22,395 [salt.loader                                 ][DEBUG   ] Loaded linux_sysctl as virtual sysctl
+2013-07-09 17:43:22,407 [salt.loader                                 ][DEBUG   ] Loaded parted as virtual partition
+2013-07-09 17:43:22,409 [salt.loader                                 ][DEBUG   ] Loaded sysmod as virtual sys
+2013-07-09 17:43:22,411 [salt.loader                                 ][DEBUG   ] Loaded useradd as virtual user
+2013-07-09 17:43:22,422 [salt.loader                                 ][DEBUG   ] Loaded djangomod as virtual django
+2013-07-09 17:43:22,425 [salt.loader                                 ][DEBUG   ] Loaded cmdmod as virtual cmd
+2013-07-09 17:43:22,436 [salt.loader                                 ][DEBUG   ] loading states in ['/var/cache/salt/minion/extmods/states', '/usr/lib/python2.7/site-packages/salt/states']
+2013-07-09 17:43:22,436 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/states, it is not a directory
+2013-07-09 17:43:22,451 [salt.loader                                 ][DEBUG   ] loading render in ['/var/cache/salt/minion/extmods/renderers', '/usr/lib/python2.7/site-packages/salt/renderers']
+2013-07-09 17:43:22,452 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/renderers, it is not a directory
+2013-07-09 17:43:22,455 [salt.loader                                 ][DEBUG   ] loading module in ['/var/cache/salt/minion/extmods/modules', '/usr/lib/python2.7/site-packages/salt/modules']
+2013-07-09 17:43:22,495 [salt.loader                                 ][DEBUG   ] Loaded localemod as virtual locale
+2013-07-09 17:43:22,496 [salt.loader                                 ][DEBUG   ] Loaded groupadd as virtual group
+2013-07-09 17:43:22,499 [salt.loader                                 ][DEBUG   ] Loaded linux_sysctl as virtual sysctl
+2013-07-09 17:43:22,511 [salt.loader                                 ][DEBUG   ] Loaded parted as virtual partition
+2013-07-09 17:43:22,513 [salt.loader                                 ][DEBUG   ] Loaded sysmod as virtual sys
+2013-07-09 17:43:22,515 [salt.loader                                 ][DEBUG   ] Loaded useradd as virtual user
+2013-07-09 17:43:22,526 [salt.loader                                 ][DEBUG   ] Loaded djangomod as virtual django
+2013-07-09 17:43:22,529 [salt.loader                                 ][DEBUG   ] Loaded cmdmod as virtual cmd
+2013-07-09 17:43:22,539 [salt.fileclient                             ][INFO    ] Fetching file 'salt://top.sls'
+2013-07-09 17:43:22,545 [salt.utils.jinja                            ][DEBUG   ] Jinja search path: '['/var/cache/salt/minion/files/base']'
+2013-07-09 17:43:22,547 [salt.template                               ][DEBUG   ] Rendered data from file: /var/cache/salt/minion/files/base/top.sls:
+base:
+  'os:cloudnode':
+    - match: grain
+    - cloudflash_node
+  'os:Ubuntu':
+    - match: grain
+    - cloudflash_ubuntu
+
+2013-07-09 17:43:22,551 [salt.minion                                 ][DEBUG   ] grains target: os:Ubuntu
+2013-07-09 17:43:22,551 [salt.minion                                 ][DEBUG   ] grains target: os:cloudnode
+2013-07-09 17:43:22,554 [salt.loaded.int.module.saltutil             ][INFO    ] Creating module dir '/var/cache/salt/minion/extmods/grains'
+2013-07-09 17:43:22,555 [salt.loaded.int.module.saltutil             ][INFO    ] Syncing grains for environment 'base'
+2013-07-09 17:43:22,555 [salt.loaded.int.module.saltutil             ][INFO    ] Loading cache from salt://_grains, for base)
+2013-07-09 17:43:22,556 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 17:43:22,666 [salt.crypt                                  ][DEBUG   ] Decrypting the current master AES key
+2013-07-09 17:43:22,666 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 17:43:23,212 [salt.fileclient                             ][INFO    ] Caching directory '_grains/' for environment 'base'
+2013-07-09 17:43:23,218 [salt.loaded.int.module.saltutil             ][DEBUG   ] Local cache dir: '/var/cache/salt/minion/files/base/_grains'
+2013-07-09 17:43:23,219 [salt.utils.event                            ][DEBUG   ] MinionEvent PUB socket URI: ipc:///var/run/salt/minion/minion_event_89e4e358afd4fb02464e13295b36c736_pub.ipc
+2013-07-09 17:43:23,219 [salt.utils.event                            ][DEBUG   ] MinionEvent PULL socket URI: ipc:///var/run/salt/minion/minion_event_89e4e358afd4fb02464e13295b36c736_pull.ipc
+2013-07-09 17:43:23,220 [salt.state                                  ][INFO    ] No changes made for saltutil.sync_grains
+2013-07-09 17:43:23,220 [salt.state                                  ][INFO    ] Executing state cmd.run for echo 9000 > /proc/sys/fs/inotify/max_user_instances
+2013-07-09 17:43:23,221 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command 'echo 9000 > /proc/sys/fs/inotify/max_user_instances' in directory '/'
+2013-07-09 17:43:23,224 [salt.state                                  ][INFO    ] {'pid': 15097, 'retcode': 0, 'stderr': '', 'stdout': ''}
+2013-07-09 17:43:23,226 [salt.state                                  ][INFO    ] Executing state pkg.installed for nodejs
+2013-07-09 17:43:23,227 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command "dpkg-query --showformat='${Status} ${Package} ${Version}\n' -W" in directory '/'
+2013-07-09 17:43:23,232 [salt.loaded.int.module.cmdmod               ][DEBUG   ] stdout: install ok installed apt 0.9.7.2
+install ok installed bouncer 0.0.0
+install ok installed busybox 1.17.2
+install ok installed condexec 0.1.1
+install ok installed curl 7.27.0
+install ok installed dirwatch 0.1
+install ok installed dpkg 1.15.8.12
+install ok installed dropbear 0.51
+install ok installed gettext 0.18.1.1
+install ok installed gmp 4.3.2
+install ok installed ifplugd 0.28
+install ok installed iproute2 2.6.26
+install ok installed iptables 1.4.2
+install ok installed jailer 0.1
+install ok installed libiconv 1.14
+install ok installed ntp 4.2.4p5
+install ok installed openssl 1.0.1c
+install ok installed ppp 2.4.5
+install ok installed uclibc 0.9.32
+install ok installed udev 167
+install ok installed zlib 1.2.3
+2013-07-09 17:43:23,233 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command 'apt-get -q update' in directory '/'
+2013-07-09 17:43:23,270 [salt.loaded.int.module.cmdmod               ][DEBUG   ] stdout: Ign http://repo.dev.intercloud.net cloudnode InRelease
+Ign http://repo.dev.intercloud.net cloudnode Release.gpg
+Ign http://repo.dev.intercloud.net cloudnode Release
+Ign http://repo.dev.intercloud.net cloudnode/release i386 Packages/DiffIndex
+Hit http://repo.dev.intercloud.net cloudnode/release i386 Packages
+Ign http://repo.dev.intercloud.net cloudnode/release Translation-en
+Reading package lists...
+2013-07-09 17:43:23,271 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command "dpkg-query --showformat='${Status} ${Package} ${Version}\n' -W" in directory '/'
+2013-07-09 17:43:23,280 [salt.loaded.int.module.cmdmod               ][DEBUG   ] stdout: install ok installed apt 0.9.7.2
+install ok installed bouncer 0.0.0
+install ok installed busybox 1.17.2
+install ok installed condexec 0.1.1
+install ok installed curl 7.27.0
+install ok installed dirwatch 0.1
+install ok installed dpkg 1.15.8.12
+install ok installed dropbear 0.51
+install ok installed gettext 0.18.1.1
+install ok installed gmp 4.3.2
+install ok installed ifplugd 0.28
+install ok installed iproute2 2.6.26
+install ok installed iptables 1.4.2
+install ok installed jailer 0.1
+install ok installed libiconv 1.14
+install ok installed ntp 4.2.4p5
+install ok installed openssl 1.0.1c
+install ok installed ppp 2.4.5
+install ok installed uclibc 0.9.32
+install ok installed udev 167
+install ok installed zlib 1.2.3
+2013-07-09 17:43:23,281 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command 'apt-get -q -y -o DPkg::Options::=--force-confold -o DPkg::Options::=--force-confdef --allow-unauthenticated  install nodejs' in directory '/'
+2013-07-09 17:43:24,105 [salt.config                                 ][DEBUG   ] Reading configuration from /etc/salt/minion
+2013-07-09 17:43:24,109 [salt.loader                                 ][DEBUG   ] loading grain in ['/var/cache/salt/minion/extmods/grains', '/usr/lib/python2.7/site-packages/salt/grains']
+2013-07-09 17:43:24,109 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/grains, it is not a directory
+2013-07-09 17:43:24,118 [salt.loaded.int.grain.core                  ][DEBUG   ] Unexpected lspci output: '/bin/ash: lspci: not found'
+2013-07-09 17:43:24,118 [salt.loaded.int.grain.core                  ][WARNING ] Error loading grains, unexpected linux_gpu_data output, check that you have a valid shell configured and permissions to run lspci command
+2013-07-09 17:43:24,135 [salt.loader                                 ][DEBUG   ] loading module in ['/var/cache/salt/minion/extmods/modules', '/usr/lib/python2.7/site-packages/salt/modules']
+2013-07-09 17:43:24,177 [salt.loader                                 ][DEBUG   ] Loaded localemod as virtual locale
+2013-07-09 17:43:24,177 [salt.loader                                 ][DEBUG   ] Loaded groupadd as virtual group
+2013-07-09 17:43:24,181 [salt.loader                                 ][DEBUG   ] Loaded linux_sysctl as virtual sysctl
+2013-07-09 17:43:24,193 [salt.loader                                 ][DEBUG   ] Loaded parted as virtual partition
+2013-07-09 17:43:24,194 [salt.loader                                 ][DEBUG   ] Loaded sysmod as virtual sys
+2013-07-09 17:43:24,197 [salt.loader                                 ][DEBUG   ] Loaded useradd as virtual user
+2013-07-09 17:43:24,207 [salt.loader                                 ][DEBUG   ] Loaded djangomod as virtual django
+2013-07-09 17:43:24,210 [salt.loader                                 ][DEBUG   ] Loaded cmdmod as virtual cmd
+2013-07-09 17:43:24,223 [salt.loader                                 ][DEBUG   ] loading returner in ['/var/cache/salt/minion/extmods/returners', '/usr/lib/python2.7/site-packages/salt/returners']
+2013-07-09 17:43:24,223 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/returners, it is not a directory
+2013-07-09 17:43:24,227 [salt.loader                                 ][DEBUG   ] Loaded syslog_return as virtual syslog
+2013-07-09 17:43:24,227 [salt.loader                                 ][DEBUG   ] Loaded carbon_return as virtual carbon
+2013-07-09 17:43:24,497 [salt.loaded.int.module.cmdmod               ][DEBUG   ] stdout: Reading package lists...
+Building dependency tree...
+The following NEW packages will be installed:
+  nodejs
+0 upgraded, 1 newly installed, 0 to remove and 1 not upgraded.
+Need to get 0 B/3038 kB of archives.
+After this operation, 11.2 MB of additional disk space will be used.
+WARNING: The following packages cannot be authenticated!
+  nodejs
+Authentication warning overridden.
+Selecting previously deselected package nodejs.
+(Reading database ... (Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 475 files and directories currently installed.)
+Unpacking nodejs (from .../nodejs_0.6.19_i386.deb) ...
+Setting up nodejs (0.6.19) ...
+2013-07-09 17:43:24,498 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command "dpkg-query --showformat='${Status} ${Package} ${Version}\n' -W" in directory '/'
+2013-07-09 17:43:24,503 [salt.loaded.int.module.cmdmod               ][DEBUG   ] stdout: install ok installed apt 0.9.7.2
+install ok installed bouncer 0.0.0
+install ok installed busybox 1.17.2
+install ok installed condexec 0.1.1
+install ok installed curl 7.27.0
+install ok installed dirwatch 0.1
+install ok installed dpkg 1.15.8.12
+install ok installed dropbear 0.51
+install ok installed gettext 0.18.1.1
+install ok installed gmp 4.3.2
+install ok installed ifplugd 0.28
+install ok installed iproute2 2.6.26
+install ok installed iptables 1.4.2
+install ok installed jailer 0.1
+install ok installed libiconv 1.14
+install ok installed nodejs 0.6.19
+install ok installed ntp 4.2.4p5
+install ok installed openssl 1.0.1c
+install ok installed ppp 2.4.5
+install ok installed uclibc 0.9.32
+install ok installed udev 167
+install ok installed zlib 1.2.3
+2013-07-09 17:43:24,504 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command "dpkg-query --showformat='${Status} ${Package} ${Version}\n' -W" in directory '/'
+2013-07-09 17:43:24,509 [salt.loaded.int.module.cmdmod               ][DEBUG   ] stdout: install ok installed apt 0.9.7.2
+install ok installed bouncer 0.0.0
+install ok installed busybox 1.17.2
+install ok installed condexec 0.1.1
+install ok installed curl 7.27.0
+install ok installed dirwatch 0.1
+install ok installed dpkg 1.15.8.12
+install ok installed dropbear 0.51
+install ok installed gettext 0.18.1.1
+install ok installed gmp 4.3.2
+install ok installed ifplugd 0.28
+install ok installed iproute2 2.6.26
+install ok installed iptables 1.4.2
+install ok installed jailer 0.1
+install ok installed libiconv 1.14
+install ok installed nodejs 0.6.19
+install ok installed ntp 4.2.4p5
+install ok installed openssl 1.0.1c
+install ok installed ppp 2.4.5
+install ok installed uclibc 0.9.32
+install ok installed udev 167
+install ok installed zlib 1.2.3
+2013-07-09 17:43:24,510 [salt.state                                  ][INFO    ] Installed Packages:
+nodejs changed from absent to 0.6.19
+
+2013-07-09 17:43:24,511 [salt.state                                  ][INFO    ] Loading fresh modules for state activity
+2013-07-09 17:43:24,511 [salt.loader                                 ][DEBUG   ] loading module in ['/var/cache/salt/minion/extmods/modules', '/usr/lib/python2.7/site-packages/salt/modules']
+2013-07-09 17:43:24,553 [salt.loader                                 ][DEBUG   ] Loaded localemod as virtual locale
+2013-07-09 17:43:24,554 [salt.loader                                 ][DEBUG   ] Loaded groupadd as virtual group
+2013-07-09 17:43:24,557 [salt.loader                                 ][DEBUG   ] Loaded linux_sysctl as virtual sysctl
+2013-07-09 17:43:24,569 [salt.loader                                 ][DEBUG   ] Loaded parted as virtual partition
+2013-07-09 17:43:24,571 [salt.loader                                 ][DEBUG   ] Loaded sysmod as virtual sys
+2013-07-09 17:43:24,573 [salt.loader                                 ][DEBUG   ] Loaded useradd as virtual user
+2013-07-09 17:43:24,584 [salt.loader                                 ][DEBUG   ] Loaded djangomod as virtual django
+2013-07-09 17:43:24,587 [salt.loader                                 ][DEBUG   ] Loaded cmdmod as virtual cmd
+2013-07-09 17:43:24,599 [salt.loader                                 ][DEBUG   ] loading states in ['/var/cache/salt/minion/extmods/states', '/usr/lib/python2.7/site-packages/salt/states']
+2013-07-09 17:43:24,599 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/states, it is not a directory
+2013-07-09 17:43:24,615 [salt.loader                                 ][DEBUG   ] loading render in ['/var/cache/salt/minion/extmods/renderers', '/usr/lib/python2.7/site-packages/salt/renderers']
+2013-07-09 17:43:24,616 [salt.loader                                 ][DEBUG   ] Skipping /var/cache/salt/minion/extmods/renderers, it is not a directory
+2013-07-09 17:43:24,620 [salt.state                                  ][INFO    ] Executing state file.managed for /etc/bolt/bolt.json
+2013-07-09 17:43:24,621 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 17:43:24,728 [salt.crypt                                  ][DEBUG   ] Decrypting the current master AES key
+2013-07-09 17:43:24,729 [salt.crypt                                  ][DEBUG   ] Loaded minion key: /etc/salt/pki/minion/minion.pem
+2013-07-09 17:43:25,280 [salt.state                                  ][INFO    ] No changes made for /etc/bolt/bolt.json
+2013-07-09 17:43:25,280 [salt.state                                  ][INFO    ] Executing state npm.installed for cloudflash-bolt
+2013-07-09 17:43:25,281 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command 'npm --version' in directory '/'
+2013-07-09 17:43:25,610 [salt.loaded.int.module.cmdmod               ][DEBUG   ] output: 1.2.19
+2013-07-09 17:43:25,611 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command 'npm list --json --global' in directory '/'
+2013-07-09 17:43:26,191 [salt.loaded.int.module.cmdmod               ][DEBUG   ] stdout: {
+  "dependencies": {
+    "coffee-script": {
+      "version": "1.6.1",
+      "from": "coffee-script"
+    },
+    "npm": {
+      "version": "1.2.19",
+      "from": "npm@1.2.19",
+      "dependencies": {
+        "semver": {
+          "version": "1.1.4",
+          "from": "semver@1.1.4"
+        },
+        "ini": {
+          "version": "1.1.0",
+          "from": "ini@latest"
+        },
+        "slide": {
+          "version": "1.1.4",
+          "from": "slide@latest"
+        },
+        "abbrev": {
+          "version": "1.0.4",
+          "from": "abbrev@latest"
+        },
+        "graceful-fs": {
+          "version": "1.2.0",
+          "from": "graceful-fs@latest"
+        },
+        "minimatch": {
+          "version": "0.2.12",
+          "from": "minimatch@latest",
+          "dependencies": {
+            "sigmund": {
+              "version": "1.0.0",
+              "from": "sigmund@~1.0.0",
+              "resolved": "https://registry.npmjs.org/sigmund/-/sigmund-1.0.0.tgz"
+            }
+          }
+        },
+        "nopt": {
+          "version": "2.1.1",
+          "from": "nopt@latest"
+        },
+        "rimraf": {
+          "version": "2.1.4",
+          "from": "rimraf@2"
+        },
+        "request": {
+          "version": "2.20.0",
+          "from": "request@latest",
+          "dependencies": {
+            "form-data": {
+              "version": "0.0.8",
+              "from": "form-data@~0.0.3",
+              "dependencies": {
+                "combined-stream": {
+                  "version": "0.0.4",
+                  "from": "combined-stream@~0.0.4",
+                  "resolved": "https://registry.npmjs.org/combined-stream/-/combined-stream-0.0.4.tgz",
+                  "dependencies": {
+                    "delayed-stream": {
+                      "version": "0.0.5",
+                      "from": "delayed-stream@0.0.5",
+                      "resolved": "https://registry.npmjs.org/delayed-stream/-/delayed-stream-0.0.5.tgz"
+                    }
+                  }
+                },
+                "async": {
+                  "version": "0.2.7",
+                  "from": "async@~0.2.7"
+                }
+              }
+            },
+            "mime": {
+              "version": "1.2.9",
+              "from": "mime@~1.2.7"
+            },
+            "hawk": {
+              "version": "0.10.2",
+              "from": "hawk@~0.10.2",
+              "dependencies": {
+                "hoek": {
+                  "version": "0.7.6",
+                  "from": "hoek@0.7.x"
+                },
+                "boom": {
+                  "version": "0.3.8",
+                  "from": "boom@0.3.x"
+                },
+                "cryptiles": {
+                  "version": "0.1.3",
+                  "from": "cryptiles@0.1.x"
+                },
+                "sntp": {
+                  "version": "0.1.4",
+                  "from": "sntp@0.1.x"
+                }
+              }
+            },
+            "node-uuid": {
+              "version": "1.4.0",
+              "from": "node-uuid@~1.4.0"
+            },
+            "cookie-jar": {
+              "version": "0.3.0",
+              "from": "cookie-jar@~0.3.0"
+            },
+            "aws-sign": {
+              "version": "0.3.0",
+              "from": "aws-sign@~0.3.0"
+            },
+            "oauth-sign": {
+              "version": "0.3.0",
+              "from": "oauth-sign@~0.3.0"
+            },
+            "http-signature": {
+              "version": "0.9.11",
+              "from": "http-signature@~0.9.1",
+              "dependencies": {
+                "assert-plus": {
+                  "version": "0.1.2",
+                  "from": "assert-plus@0.1.2"
+                },
+                "asn1": {
+                  "version": "0.1.11",
+                  "from": "asn1@0.1.11"
+                },
+                "ctype": {
+                  "version": "0.5.2",
+                  "from": "ctype@0.5.2"
+                }
+              }
+            },
+            "forever-agent": {
+              "version": "0.3.0",
+              "from": "forever-agent@~0.3.0"
+            },
+            "tunnel-agent": {
+              "version": "0.3.0",
+              "from": "tunnel-agent@~0.3.0"
+            },
+            "json-stringify-safe": {
+              "version": "3.0.0",
+              "from": "json-stringify-safe@~3.0.0"
+            },
+            "qs": {
+              "version": "0.5.6",
+              "from": "qs@~0.5.4"
+            }
+          }
+        },
+        "which": {
+          "version": "1.0.5",
+          "from": "which@1"
+        },
+        "tar": {
+          "version": "0.1.17",
+          "from": "tar@0.1.17",
+          "resolved": "https://registry.npmjs.org/tar/-/tar-0.1.17.tgz"
+        },
+        "fstream": {
+          "version": "0.1.22",
+          "from": "fstream@latest"
+        },
+        "block-stream": {
+          "version": "0.0.6",
+          "from": "block-stream@*"
+        },
+        "inherits": {
+          "version": "1.0.0",
+          "from": "git://github.com/isaacs/inherits"
+        },
+        "mkdirp": {
+          "version": "0.3.5",
+          "from": "mkdirp@0.3.5",
+          "resolved": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.3.5.tgz"
+        },
+        "read": {
+          "version": "1.0.4",
+          "from": "read@~1.0.3",
+          "dependencies": {
+            "mute-stream": {
+              "version": "0.0.3",
+              "from": "mute-stream@~0.0.2"
+            }
+          }
+        },
+        "lru-cache": {
+          "version": "2.3.0",
+          "from": "lru-cache@latest"
+        },
+        "node-gyp": {
+          "version": "0.9.5",
+          "from": "node-gyp@latest"
+        },
+        "fstream-npm": {
+          "version": "0.1.4",
+          "from": "fstream-npm@latest",
+          "dependencies": {
+            "fstream-ignore": {
+              "version": "0.0.6",
+              "from": "fstream-ignore@~0.0.5"
+            }
+          }
+        },
+        "uid-number": {
+          "version": "0.0.3",
+          "from": "../uid-number"
+        },
+        "archy": {
+          "version": "0.0.2",
+          "from": "archy@0.0.2"
+        },
+        "chownr": {
+          "version": "0.0.1",
+          "from": "../chownr"
+        },
+        "npmlog": {
+          "version": "0.0.2",
+          "from": "npmlog@0"
+        },
+        "ansi": {
+          "version": "0.1.2",
+          "from": "ansi@~0.1.2"
+        },
+        "npm-registry-client": {
+          "version": "0.2.22",
+          "from": "npm-registry-client@latest",
+          "dependencies": {
+            "couch-login": {
+              "version": "0.1.16",
+              "from": "couch-login@~0.1.15"
+            }
+          }
+        },
+        "read-package-json": {
+          "version": "0.4.1",
+          "from": "read-package-json@latest",
+          "dependencies": {
+            "normalize-package-data": {
+              "version": "0.1.2",
+              "from": "normalize-package-data@~0.1.2",
+              "dependencies": {
+                "github-url-from-git": {
+                  "version": "1.1.1",
+                  "from": "github-url-from-git@~1.1.1"
+                }
+              }
+            }
+          }
+        },
+        "read-installed": {
+          "version": "0.1.1",
+          "from": "read-installed@0"
+        },
+        "glob": {
+          "version": "3.2.1",
+          "from": "glob@3.2.1",
+          "resolved": "https://registry.npmjs.org/glob/-/glob-3.2.1.tgz"
+        },
+        "init-package-json": {
+          "version": "0.0.8",
+          "from": "init-package-json@latest",
+          "dependencies": {
+            "promzard": {
+              "version": "0.2.0",
+              "from": "promzard@~0.2.0"
+            }
+          }
+        },
+        "osenv": {
+          "version": "0.0.3",
+          "from": "osenv@latest"
+        },
+        "lockfile": {
+          "version": "0.3.1",
+          "from": "lockfile@0.3.1",
+          "resolved": "https://registry.npmjs.org/lockfile/-/lockfile-0.3.1.tgz"
+        },
+        "retry": {
+          "version": "0.6.0",
+          "from": "retry"
+        },
+        "once": {
+          "version": "1.1.1",
+          "from": "once"
+        },
+        "npmconf": {
+          "version": "0.0.24",
+          "from": "npmconf@latest",
+          "dependencies": {
+            "config-chain": {
+              "version": "1.1.7",
+              "from": "config-chain@~1.1.1",
+              "resolved": "https://registry.npmjs.org/config-chain/-/config-chain-1.1.7.tgz",
+              "dependencies": {
+                "proto-list": {
+                  "version": "1.2.2",
+                  "from": "proto-list@~1.2.1",
+                  "resolved": "https://registry.npmjs.org/proto-list/-/proto-list-1.2.2.tgz"
+                }
+              }
+            }
+          }
+        },
+        "opener": {
+          "version": "1.3.0",
+          "from": "opener@latest"
+        },
+        "chmodr": {
+          "version": "0.1.0",
+          "from": "chmodr@latest"
+        },
+        "cmd-shim": {
+          "version": "1.1.0",
+          "from": "cmd-shim@"
+        },
+        "sha": {
+          "version": "1.0.1",
+          "from": "sha@~1.0.1"
+        },
+        "editor": {
+          "version": "0.0.4",
+          "from": "editor@"
+        },
+        "child-process-close": {
+          "version": "0.1.1",
+          "from": "child-process-close@",
+          "resolved": "https://registry.npmjs.org/child-process-close/-/child-process-close-0.1.1.tgz"
+        }
+      }
+    }
+  }
+}
+2013-07-09 17:43:26,192 [salt.loaded.int.module.cmdmod               ][DEBUG   ] stderr: npm WARN package.json retry@0.6.0 No readme data!
+2013-07-09 17:43:26,193 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command 'npm --version' in directory '/'
+2013-07-09 17:43:26,502 [salt.loaded.int.module.cmdmod               ][DEBUG   ] output: 1.2.19
+2013-07-09 17:43:26,503 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command 'npm install --silent --json --global cloudflash-bolt' in directory '/'
+2013-07-09 17:43:46,236 [salt.loaded.int.module.cmdmod               ][DEBUG   ] stdout: 
+> ws@0.4.27 install /lib/node_modules/cloudflash-bolt/node_modules/zappajs/node_modules/socket.io/node_modules/socket.io-client/node_modules/ws
+> (node-gyp rebuild 2> builderror.log) || (exit 0)
+
+[
+  {
+    "name": "cloudflash-bolt",
+    "version": "0.1.5",
+    "from": "cloudflash-bolt@",
+    "dependencies": {
+      "fileops": {
+        "version": "0.1.3",
+        "from": "fileops@0.1.3",
+        "dependencies": {}
+      },
+      "node-uuid": {
+        "version": "1.3.3",
+        "from": "node-uuid@1.3.x",
+        "dependencies": {}
+      },
+      "dirty": {
+        "version": "0.9.7",
+        "from": "dirty@0.9.x",
+        "dependencies": {}
+      },
+      "json-schema": {
+        "version": "0.2.0",
+        "from": "json-schema@0.2.0",
+        "dependencies": {}
+      },
+      "request": {
+        "version": "2.9.203",
+        "from": "request@2.9.x",
+        "dependencies": {}
+      },
+      "zappajs": {
+        "version": "0.3.10",
+        "from": "zappajs@0.3.x",
+        "dependencies": {
+          "node-uuid": {
+            "version": "1.2.0",
+            "from": "node-uuid@1.2.0",
+            "dependencies": {}
+          },
+          "uglify-js": {
+            "version": "1.1.1",
+            "from": "uglify-js@1.1.x",
+            "dependencies": {}
+          },
+          "express": {
+            "version": "2.5.10",
+            "from": "express@2.5.10",
+            "dependencies": {
+              "qs": {
+                "version": "0.4.2",
+                "from": "qs@0.4.x",
+                "dependencies": {}
+              },
+              "mime": {
+                "version": "1.2.4",
+                "from": "mime@1.2.4",
+                "dependencies": {}
+              },
+              "mkdirp": {
+                "version": "0.3.0",
+                "from": "mkdirp@0.3.0",
+                "dependencies": {}
+              },
+              "connect": {
+                "version": "1.9.2",
+                "from": "connect@1.x",
+                "dependencies": {
+                  "formidable": {
+                    "version": "1.0.14",
+                    "from": "formidable@1.0.x",
+                    "dependencies": {}
+                  }
+                }
+              }
+            }
+          },
+          "coffeecup": {
+            "version": "0.3.21",
+            "from": "coffeecup@0.3.x",
+            "dependencies": {
+              "optparse": {
+                "version": "1.0.3",
+                "from": "optparse@1.0.3",
+                "dependencies": {}
+              },
+              "coffee-script": {
+                "version": "1.6.3",
+                "from": "coffee-script@>=1.3 <2",
+                "dependencies": {}
+              },
+              "uglify-js": {
+                "version": "1.2.6",
+                "from": "uglify-js@1.2.6",
+                "dependencies": {}
+              },
+              "stylus": {
+                "version": "0.27.2",
+                "from": "stylus@0.27.2",
+                "dependencies": {
+                  "debug": {
+                    "version": "0.7.2",
+                    "from": "debug@*",
+                    "dependencies": {}
+                  },
+                  "mkdirp": {
+                    "version": "0.3.5",
+                    "from": "mkdirp@0.3.x",
+                    "dependencies": {}
+                  },
+                  "cssom": {
+                    "version": "0.2.5",
+                    "from": "cssom@0.2.x",
+                    "dependencies": {}
+                  }
+                }
+              }
+            }
+          },
+          "socket.io": {
+            "version": "0.9.16",
+            "from": "socket.io@0.9.x",
+            "dependencies": {
+              "base64id": {
+                "version": "0.1.0",
+                "from": "base64id@0.1.0",
+                "dependencies": {}
+              },
+              "policyfile": {
+                "version": "0.0.4",
+                "from": "policyfile@0.0.4",
+                "dependencies": {}
+              },
+              "redis": {
+                "version": "0.7.3",
+                "from": "redis@0.7.3",
+                "dependencies": {}
+              },
+              "socket.io-client": {
+                "version": "0.9.16",
+                "from": "socket.io-client@0.9.16",
+                "dependencies": {
+                  "xmlhttprequest": {
+                    "version": "1.4.2",
+                    "from": "xmlhttprequest@1.4.2",
+                    "dependencies": {}
+                  },
+                  "uglify-js": {
+                    "version": "1.2.5",
+                    "from": "uglify-js@1.2.5",
+                    "dependencies": {}
+                  },
+                  "ws": {
+                    "version": "0.4.27",
+                    "from": "ws@0.4.x",
+                    "dependencies": {
+                      "tinycolor": {
+                        "version": "0.0.1",
+                        "from": "tinycolor@0.x",
+                        "dependencies": {}
+                      },
+                      "options": {
+                        "version": "0.0.5",
+                        "from": "options@>=0.0.5",
+                        "dependencies": {}
+                      },
+                      "commander": {
+                        "version": "0.6.1",
+                        "from": "commander@~0.6.1",
+                        "dependencies": {}
+                      }
+                    }
+                  },
+                  "active-x-obfuscator": {
+                    "version": "0.0.1",
+                    "from": "active-x-obfuscator@0.0.1",
+                    "dependencies": {
+                      "zeparser": {
+                        "version": "0.0.5",
+                        "from": "zeparser@0.0.5",
+                        "dependencies": {}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+]
+2013-07-09 17:43:46,237 [salt.loaded.int.module.npm                  ][ERROR   ] ['', '> ws@0.4.27 install /lib/node_modules/cloudflash-bolt/node_modules/zappajs/node_modules/socket.io/node_modules/socket.io-client/node_modules/ws', '> (node-gyp rebuild 2> builderror.log) || (exit 0)', '', '[', '  {', '    "name": "cloudflash-bolt",', '    "version": "0.1.5",', '    "from": "cloudflash-bolt@",', '    "dependencies": {', '      "fileops": {', '        "version": "0.1.3",', '        "from": "fileops@0.1.3",', '        "dependencies": {}', '      },', '      "node-uuid": {', '        "version": "1.3.3",', '        "from": "node-uuid@1.3.x",', '        "dependencies": {}', '      },', '      "dirty": {', '        "version": "0.9.7",', '        "from": "dirty@0.9.x",', '        "dependencies": {}', '      },', '      "json-schema": {', '        "version": "0.2.0",', '        "from": "json-schema@0.2.0",', '        "dependencies": {}', '      },', '      "request": {', '        "version": "2.9.203",', '        "from": "request@2.9.x",', '        "dependencies": {}', '      },', '      "zappajs": {', '        "version": "0.3.10",', '        "from": "zappajs@0.3.x",', '        "dependencies": {', '          "node-uuid": {', '            "version": "1.2.0",', '            "from": "node-uuid@1.2.0",', '            "dependencies": {}', '          },', '          "uglify-js": {', '            "version": "1.1.1",', '            "from": "uglify-js@1.1.x",', '            "dependencies": {}', '          },', '          "express": {', '            "version": "2.5.10",', '            "from": "express@2.5.10",', '            "dependencies": {', '              "qs": {', '                "version": "0.4.2",', '                "from": "qs@0.4.x",', '                "dependencies": {}', '              },', '              "mime": {', '                "version": "1.2.4",', '                "from": "mime@1.2.4",', '                "dependencies": {}', '              },', '              "mkdirp": {', '                "version": "0.3.0",', '                "from": "mkdirp@0.3.0",', '                "dependencies": {}', '              },', '              "connect": {', '                "version": "1.9.2",', '                "from": "connect@1.x",', '                "dependencies": {', '                  "formidable": {', '                    "version": "1.0.14",', '                    "from": "formidable@1.0.x",', '                    "dependencies": {}', '                  }', '                }', '              }', '            }', '          },', '          "coffeecup": {', '            "version": "0.3.21",', '            "from": "coffeecup@0.3.x",', '            "dependencies": {', '              "optparse": {', '                "version": "1.0.3",', '                "from": "optparse@1.0.3",', '                "dependencies": {}', '              },', '              "coffee-script": {', '                "version": "1.6.3",', '                "from": "coffee-script@>=1.3 <2",', '                "dependencies": {}', '              },', '              "uglify-js": {', '                "version": "1.2.6",', '                "from": "uglify-js@1.2.6",', '                "dependencies": {}', '              },', '              "stylus": {', '                "version": "0.27.2",', '                "from": "stylus@0.27.2",', '                "dependencies": {', '                  "debug": {', '                    "version": "0.7.2",', '                    "from": "debug@*",', '                    "dependencies": {}', '                  },', '                  "mkdirp": {', '                    "version": "0.3.5",', '                    "from": "mkdirp@0.3.x",', '                    "dependencies": {}', '                  },', '                  "cssom": {', '                    "version": "0.2.5",', '                    "from": "cssom@0.2.x",', '                    "dependencies": {}', '                  }', '                }', '              }', '            }', '          },', '          "socket.io": {', '            "version": "0.9.16",', '            "from": "socket.io@0.9.x",', '            "dependencies": {', '              "base64id": {', '                "version": "0.1.0",', '                "from": "base64id@0.1.0",', '                "dependencies": {}', '              },', '              "policyfile": {', '                "version": "0.0.4",', '                "from": "policyfile@0.0.4",', '                "dependencies": {}', '              },', '              "redis": {', '                "version": "0.7.3",', '                "from": "redis@0.7.3",', '                "dependencies": {}', '              },', '              "socket.io-client": {', '                "version": "0.9.16",', '                "from": "socket.io-client@0.9.16",', '                "dependencies": {', '                  "xmlhttprequest": {', '                    "version": "1.4.2",', '                    "from": "xmlhttprequest@1.4.2",', '                    "dependencies": {}', '                  },', '                  "uglify-js": {', '                    "version": "1.2.5",', '                    "from": "uglify-js@1.2.5",', '                    "dependencies": {}', '                  },', '                  "ws": {', '                    "version": "0.4.27",', '                    "from": "ws@0.4.x",', '                    "dependencies": {', '                      "tinycolor": {', '                        "version": "0.0.1",', '                        "from": "tinycolor@0.x",', '                        "dependencies": {}', '                      },', '                      "options": {', '                        "version": "0.0.5",', '                        "from": "options@>=0.0.5",', '                        "dependencies": {}', '                      },', '                      "commander": {', '                        "version": "0.6.1",', '                        "from": "commander@~0.6.1",', '                        "dependencies": {}', '                      }', '                    }', '                  },', '                  "active-x-obfuscator": {', '                    "version": "0.0.1",', '                    "from": "active-x-obfuscator@0.0.1",', '                    "dependencies": {', '                      "zeparser": {', '                        "version": "0.0.5",', '                        "from": "zeparser@0.0.5",', '                        "dependencies": {}', '                      }', '                    }', '                  }', '                }', '              }', '            }', '          }', '        }', '      }', '    }', '  }', ']']
+2013-07-09 17:43:46,238 [salt.state                                  ][INFO    ] {'cloudflash-bolt@0.1.5': 'Installed'}
+2013-07-09 17:43:46,239 [salt.state                                  ][INFO    ] Executing state cmd.run for echo foo > /tmp/.test
+2013-07-09 17:43:46,239 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command 'ps | grep app.coffee | grep -v grep' in directory '/'
+2013-07-09 17:43:46,245 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command 'echo foo > /tmp/.test' in directory '/'
+2013-07-09 17:43:46,248 [salt.state                                  ][INFO    ] {'pid': 15804, 'retcode': 0, 'stderr': '', 'stdout': ''}
+2013-07-09 17:43:46,252 [salt.state                                  ][INFO    ] Executing state cmd.run for ulimit -n 9000
+2013-07-09 17:43:46,253 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command 'ulimit -n 9000' in directory '/'
+2013-07-09 17:43:46,255 [salt.state                                  ][INFO    ] {'pid': 15805, 'retcode': 0, 'stderr': '', 'stdout': ''}
+2013-07-09 17:43:46,256 [salt.state                                  ][INFO    ] Executing state file.managed for /lib/node_modules/.nodemonignore
+2013-07-09 17:43:46,259 [salt.state                                  ][INFO    ] No changes made for /lib/node_modules/.nodemonignore
+2013-07-09 17:43:46,260 [salt.state                                  ][INFO    ] Executing state npm.installed for nodemon
+2013-07-09 17:43:46,261 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command 'npm --version' in directory '/'
+2013-07-09 17:43:46,584 [salt.loaded.int.module.cmdmod               ][DEBUG   ] output: 1.2.19
+2013-07-09 17:43:46,585 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command 'npm list --json --global' in directory '/'
+2013-07-09 17:43:47,233 [salt.loaded.int.module.cmdmod               ][DEBUG   ] stdout: {
+  "dependencies": {
+    "cloudflash-bolt": {
+      "version": "0.1.5",
+      "from": "cloudflash-bolt@",
+      "resolved": "https://registry.npmjs.org/cloudflash-bolt/-/cloudflash-bolt-0.1.5.tgz",
+      "dependencies": {
+        "zappajs": {
+          "version": "0.3.10",
+          "from": "zappajs@0.3.x",
+          "resolved": "https://registry.npmjs.org/zappajs/-/zappajs-0.3.10.tgz",
+          "dependencies": {
+            "express": {
+              "version": "2.5.10",
+              "from": "express@2.5.10",
+              "resolved": "https://registry.npmjs.org/express/-/express-2.5.10.tgz",
+              "dependencies": {
+                "connect": {
+                  "version": "1.9.2",
+                  "from": "connect@1.x",
+                  "resolved": "https://registry.npmjs.org/connect/-/connect-1.9.2.tgz",
+                  "dependencies": {
+                    "formidable": {
+                      "version": "1.0.14",
+                      "from": "formidable@1.0.x",
+                      "resolved": "https://registry.npmjs.org/formidable/-/formidable-1.0.14.tgz"
+                    }
+                  }
+                },
+                "mime": {
+                  "version": "1.2.4",
+                  "from": "mime@1.2.4",
+                  "resolved": "https://registry.npmjs.org/mime/-/mime-1.2.4.tgz"
+                },
+                "qs": {
+                  "version": "0.4.2",
+                  "from": "qs@0.4.x",
+                  "resolved": "https://registry.npmjs.org/qs/-/qs-0.4.2.tgz"
+                },
+                "mkdirp": {
+                  "version": "0.3.0",
+                  "from": "mkdirp@0.3.0",
+                  "resolved": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.3.0.tgz"
+                }
+              }
+            },
+            "socket.io": {
+              "version": "0.9.16",
+              "from": "socket.io@0.9.x",
+              "resolved": "https://registry.npmjs.org/socket.io/-/socket.io-0.9.16.tgz",
+              "dependencies": {
+                "socket.io-client": {
+                  "version": "0.9.16",
+                  "from": "socket.io-client@0.9.16",
+                  "resolved": "https://registry.npmjs.org/socket.io-client/-/socket.io-client-0.9.16.tgz",
+                  "dependencies": {
+                    "uglify-js": {
+                      "version": "1.2.5",
+                      "from": "uglify-js@1.2.5",
+                      "resolved": "https://registry.npmjs.org/uglify-js/-/uglify-js-1.2.5.tgz"
+                    },
+                    "ws": {
+                      "version": "0.4.27",
+                      "from": "ws@0.4.x",
+                      "resolved": "https://registry.npmjs.org/ws/-/ws-0.4.27.tgz",
+                      "dependencies": {
+                        "commander": {
+                          "version": "0.6.1",
+                          "from": "commander@~0.6.1",
+                          "resolved": "https://registry.npmjs.org/commander/-/commander-0.6.1.tgz"
+                        },
+                        "tinycolor": {
+                          "version": "0.0.1",
+                          "from": "tinycolor@0.x",
+                          "resolved": "https://registry.npmjs.org/tinycolor/-/tinycolor-0.0.1.tgz"
+                        },
+                        "options": {
+                          "version": "0.0.5",
+                          "from": "options@>=0.0.5",
+                          "resolved": "https://registry.npmjs.org/options/-/options-0.0.5.tgz"
+                        }
+                      }
+                    },
+                    "xmlhttprequest": {
+                      "version": "1.4.2",
+                      "from": "xmlhttprequest@1.4.2",
+                      "resolved": "https://registry.npmjs.org/xmlhttprequest/-/xmlhttprequest-1.4.2.tgz"
+                    },
+                    "active-x-obfuscator": {
+                      "version": "0.0.1",
+                      "from": "active-x-obfuscator@0.0.1",
+                      "resolved": "https://registry.npmjs.org/active-x-obfuscator/-/active-x-obfuscator-0.0.1.tgz",
+                      "dependencies": {
+                        "zeparser": {
+                          "version": "0.0.5",
+                          "from": "zeparser@0.0.5",
+                          "resolved": "https://registry.npmjs.org/zeparser/-/zeparser-0.0.5.tgz"
+                        }
+                      }
+                    }
+                  }
+                },
+                "policyfile": {
+                  "version": "0.0.4",
+                  "from": "policyfile@0.0.4",
+                  "resolved": "https://registry.npmjs.org/policyfile/-/policyfile-0.0.4.tgz"
+                },
+                "base64id": {
+                  "version": "0.1.0",
+                  "from": "base64id@0.1.0",
+                  "resolved": "https://registry.npmjs.org/base64id/-/base64id-0.1.0.tgz"
+                },
+                "redis": {
+                  "version": "0.7.3",
+                  "from": "redis@0.7.3",
+                  "resolved": "https://registry.npmjs.org/redis/-/redis-0.7.3.tgz"
+                }
+              }
+            },
+            "coffeecup": {
+              "version": "0.3.21",
+              "from": "coffeecup@0.3.x",
+              "resolved": "https://registry.npmjs.org/coffeecup/-/coffeecup-0.3.21.tgz",
+              "dependencies": {
+                "coffee-script": {
+                  "version": "1.6.3",
+                  "from": "coffee-script@>=1.3 <2",
+                  "resolved": "https://registry.npmjs.org/coffee-script/-/coffee-script-1.6.3.tgz"
+                },
+                "optparse": {
+                  "version": "1.0.3",
+                  "from": "optparse@1.0.3",
+                  "resolved": "https://registry.npmjs.org/optparse/-/optparse-1.0.3.tgz"
+                },
+                "uglify-js": {
+                  "version": "1.2.6",
+                  "from": "uglify-js@1.2.6",
+                  "resolved": "https://registry.npmjs.org/uglify-js/-/uglify-js-1.2.6.tgz"
+                },
+                "stylus": {
+                  "version": "0.27.2",
+                  "from": "stylus@0.27.2",
+                  "resolved": "https://registry.npmjs.org/stylus/-/stylus-0.27.2.tgz",
+                  "dependencies": {
+                    "cssom": {
+                      "version": "0.2.5",
+                      "from": "cssom@0.2.x",
+                      "resolved": "https://registry.npmjs.org/cssom/-/cssom-0.2.5.tgz"
+                    },
+                    "mkdirp": {
+                      "version": "0.3.5",
+                      "from": "mkdirp@0.3.x",
+                      "resolved": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.3.5.tgz"
+                    },
+                    "debug": {
+                      "version": "0.7.2",
+                      "from": "debug@*",
+                      "resolved": "https://registry.npmjs.org/debug/-/debug-0.7.2.tgz"
+                    }
+                  }
+                }
+              }
+            },
+            "node-uuid": {
+              "version": "1.2.0",
+              "from": "node-uuid@1.2.0",
+              "resolved": "https://registry.npmjs.org/node-uuid/-/node-uuid-1.2.0.tgz"
+            },
+            "uglify-js": {
+              "version": "1.1.1",
+              "from": "uglify-js@1.1.x",
+              "resolved": "https://registry.npmjs.org/uglify-js/-/uglify-js-1.1.1.tgz"
+            }
+          }
+        },
+        "dirty": {
+          "version": "0.9.7",
+          "from": "dirty@0.9.x",
+          "resolved": "https://registry.npmjs.org/dirty/-/dirty-0.9.7.tgz"
+        },
+        "request": {
+          "version": "2.9.203",
+          "from": "request@2.9.x",
+          "resolved": "https://registry.npmjs.org/request/-/request-2.9.203.tgz"
+        },
+        "json-schema": {
+          "version": "0.2.0",
+          "from": "json-schema@0.2.0",
+          "resolved": "https://registry.npmjs.org/json-schema/-/json-schema-0.2.0.tgz"
+        },
+        "node-uuid": {
+          "version": "1.3.3",
+          "from": "node-uuid@1.3.x",
+          "resolved": "https://registry.npmjs.org/node-uuid/-/node-uuid-1.3.3.tgz"
+        },
+        "fileops": {
+          "version": "0.1.3",
+          "from": "fileops@0.1.3",
+          "resolved": "https://registry.npmjs.org/fileops/-/fileops-0.1.3.tgz"
+        }
+      }
+    },
+    "coffee-script": {
+      "version": "1.6.1",
+      "from": "coffee-script"
+    },
+    "npm": {
+      "version": "1.2.19",
+      "from": "npm@1.2.19",
+      "dependencies": {
+        "semver": {
+          "version": "1.1.4",
+          "from": "semver@1.1.4"
+        },
+        "ini": {
+          "version": "1.1.0",
+          "from": "ini@latest"
+        },
+        "slide": {
+          "version": "1.1.4",
+          "from": "slide@latest"
+        },
+        "abbrev": {
+          "version": "1.0.4",
+          "from": "abbrev@latest"
+        },
+        "graceful-fs": {
+          "version": "1.2.0",
+          "from": "graceful-fs@latest"
+        },
+        "minimatch": {
+          "version": "0.2.12",
+          "from": "minimatch@latest",
+          "dependencies": {
+            "sigmund": {
+              "version": "1.0.0",
+              "from": "sigmund@~1.0.0",
+              "resolved": "https://registry.npmjs.org/sigmund/-/sigmund-1.0.0.tgz"
+            }
+          }
+        },
+        "nopt": {
+          "version": "2.1.1",
+          "from": "nopt@latest"
+        },
+        "rimraf": {
+          "version": "2.1.4",
+          "from": "rimraf@2"
+        },
+        "request": {
+          "version": "2.20.0",
+          "from": "request@latest",
+          "dependencies": {
+            "form-data": {
+              "version": "0.0.8",
+              "from": "form-data@~0.0.3",
+              "dependencies": {
+                "combined-stream": {
+                  "version": "0.0.4",
+                  "from": "combined-stream@~0.0.4",
+                  "resolved": "https://registry.npmjs.org/combined-stream/-/combined-stream-0.0.4.tgz",
+                  "dependencies": {
+                    "delayed-stream": {
+                      "version": "0.0.5",
+                      "from": "delayed-stream@0.0.5",
+                      "resolved": "https://registry.npmjs.org/delayed-stream/-/delayed-stream-0.0.5.tgz"
+                    }
+                  }
+                },
+                "async": {
+                  "version": "0.2.7",
+                  "from": "async@~0.2.7"
+                }
+              }
+            },
+            "mime": {
+              "version": "1.2.9",
+              "from": "mime@~1.2.7"
+            },
+            "hawk": {
+              "version": "0.10.2",
+              "from": "hawk@~0.10.2",
+              "dependencies": {
+                "hoek": {
+                  "version": "0.7.6",
+                  "from": "hoek@0.7.x"
+                },
+                "boom": {
+                  "version": "0.3.8",
+                  "from": "boom@0.3.x"
+                },
+                "cryptiles": {
+                  "version": "0.1.3",
+                  "from": "cryptiles@0.1.x"
+                },
+                "sntp": {
+                  "version": "0.1.4",
+                  "from": "sntp@0.1.x"
+                }
+              }
+            },
+            "node-uuid": {
+              "version": "1.4.0",
+              "from": "node-uuid@~1.4.0"
+            },
+            "cookie-jar": {
+              "version": "0.3.0",
+              "from": "cookie-jar@~0.3.0"
+            },
+            "aws-sign": {
+              "version": "0.3.0",
+              "from": "aws-sign@~0.3.0"
+            },
+            "oauth-sign": {
+              "version": "0.3.0",
+              "from": "oauth-sign@~0.3.0"
+            },
+            "http-signature": {
+              "version": "0.9.11",
+              "from": "http-signature@~0.9.1",
+              "dependencies": {
+                "assert-plus": {
+                  "version": "0.1.2",
+                  "from": "assert-plus@0.1.2"
+                },
+                "asn1": {
+                  "version": "0.1.11",
+                  "from": "asn1@0.1.11"
+                },
+                "ctype": {
+                  "version": "0.5.2",
+                  "from": "ctype@0.5.2"
+                }
+              }
+            },
+            "forever-agent": {
+              "version": "0.3.0",
+              "from": "forever-agent@~0.3.0"
+            },
+            "tunnel-agent": {
+              "version": "0.3.0",
+              "from": "tunnel-agent@~0.3.0"
+            },
+            "json-stringify-safe": {
+              "version": "3.0.0",
+              "from": "json-stringify-safe@~3.0.0"
+            },
+            "qs": {
+              "version": "0.5.6",
+              "from": "qs@~0.5.4"
+            }
+          }
+        },
+        "which": {
+          "version": "1.0.5",
+          "from": "which@1"
+        },
+        "tar": {
+          "version": "0.1.17",
+          "from": "tar@0.1.17",
+          "resolved": "https://registry.npmjs.org/tar/-/tar-0.1.17.tgz"
+        },
+        "fstream": {
+          "version": "0.1.22",
+          "from": "fstream@latest"
+        },
+        "block-stream": {
+          "version": "0.0.6",
+          "from": "block-stream@*"
+        },
+        "inherits": {
+          "version": "1.0.0",
+          "from": "git://github.com/isaacs/inherits"
+        },
+        "mkdirp": {
+          "version": "0.3.5",
+          "from": "mkdirp@0.3.5",
+          "resolved": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.3.5.tgz"
+        },
+        "read": {
+          "version": "1.0.4",
+          "from": "read@~1.0.3",
+          "dependencies": {
+            "mute-stream": {
+              "version": "0.0.3",
+              "from": "mute-stream@~0.0.2"
+            }
+          }
+        },
+        "lru-cache": {
+          "version": "2.3.0",
+          "from": "lru-cache@latest"
+        },
+        "node-gyp": {
+          "version": "0.9.5",
+          "from": "node-gyp@latest"
+        },
+        "fstream-npm": {
+          "version": "0.1.4",
+          "from": "fstream-npm@latest",
+          "dependencies": {
+            "fstream-ignore": {
+              "version": "0.0.6",
+              "from": "fstream-ignore@~0.0.5"
+            }
+          }
+        },
+        "uid-number": {
+          "version": "0.0.3",
+          "from": "../uid-number"
+        },
+        "archy": {
+          "version": "0.0.2",
+          "from": "archy@0.0.2"
+        },
+        "chownr": {
+          "version": "0.0.1",
+          "from": "../chownr"
+        },
+        "npmlog": {
+          "version": "0.0.2",
+          "from": "npmlog@0"
+        },
+        "ansi": {
+          "version": "0.1.2",
+          "from": "ansi@~0.1.2"
+        },
+        "npm-registry-client": {
+          "version": "0.2.22",
+          "from": "npm-registry-client@latest",
+          "dependencies": {
+            "couch-login": {
+              "version": "0.1.16",
+              "from": "couch-login@~0.1.15"
+            }
+          }
+        },
+        "read-package-json": {
+          "version": "0.4.1",
+          "from": "read-package-json@latest",
+          "dependencies": {
+            "normalize-package-data": {
+              "version": "0.1.2",
+              "from": "normalize-package-data@~0.1.2",
+              "dependencies": {
+                "github-url-from-git": {
+                  "version": "1.1.1",
+                  "from": "github-url-from-git@~1.1.1"
+                }
+              }
+            }
+          }
+        },
+        "read-installed": {
+          "version": "0.1.1",
+          "from": "read-installed@0"
+        },
+        "glob": {
+          "version": "3.2.1",
+          "from": "glob@3.2.1",
+          "resolved": "https://registry.npmjs.org/glob/-/glob-3.2.1.tgz"
+        },
+        "init-package-json": {
+          "version": "0.0.8",
+          "from": "init-package-json@latest",
+          "dependencies": {
+            "promzard": {
+              "version": "0.2.0",
+              "from": "promzard@~0.2.0"
+            }
+          }
+        },
+        "osenv": {
+          "version": "0.0.3",
+          "from": "osenv@latest"
+        },
+        "lockfile": {
+          "version": "0.3.1",
+          "from": "lockfile@0.3.1",
+          "resolved": "https://registry.npmjs.org/lockfile/-/lockfile-0.3.1.tgz"
+        },
+        "retry": {
+          "version": "0.6.0",
+          "from": "retry"
+        },
+        "once": {
+          "version": "1.1.1",
+          "from": "once"
+        },
+        "npmconf": {
+          "version": "0.0.24",
+          "from": "npmconf@latest",
+          "dependencies": {
+            "config-chain": {
+              "version": "1.1.7",
+              "from": "config-chain@~1.1.1",
+              "resolved": "https://registry.npmjs.org/config-chain/-/config-chain-1.1.7.tgz",
+              "dependencies": {
+                "proto-list": {
+                  "version": "1.2.2",
+                  "from": "proto-list@~1.2.1",
+                  "resolved": "https://registry.npmjs.org/proto-list/-/proto-list-1.2.2.tgz"
+                }
+              }
+            }
+          }
+        },
+        "opener": {
+          "version": "1.3.0",
+          "from": "opener@latest"
+        },
+        "chmodr": {
+          "version": "0.1.0",
+          "from": "chmodr@latest"
+        },
+        "cmd-shim": {
+          "version": "1.1.0",
+          "from": "cmd-shim@"
+        },
+        "sha": {
+          "version": "1.0.1",
+          "from": "sha@~1.0.1"
+        },
+        "editor": {
+          "version": "0.0.4",
+          "from": "editor@"
+        },
+        "child-process-close": {
+          "version": "0.1.1",
+          "from": "child-process-close@",
+          "resolved": "https://registry.npmjs.org/child-process-close/-/child-process-close-0.1.1.tgz"
+        }
+      }
+    }
+  }
+}
+2013-07-09 17:43:47,234 [salt.loaded.int.module.cmdmod               ][DEBUG   ] stderr: npm WARN package.json retry@0.6.0 No readme data!
+2013-07-09 17:43:47,235 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command 'npm --version' in directory '/'
+2013-07-09 17:43:47,556 [salt.loaded.int.module.cmdmod               ][DEBUG   ] output: 1.2.19
+2013-07-09 17:43:47,557 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command 'npm install --silent --json --global nodemon' in directory '/'
+2013-07-09 17:43:49,321 [salt.loaded.int.module.cmdmod               ][DEBUG   ] stdout: /bin/nodemon -> /lib/node_modules/nodemon/nodemon.js
+[
+  {
+    "name": "nodemon",
+    "version": "0.7.8",
+    "from": "nodemon@",
+    "dependencies": {}
+  }
+]
+2013-07-09 17:43:49,321 [salt.loaded.int.module.npm                  ][ERROR   ] ['/bin/nodemon -> /lib/node_modules/nodemon/nodemon.js', '[', '  {', '    "name": "nodemon",', '    "version": "0.7.8",', '    "from": "nodemon@",', '    "dependencies": {}', '  }', ']']
+2013-07-09 17:43:49,322 [salt.state                                  ][INFO    ] {'nodemon@0.7.8': 'Installed'}
+2013-07-09 17:43:49,323 [salt.state                                  ][INFO    ] Executing state npm.installed for cloudflash
+2013-07-09 17:43:49,323 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command 'npm --version' in directory '/'
+2013-07-09 17:43:49,636 [salt.loaded.int.module.cmdmod               ][DEBUG   ] output: 1.2.19
+2013-07-09 17:43:49,637 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command 'npm list --json --global' in directory '/'
+2013-07-09 17:43:50,277 [salt.loaded.int.module.cmdmod               ][DEBUG   ] stdout: {
+  "dependencies": {
+    "nodemon": {
+      "version": "0.7.8",
+      "from": "nodemon@",
+      "resolved": "https://registry.npmjs.org/nodemon/-/nodemon-0.7.8.tgz"
+    },
+    "cloudflash-bolt": {
+      "version": "0.1.5",
+      "from": "cloudflash-bolt@",
+      "resolved": "https://registry.npmjs.org/cloudflash-bolt/-/cloudflash-bolt-0.1.5.tgz",
+      "dependencies": {
+        "zappajs": {
+          "version": "0.3.10",
+          "from": "zappajs@0.3.x",
+          "resolved": "https://registry.npmjs.org/zappajs/-/zappajs-0.3.10.tgz",
+          "dependencies": {
+            "express": {
+              "version": "2.5.10",
+              "from": "express@2.5.10",
+              "resolved": "https://registry.npmjs.org/express/-/express-2.5.10.tgz",
+              "dependencies": {
+                "connect": {
+                  "version": "1.9.2",
+                  "from": "connect@1.x",
+                  "resolved": "https://registry.npmjs.org/connect/-/connect-1.9.2.tgz",
+                  "dependencies": {
+                    "formidable": {
+                      "version": "1.0.14",
+                      "from": "formidable@1.0.x",
+                      "resolved": "https://registry.npmjs.org/formidable/-/formidable-1.0.14.tgz"
+                    }
+                  }
+                },
+                "mime": {
+                  "version": "1.2.4",
+                  "from": "mime@1.2.4",
+                  "resolved": "https://registry.npmjs.org/mime/-/mime-1.2.4.tgz"
+                },
+                "qs": {
+                  "version": "0.4.2",
+                  "from": "qs@0.4.x",
+                  "resolved": "https://registry.npmjs.org/qs/-/qs-0.4.2.tgz"
+                },
+                "mkdirp": {
+                  "version": "0.3.0",
+                  "from": "mkdirp@0.3.0",
+                  "resolved": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.3.0.tgz"
+                }
+              }
+            },
+            "socket.io": {
+              "version": "0.9.16",
+              "from": "socket.io@0.9.x",
+              "resolved": "https://registry.npmjs.org/socket.io/-/socket.io-0.9.16.tgz",
+              "dependencies": {
+                "socket.io-client": {
+                  "version": "0.9.16",
+                  "from": "socket.io-client@0.9.16",
+                  "resolved": "https://registry.npmjs.org/socket.io-client/-/socket.io-client-0.9.16.tgz",
+                  "dependencies": {
+                    "uglify-js": {
+                      "version": "1.2.5",
+                      "from": "uglify-js@1.2.5",
+                      "resolved": "https://registry.npmjs.org/uglify-js/-/uglify-js-1.2.5.tgz"
+                    },
+                    "ws": {
+                      "version": "0.4.27",
+                      "from": "ws@0.4.x",
+                      "resolved": "https://registry.npmjs.org/ws/-/ws-0.4.27.tgz",
+                      "dependencies": {
+                        "commander": {
+                          "version": "0.6.1",
+                          "from": "commander@~0.6.1",
+                          "resolved": "https://registry.npmjs.org/commander/-/commander-0.6.1.tgz"
+                        },
+                        "tinycolor": {
+                          "version": "0.0.1",
+                          "from": "tinycolor@0.x",
+                          "resolved": "https://registry.npmjs.org/tinycolor/-/tinycolor-0.0.1.tgz"
+                        },
+                        "options": {
+                          "version": "0.0.5",
+                          "from": "options@>=0.0.5",
+                          "resolved": "https://registry.npmjs.org/options/-/options-0.0.5.tgz"
+                        }
+                      }
+                    },
+                    "xmlhttprequest": {
+                      "version": "1.4.2",
+                      "from": "xmlhttprequest@1.4.2",
+                      "resolved": "https://registry.npmjs.org/xmlhttprequest/-/xmlhttprequest-1.4.2.tgz"
+                    },
+                    "active-x-obfuscator": {
+                      "version": "0.0.1",
+                      "from": "active-x-obfuscator@0.0.1",
+                      "resolved": "https://registry.npmjs.org/active-x-obfuscator/-/active-x-obfuscator-0.0.1.tgz",
+                      "dependencies": {
+                        "zeparser": {
+                          "version": "0.0.5",
+                          "from": "zeparser@0.0.5",
+                          "resolved": "https://registry.npmjs.org/zeparser/-/zeparser-0.0.5.tgz"
+                        }
+                      }
+                    }
+                  }
+                },
+                "policyfile": {
+                  "version": "0.0.4",
+                  "from": "policyfile@0.0.4",
+                  "resolved": "https://registry.npmjs.org/policyfile/-/policyfile-0.0.4.tgz"
+                },
+                "base64id": {
+                  "version": "0.1.0",
+                  "from": "base64id@0.1.0",
+                  "resolved": "https://registry.npmjs.org/base64id/-/base64id-0.1.0.tgz"
+                },
+                "redis": {
+                  "version": "0.7.3",
+                  "from": "redis@0.7.3",
+                  "resolved": "https://registry.npmjs.org/redis/-/redis-0.7.3.tgz"
+                }
+              }
+            },
+            "coffeecup": {
+              "version": "0.3.21",
+              "from": "coffeecup@0.3.x",
+              "resolved": "https://registry.npmjs.org/coffeecup/-/coffeecup-0.3.21.tgz",
+              "dependencies": {
+                "coffee-script": {
+                  "version": "1.6.3",
+                  "from": "coffee-script@>=1.3 <2",
+                  "resolved": "https://registry.npmjs.org/coffee-script/-/coffee-script-1.6.3.tgz"
+                },
+                "optparse": {
+                  "version": "1.0.3",
+                  "from": "optparse@1.0.3",
+                  "resolved": "https://registry.npmjs.org/optparse/-/optparse-1.0.3.tgz"
+                },
+                "uglify-js": {
+                  "version": "1.2.6",
+                  "from": "uglify-js@1.2.6",
+                  "resolved": "https://registry.npmjs.org/uglify-js/-/uglify-js-1.2.6.tgz"
+                },
+                "stylus": {
+                  "version": "0.27.2",
+                  "from": "stylus@0.27.2",
+                  "resolved": "https://registry.npmjs.org/stylus/-/stylus-0.27.2.tgz",
+                  "dependencies": {
+                    "cssom": {
+                      "version": "0.2.5",
+                      "from": "cssom@0.2.x",
+                      "resolved": "https://registry.npmjs.org/cssom/-/cssom-0.2.5.tgz"
+                    },
+                    "mkdirp": {
+                      "version": "0.3.5",
+                      "from": "mkdirp@0.3.x",
+                      "resolved": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.3.5.tgz"
+                    },
+                    "debug": {
+                      "version": "0.7.2",
+                      "from": "debug@*",
+                      "resolved": "https://registry.npmjs.org/debug/-/debug-0.7.2.tgz"
+                    }
+                  }
+                }
+              }
+            },
+            "node-uuid": {
+              "version": "1.2.0",
+              "from": "node-uuid@1.2.0",
+              "resolved": "https://registry.npmjs.org/node-uuid/-/node-uuid-1.2.0.tgz"
+            },
+            "uglify-js": {
+              "version": "1.1.1",
+              "from": "uglify-js@1.1.x",
+              "resolved": "https://registry.npmjs.org/uglify-js/-/uglify-js-1.1.1.tgz"
+            }
+          }
+        },
+        "dirty": {
+          "version": "0.9.7",
+          "from": "dirty@0.9.x",
+          "resolved": "https://registry.npmjs.org/dirty/-/dirty-0.9.7.tgz"
+        },
+        "request": {
+          "version": "2.9.203",
+          "from": "request@2.9.x",
+          "resolved": "https://registry.npmjs.org/request/-/request-2.9.203.tgz"
+        },
+        "json-schema": {
+          "version": "0.2.0",
+          "from": "json-schema@0.2.0",
+          "resolved": "https://registry.npmjs.org/json-schema/-/json-schema-0.2.0.tgz"
+        },
+        "node-uuid": {
+          "version": "1.3.3",
+          "from": "node-uuid@1.3.x",
+          "resolved": "https://registry.npmjs.org/node-uuid/-/node-uuid-1.3.3.tgz"
+        },
+        "fileops": {
+          "version": "0.1.3",
+          "from": "fileops@0.1.3",
+          "resolved": "https://registry.npmjs.org/fileops/-/fileops-0.1.3.tgz"
+        }
+      }
+    },
+    "coffee-script": {
+      "version": "1.6.1",
+      "from": "coffee-script"
+    },
+    "npm": {
+      "version": "1.2.19",
+      "from": "npm@1.2.19",
+      "dependencies": {
+        "semver": {
+          "version": "1.1.4",
+          "from": "semver@1.1.4"
+        },
+        "ini": {
+          "version": "1.1.0",
+          "from": "ini@latest"
+        },
+        "slide": {
+          "version": "1.1.4",
+          "from": "slide@latest"
+        },
+        "abbrev": {
+          "version": "1.0.4",
+          "from": "abbrev@latest"
+        },
+        "graceful-fs": {
+          "version": "1.2.0",
+          "from": "graceful-fs@latest"
+        },
+        "minimatch": {
+          "version": "0.2.12",
+          "from": "minimatch@latest",
+          "dependencies": {
+            "sigmund": {
+              "version": "1.0.0",
+              "from": "sigmund@~1.0.0",
+              "resolved": "https://registry.npmjs.org/sigmund/-/sigmund-1.0.0.tgz"
+            }
+          }
+        },
+        "nopt": {
+          "version": "2.1.1",
+          "from": "nopt@latest"
+        },
+        "rimraf": {
+          "version": "2.1.4",
+          "from": "rimraf@2"
+        },
+        "request": {
+          "version": "2.20.0",
+          "from": "request@latest",
+          "dependencies": {
+            "form-data": {
+              "version": "0.0.8",
+              "from": "form-data@~0.0.3",
+              "dependencies": {
+                "combined-stream": {
+                  "version": "0.0.4",
+                  "from": "combined-stream@~0.0.4",
+                  "resolved": "https://registry.npmjs.org/combined-stream/-/combined-stream-0.0.4.tgz",
+                  "dependencies": {
+                    "delayed-stream": {
+                      "version": "0.0.5",
+                      "from": "delayed-stream@0.0.5",
+                      "resolved": "https://registry.npmjs.org/delayed-stream/-/delayed-stream-0.0.5.tgz"
+                    }
+                  }
+                },
+                "async": {
+                  "version": "0.2.7",
+                  "from": "async@~0.2.7"
+                }
+              }
+            },
+            "mime": {
+              "version": "1.2.9",
+              "from": "mime@~1.2.7"
+            },
+            "hawk": {
+              "version": "0.10.2",
+              "from": "hawk@~0.10.2",
+              "dependencies": {
+                "hoek": {
+                  "version": "0.7.6",
+                  "from": "hoek@0.7.x"
+                },
+                "boom": {
+                  "version": "0.3.8",
+                  "from": "boom@0.3.x"
+                },
+                "cryptiles": {
+                  "version": "0.1.3",
+                  "from": "cryptiles@0.1.x"
+                },
+                "sntp": {
+                  "version": "0.1.4",
+                  "from": "sntp@0.1.x"
+                }
+              }
+            },
+            "node-uuid": {
+              "version": "1.4.0",
+              "from": "node-uuid@~1.4.0"
+            },
+            "cookie-jar": {
+              "version": "0.3.0",
+              "from": "cookie-jar@~0.3.0"
+            },
+            "aws-sign": {
+              "version": "0.3.0",
+              "from": "aws-sign@~0.3.0"
+            },
+            "oauth-sign": {
+              "version": "0.3.0",
+              "from": "oauth-sign@~0.3.0"
+            },
+            "http-signature": {
+              "version": "0.9.11",
+              "from": "http-signature@~0.9.1",
+              "dependencies": {
+                "assert-plus": {
+                  "version": "0.1.2",
+                  "from": "assert-plus@0.1.2"
+                },
+                "asn1": {
+                  "version": "0.1.11",
+                  "from": "asn1@0.1.11"
+                },
+                "ctype": {
+                  "version": "0.5.2",
+                  "from": "ctype@0.5.2"
+                }
+              }
+            },
+            "forever-agent": {
+              "version": "0.3.0",
+              "from": "forever-agent@~0.3.0"
+            },
+            "tunnel-agent": {
+              "version": "0.3.0",
+              "from": "tunnel-agent@~0.3.0"
+            },
+            "json-stringify-safe": {
+              "version": "3.0.0",
+              "from": "json-stringify-safe@~3.0.0"
+            },
+            "qs": {
+              "version": "0.5.6",
+              "from": "qs@~0.5.4"
+            }
+          }
+        },
+        "which": {
+          "version": "1.0.5",
+          "from": "which@1"
+        },
+        "tar": {
+          "version": "0.1.17",
+          "from": "tar@0.1.17",
+          "resolved": "https://registry.npmjs.org/tar/-/tar-0.1.17.tgz"
+        },
+        "fstream": {
+          "version": "0.1.22",
+          "from": "fstream@latest"
+        },
+        "block-stream": {
+          "version": "0.0.6",
+          "from": "block-stream@*"
+        },
+        "inherits": {
+          "version": "1.0.0",
+          "from": "git://github.com/isaacs/inherits"
+        },
+        "mkdirp": {
+          "version": "0.3.5",
+          "from": "mkdirp@0.3.5",
+          "resolved": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.3.5.tgz"
+        },
+        "read": {
+          "version": "1.0.4",
+          "from": "read@~1.0.3",
+          "dependencies": {
+            "mute-stream": {
+              "version": "0.0.3",
+              "from": "mute-stream@~0.0.2"
+            }
+          }
+        },
+        "lru-cache": {
+          "version": "2.3.0",
+          "from": "lru-cache@latest"
+        },
+        "node-gyp": {
+          "version": "0.9.5",
+          "from": "node-gyp@latest"
+        },
+        "fstream-npm": {
+          "version": "0.1.4",
+          "from": "fstream-npm@latest",
+          "dependencies": {
+            "fstream-ignore": {
+              "version": "0.0.6",
+              "from": "fstream-ignore@~0.0.5"
+            }
+          }
+        },
+        "uid-number": {
+          "version": "0.0.3",
+          "from": "../uid-number"
+        },
+        "archy": {
+          "version": "0.0.2",
+          "from": "archy@0.0.2"
+        },
+        "chownr": {
+          "version": "0.0.1",
+          "from": "../chownr"
+        },
+        "npmlog": {
+          "version": "0.0.2",
+          "from": "npmlog@0"
+        },
+        "ansi": {
+          "version": "0.1.2",
+          "from": "ansi@~0.1.2"
+        },
+        "npm-registry-client": {
+          "version": "0.2.22",
+          "from": "npm-registry-client@latest",
+          "dependencies": {
+            "couch-login": {
+              "version": "0.1.16",
+              "from": "couch-login@~0.1.15"
+            }
+          }
+        },
+        "read-package-json": {
+          "version": "0.4.1",
+          "from": "read-package-json@latest",
+          "dependencies": {
+            "normalize-package-data": {
+              "version": "0.1.2",
+              "from": "normalize-package-data@~0.1.2",
+              "dependencies": {
+                "github-url-from-git": {
+                  "version": "1.1.1",
+                  "from": "github-url-from-git@~1.1.1"
+                }
+              }
+            }
+          }
+        },
+        "read-installed": {
+          "version": "0.1.1",
+          "from": "read-installed@0"
+        },
+        "glob": {
+          "version": "3.2.1",
+          "from": "glob@3.2.1",
+          "resolved": "https://registry.npmjs.org/glob/-/glob-3.2.1.tgz"
+        },
+        "init-package-json": {
+          "version": "0.0.8",
+          "from": "init-package-json@latest",
+          "dependencies": {
+            "promzard": {
+              "version": "0.2.0",
+              "from": "promzard@~0.2.0"
+            }
+          }
+        },
+        "osenv": {
+          "version": "0.0.3",
+          "from": "osenv@latest"
+        },
+        "lockfile": {
+          "version": "0.3.1",
+          "from": "lockfile@0.3.1",
+          "resolved": "https://registry.npmjs.org/lockfile/-/lockfile-0.3.1.tgz"
+        },
+        "retry": {
+          "version": "0.6.0",
+          "from": "retry"
+        },
+        "once": {
+          "version": "1.1.1",
+          "from": "once"
+        },
+        "npmconf": {
+          "version": "0.0.24",
+          "from": "npmconf@latest",
+          "dependencies": {
+            "config-chain": {
+              "version": "1.1.7",
+              "from": "config-chain@~1.1.1",
+              "resolved": "https://registry.npmjs.org/config-chain/-/config-chain-1.1.7.tgz",
+              "dependencies": {
+                "proto-list": {
+                  "version": "1.2.2",
+                  "from": "proto-list@~1.2.1",
+                  "resolved": "https://registry.npmjs.org/proto-list/-/proto-list-1.2.2.tgz"
+                }
+              }
+            }
+          }
+        },
+        "opener": {
+          "version": "1.3.0",
+          "from": "opener@latest"
+        },
+        "chmodr": {
+          "version": "0.1.0",
+          "from": "chmodr@latest"
+        },
+        "cmd-shim": {
+          "version": "1.1.0",
+          "from": "cmd-shim@"
+        },
+        "sha": {
+          "version": "1.0.1",
+          "from": "sha@~1.0.1"
+        },
+        "editor": {
+          "version": "0.0.4",
+          "from": "editor@"
+        },
+        "child-process-close": {
+          "version": "0.1.1",
+          "from": "child-process-close@",
+          "resolved": "https://registry.npmjs.org/child-process-close/-/child-process-close-0.1.1.tgz"
+        }
+      }
+    }
+  }
+}
+2013-07-09 17:43:50,277 [salt.loaded.int.module.cmdmod               ][DEBUG   ] stderr: npm WARN package.json retry@0.6.0 No readme data!
+2013-07-09 17:43:50,279 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command 'npm --version' in directory '/'
+2013-07-09 17:43:50,600 [salt.loaded.int.module.cmdmod               ][DEBUG   ] output: 1.2.19
+2013-07-09 17:43:50,601 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command 'npm install --silent --json --global cloudflash' in directory '/'
+2013-07-09 17:43:57,407 [salt.loaded.int.module.cmdmod               ][DEBUG   ] stdout: 
+> ws@0.4.27 install /lib/node_modules/cloudflash/node_modules/zappajs/node_modules/socket.io/node_modules/socket.io-client/node_modules/ws
+> (node-gyp rebuild 2> builderror.log) || (exit 0)
+
+[
+  {
+    "name": "cloudflash",
+    "version": "0.6.2",
+    "from": "cloudflash@",
+    "dependencies": {
+      "fileops": {
+        "version": "0.1.3",
+        "from": "fileops@0.1.3",
+        "dependencies": {}
+      },
+      "node-uuid": {
+        "version": "1.3.3",
+        "from": "node-uuid@1.3.x",
+        "dependencies": {}
+      },
+      "async": {
+        "version": "0.1.22",
+        "from": "async@0.1.x",
+        "dependencies": {}
+      },
+      "lazy": {
+        "version": "1.0.11",
+        "from": "lazy@1.0.x",
+        "dependencies": {}
+      },
+      "dirty": {
+        "version": "0.9.7",
+        "from": "dirty@0.9.x",
+        "dependencies": {}
+      },
+      "json-schema": {
+        "version": "0.2.0",
+        "from": "json-schema@0.2.0",
+        "dependencies": {}
+      },
+      "request": {
+        "version": "2.9.203",
+        "from": "request@2.9.x",
+        "dependencies": {}
+      },
+      "zappajs": {
+        "version": "0.3.10",
+        "from": "zappajs@0.3.x",
+        "dependencies": {
+          "node-uuid": {
+            "version": "1.2.0",
+            "from": "node-uuid@1.2.0",
+            "dependencies": {}
+          },
+          "uglify-js": {
+            "version": "1.1.1",
+            "from": "uglify-js@1.1.x",
+            "dependencies": {}
+          },
+          "coffeecup": {
+            "version": "0.3.21",
+            "from": "coffeecup@0.3.x",
+            "dependencies": {
+              "optparse": {
+                "version": "1.0.3",
+                "from": "optparse@1.0.3",
+                "dependencies": {}
+              },
+              "coffee-script": {
+                "version": "1.6.3",
+                "from": "coffee-script@>=1.3 <2",
+                "dependencies": {}
+              },
+              "stylus": {
+                "version": "0.27.2",
+                "from": "stylus@0.27.2",
+                "dependencies": {
+                  "debug": {
+                    "version": "0.7.2",
+                    "from": "debug@*",
+                    "dependencies": {}
+                  },
+                  "mkdirp": {
+                    "version": "0.3.5",
+                    "from": "mkdirp@0.3.x",
+                    "dependencies": {}
+                  },
+                  "cssom": {
+                    "version": "0.2.5",
+                    "from": "cssom@0.2.x",
+                    "dependencies": {}
+                  }
+                }
+              },
+              "uglify-js": {
+                "version": "1.2.6",
+                "from": "uglify-js@1.2.6",
+                "dependencies": {}
+              }
+            }
+          },
+          "express": {
+            "version": "2.5.10",
+            "from": "express@2.5.10",
+            "dependencies": {
+              "qs": {
+                "version": "0.4.2",
+                "from": "qs@0.4.x",
+                "dependencies": {}
+              },
+              "mime": {
+                "version": "1.2.4",
+                "from": "mime@1.2.4",
+                "dependencies": {}
+              },
+              "mkdirp": {
+                "version": "0.3.0",
+                "from": "mkdirp@0.3.0",
+                "dependencies": {}
+              },
+              "connect": {
+                "version": "1.9.2",
+                "from": "connect@1.x",
+                "dependencies": {
+                  "formidable": {
+                    "version": "1.0.14",
+                    "from": "formidable@1.0.x",
+                    "dependencies": {}
+                  }
+                }
+              }
+            }
+          },
+          "socket.io": {
+            "version": "0.9.16",
+            "from": "socket.io@0.9.x",
+            "dependencies": {
+              "base64id": {
+                "version": "0.1.0",
+                "from": "base64id@0.1.0",
+                "dependencies": {}
+              },
+              "policyfile": {
+                "version": "0.0.4",
+                "from": "policyfile@0.0.4",
+                "dependencies": {}
+              },
+              "redis": {
+                "version": "0.7.3",
+                "from": "redis@0.7.3",
+                "dependencies": {}
+              },
+              "socket.io-client": {
+                "version": "0.9.16",
+                "from": "socket.io-client@0.9.16",
+                "dependencies": {
+                  "xmlhttprequest": {
+                    "version": "1.4.2",
+                    "from": "xmlhttprequest@1.4.2",
+                    "dependencies": {}
+                  },
+                  "uglify-js": {
+                    "version": "1.2.5",
+                    "from": "uglify-js@1.2.5",
+                    "dependencies": {}
+                  },
+                  "ws": {
+                    "version": "0.4.27",
+                    "from": "ws@0.4.x",
+                    "dependencies": {
+                      "tinycolor": {
+                        "version": "0.0.1",
+                        "from": "tinycolor@0.x",
+                        "dependencies": {}
+                      },
+                      "options": {
+                        "version": "0.0.5",
+                        "from": "options@>=0.0.5",
+                        "dependencies": {}
+                      },
+                      "commander": {
+                        "version": "0.6.1",
+                        "from": "commander@~0.6.1",
+                        "dependencies": {}
+                      }
+                    }
+                  },
+                  "active-x-obfuscator": {
+                    "version": "0.0.1",
+                    "from": "active-x-obfuscator@0.0.1",
+                    "dependencies": {
+                      "zeparser": {
+                        "version": "0.0.5",
+                        "from": "zeparser@0.0.5",
+                        "dependencies": {}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+]
+2013-07-09 17:43:57,408 [salt.loaded.int.module.npm                  ][ERROR   ] ['', '> ws@0.4.27 install /lib/node_modules/cloudflash/node_modules/zappajs/node_modules/socket.io/node_modules/socket.io-client/node_modules/ws', '> (node-gyp rebuild 2> builderror.log) || (exit 0)', '', '[', '  {', '    "name": "cloudflash",', '    "version": "0.6.2",', '    "from": "cloudflash@",', '    "dependencies": {', '      "fileops": {', '        "version": "0.1.3",', '        "from": "fileops@0.1.3",', '        "dependencies": {}', '      },', '      "node-uuid": {', '        "version": "1.3.3",', '        "from": "node-uuid@1.3.x",', '        "dependencies": {}', '      },', '      "async": {', '        "version": "0.1.22",', '        "from": "async@0.1.x",', '        "dependencies": {}', '      },', '      "lazy": {', '        "version": "1.0.11",', '        "from": "lazy@1.0.x",', '        "dependencies": {}', '      },', '      "dirty": {', '        "version": "0.9.7",', '        "from": "dirty@0.9.x",', '        "dependencies": {}', '      },', '      "json-schema": {', '        "version": "0.2.0",', '        "from": "json-schema@0.2.0",', '        "dependencies": {}', '      },', '      "request": {', '        "version": "2.9.203",', '        "from": "request@2.9.x",', '        "dependencies": {}', '      },', '      "zappajs": {', '        "version": "0.3.10",', '        "from": "zappajs@0.3.x",', '        "dependencies": {', '          "node-uuid": {', '            "version": "1.2.0",', '            "from": "node-uuid@1.2.0",', '            "dependencies": {}', '          },', '          "uglify-js": {', '            "version": "1.1.1",', '            "from": "uglify-js@1.1.x",', '            "dependencies": {}', '          },', '          "coffeecup": {', '            "version": "0.3.21",', '            "from": "coffeecup@0.3.x",', '            "dependencies": {', '              "optparse": {', '                "version": "1.0.3",', '                "from": "optparse@1.0.3",', '                "dependencies": {}', '              },', '              "coffee-script": {', '                "version": "1.6.3",', '                "from": "coffee-script@>=1.3 <2",', '                "dependencies": {}', '              },', '              "stylus": {', '                "version": "0.27.2",', '                "from": "stylus@0.27.2",', '                "dependencies": {', '                  "debug": {', '                    "version": "0.7.2",', '                    "from": "debug@*",', '                    "dependencies": {}', '                  },', '                  "mkdirp": {', '                    "version": "0.3.5",', '                    "from": "mkdirp@0.3.x",', '                    "dependencies": {}', '                  },', '                  "cssom": {', '                    "version": "0.2.5",', '                    "from": "cssom@0.2.x",', '                    "dependencies": {}', '                  }', '                }', '              },', '              "uglify-js": {', '                "version": "1.2.6",', '                "from": "uglify-js@1.2.6",', '                "dependencies": {}', '              }', '            }', '          },', '          "express": {', '            "version": "2.5.10",', '            "from": "express@2.5.10",', '            "dependencies": {', '              "qs": {', '                "version": "0.4.2",', '                "from": "qs@0.4.x",', '                "dependencies": {}', '              },', '              "mime": {', '                "version": "1.2.4",', '                "from": "mime@1.2.4",', '                "dependencies": {}', '              },', '              "mkdirp": {', '                "version": "0.3.0",', '                "from": "mkdirp@0.3.0",', '                "dependencies": {}', '              },', '              "connect": {', '                "version": "1.9.2",', '                "from": "connect@1.x",', '                "dependencies": {', '                  "formidable": {', '                    "version": "1.0.14",', '                    "from": "formidable@1.0.x",', '                    "dependencies": {}', '                  }', '                }', '              }', '            }', '          },', '          "socket.io": {', '            "version": "0.9.16",', '            "from": "socket.io@0.9.x",', '            "dependencies": {', '              "base64id": {', '                "version": "0.1.0",', '                "from": "base64id@0.1.0",', '                "dependencies": {}', '              },', '              "policyfile": {', '                "version": "0.0.4",', '                "from": "policyfile@0.0.4",', '                "dependencies": {}', '              },', '              "redis": {', '                "version": "0.7.3",', '                "from": "redis@0.7.3",', '                "dependencies": {}', '              },', '              "socket.io-client": {', '                "version": "0.9.16",', '                "from": "socket.io-client@0.9.16",', '                "dependencies": {', '                  "xmlhttprequest": {', '                    "version": "1.4.2",', '                    "from": "xmlhttprequest@1.4.2",', '                    "dependencies": {}', '                  },', '                  "uglify-js": {', '                    "version": "1.2.5",', '                    "from": "uglify-js@1.2.5",', '                    "dependencies": {}', '                  },', '                  "ws": {', '                    "version": "0.4.27",', '                    "from": "ws@0.4.x",', '                    "dependencies": {', '                      "tinycolor": {', '                        "version": "0.0.1",', '                        "from": "tinycolor@0.x",', '                        "dependencies": {}', '                      },', '                      "options": {', '                        "version": "0.0.5",', '                        "from": "options@>=0.0.5",', '                        "dependencies": {}', '                      },', '                      "commander": {', '                        "version": "0.6.1",', '                        "from": "commander@~0.6.1",', '                        "dependencies": {}', '                      }', '                    }', '                  },', '                  "active-x-obfuscator": {', '                    "version": "0.0.1",', '                    "from": "active-x-obfuscator@0.0.1",', '                    "dependencies": {', '                      "zeparser": {', '                        "version": "0.0.5",', '                        "from": "zeparser@0.0.5",', '                        "dependencies": {}', '                      }', '                    }', '                  }', '                }', '              }', '            }', '          }', '        }', '      }', '    }', '  }', ']']
+2013-07-09 17:43:57,409 [salt.state                                  ][INFO    ] {'cloudflash@0.6.2': 'Installed'}
+2013-07-09 17:43:57,410 [salt.state                                  ][INFO    ] Executing state cmd.run for echo foo > /tmp/.test
+2013-07-09 17:43:57,410 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command 'ps | grep app.coffee | grep -v grep' in directory '/'
+2013-07-09 17:43:57,416 [salt.loaded.int.module.cmdmod               ][INFO    ] Executing command 'echo foo > /tmp/.test' in directory '/'
+2013-07-09 17:43:57,419 [salt.state                                  ][INFO    ] {'pid': 16110, 'retcode': 0, 'stderr': '', 'stdout': ''}
+2013-07-09 17:43:57,421 [salt.state                                  ][INFO    ] Executing state module.wait for cmd_minion.start_cloudflash_bolt
+2013-07-09 17:43:57,421 [salt.state                                  ][INFO    ] No changes made for cmd_minion.start_cloudflash_bolt
+2013-07-09 17:43:57,421 [salt.state                                  ][INFO    ] Executing state module.mod_watch for cmd_minion.start_cloudflash_bolt
+2013-07-09 17:43:57,423 [salt.state                                  ][INFO    ] {'ret': 'coffee /lib/node_modules/cloudflash-bolt/app.coffee &> /var/log/bolt.log'}
+2013-07-09 17:43:57,424 [salt.state                                  ][INFO    ] Executing state module.wait for cmd_minion.start_cloudflash
+2013-07-09 17:43:57,425 [salt.state                                  ][INFO    ] No changes made for cmd_minion.start_cloudflash
+2013-07-09 17:43:57,425 [salt.state                                  ][INFO    ] Executing state module.mod_watch for cmd_minion.start_cloudflash
+2013-07-09 17:43:57,427 [salt.state                                  ][INFO    ] {'ret': 'nodemon /lib/node_modules/cloudflash/app.coffee &> /var/log/cloudflash.log'}
+2013-07-09 17:43:57,434 [salt.minion                                 ][INFO    ] Returning information for job: req

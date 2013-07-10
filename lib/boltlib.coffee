@@ -219,7 +219,10 @@ class cloudflashbolt
                 if recvData.method == "POST" || recvData.method == "PUT" 
                     if recvData.header
                         request.setHeader("Content-Type",recvData.header)
-                    request.setHeader("Content-Length",recvData.length)
+
+                    if boltTargetPort != 5000
+                        request.setHeader("Content-Length",recvData.length)
+
                     if recvData.accept
                         request.setHeader("Accept",recvData.accept)
                     if recvData.authorization
