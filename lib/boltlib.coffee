@@ -173,7 +173,11 @@ class cloudflashbolt
                     return callback new Error "bolt cname entry not found!" 
         else
             return callback new Error "bolt target missing!"
-    
+
+    #reconnect logic for bolt client
+	reconnect: (host, port) ->
+        setTimeout(@boltClient host, port, 1000)   
+
     #Method to start bolt client
     boltClient: (host, port) ->
         # try to connect to the server
@@ -189,6 +193,10 @@ class cloudflashbolt
                 client.socket.write result
                 console.log "Failed to authorize TLS connection. Could not connect to bolt server"                
         )
+
+        client.socket.on "error", (err) =>
+            console.log 'client error: ' + err
+            @reconnect host, port        
 
         client.socket.addListener "data", (data) ->
             res = {}
@@ -248,6 +256,9 @@ class cloudflashbolt
                     console.log "STATUS: " + response.statusCode
                     console.log("HEADERS: " + JSON.stringify(response.headers))
                     response.setEncoding "utf8"                    
+                    #Latest Modules like cloudflash-ffproxy / cloudflash-uproxy return 204 without data
+                    if response.statusCode == 204 &&  boltTargetPort == 5000
+                        client.socket.write {"deleted":true}               
                     response.on "data", (resFromCF) ->
                         console.log "response from cloudflash: " + resFromCF 
                         if response.statusCode == 200 || response.statusCode == 204 || response.statusCode == 202
