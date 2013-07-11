@@ -175,7 +175,7 @@ class cloudflashbolt
             return callback new Error "bolt target missing!"
 
     #reconnect logic for bolt client
-	reconnect: (host, port) ->
+    reconnect: (host, port) ->
         setTimeout(@boltClient host, port, 1000)   
 
     #Method to start bolt client
