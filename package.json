@@ -1,6 +1,6 @@
 {
   "name": "cloudflash-bolt",
-  "version": "0.1.1",
+  "version": "0.1.7",
   "dependencies": {
           "zappajs": "0.3.x",
 	  "dirty": "0.9.x",
@@ -14,7 +14,7 @@
   },
   "devDependencies": {},
   "optionalDependencies": {},
-  "author": "Geetha Rani/Murty Mulagala",
+  "author": "Geetha Rani/Murty Mulagala/Sivaprasath Busa",
   "description": "CloudFlash-bolt is a web framework for cloud based automation connect bolt client.",
   "repository": {
     "type": "git",

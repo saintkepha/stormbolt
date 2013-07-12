@@ -1,14 +1,12 @@
-boltjson = require('./lib/commonfunction')
+boltjson = require('./lib/boltutil')
 
-listenPort = '';
+listenPort = ''; 
 boltJsonObj = boltjson.readBoltJson()
 listen = boltJsonObj.listen
-if listen
+if listen    
     listenPort = listen.split(":")[1]
-    console.log 'listenPort: ' + listenPort
-
-# start the bolt web service
-
+    console.log 'listenPort: ' + listenPort    
+    
 {@app} = require('zappajs') listenPort, ->
     @configure =>
       @use 'bodyParser', 'methodOverride', @app.router, 'static'
@@ -19,6 +17,6 @@ if listen
       production: => @use 'errorHandler'
 
     @enable 'serve jquery', 'minify'
-
+    
     @include './lib/bolt'
 
