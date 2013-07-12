@@ -78,6 +78,7 @@ class cloudflashbolt
                     result.cname = cname
                     socket.name = cname
                     result.sockName = cname 
+                    result.caddress = socket.remoteAddress
                     console.log 'cname result : ' + JSON.stringify result     
                     boltClientData.push result
                 else
@@ -148,6 +149,7 @@ class cloudflashbolt
                         if  request.header('X-Auth-Token')
                             serverRequest.authorization = request.header('X-Auth-Token')
                    
+                    serverRequest.headers = request.headers
                     serverRequest.path = request.path
                     serverRequest.method = request.method
                     serverRequest.target = request.header('cloudflash-bolt-target')
@@ -170,13 +172,23 @@ class cloudflashbolt
                         callback result                        
                     ), 15000
                 else
-                    return callback new Error "bolt cname entry not found!" 
+                    res = @fillLocalErrorResponse 500,request.headers,"bolt cname entry not found!"                    
+                    return callback(JSON.stringify res)
         else
-            return callback new Error "bolt target missing!"
+            console.log 'bolt target missing'
+            res = @fillLocalErrorResponse 500,request.headers,"bolt target missing!"             
+            return callback(JSON.stringify res)
 
     #reconnect logic for bolt client
     reconnect: (host, port) ->
-        setTimeout(@boltClient host, port, 1000)   
+        setTimeout(@boltClient host, port, 1000)
+    
+    fillLocalErrorResponse: (status,headers,data) ->
+        res = {}
+        res.status = status
+        res.headers = headers                  
+        res.data = data
+        return res           
 
     #Method to start bolt client
     boltClient: (host, port) ->
@@ -197,8 +209,12 @@ class cloudflashbolt
         client.socket.on "error", (err) =>
             console.log 'client error: ' + err
             @reconnect host, port        
-
-        client.socket.addListener "data", (data) ->
+        
+        client.socket.on "close", =>
+            console.log 'client closed: '
+            @reconnect host, port        
+        
+        client.socket.addListener "data", (data) =>
             res = {}
             console.log "Data received from bolt server: " + data            
             recvData = JSON.parse data
@@ -247,29 +263,37 @@ class cloudflashbolt
                         request.setHeader("X-Auth-Token",recvData.authorization)
                 
                 request.end()                
-                request.on "error", (err) ->
-                    console.log "error: " + err                    
-                    res.error = err                    
+
+                request.on "error", (err) =>
+                    console.log "error: " + err
+                    res = @fillLocalErrorResponse(500,recvData.headers,err)
                     client.socket.write JSON.stringify(res)
+
                 #console.log 'request object client: ' + util.inspect(request)  
-                request.on "response", (response) ->                    
+                request.on "response", (response) =>  
+                    resObj = {}                  
                     console.log "STATUS: " + response.statusCode
                     console.log("HEADERS: " + JSON.stringify(response.headers))
-                    response.setEncoding "utf8"                    
+                    response.setEncoding "utf8"          
+                    resObj.headers = response.headers
+                    resObj.status = response.statusCode          
                     #Latest Modules like cloudflash-ffproxy / cloudflash-uproxy return 204 without data
                     if response.statusCode == 204 &&  boltTargetPort == 5000
-                        client.socket.write {"deleted":true}               
+                        resObj.data = {"deleted":true}
+                        client.socket.write JSON.stringify resObj               
                     response.on "data", (resFromCF) ->
                         console.log "response from cloudflash: " + resFromCF 
                         if response.statusCode == 200 || response.statusCode == 204 || response.statusCode == 202
                             #console.log 'response object client: ' + util.inspect(response)  
-                            client.socket.write resFromCF
+                            resObj.data = resFromCF
+                            client.socket.write JSON.stringify resObj
                         else                            
-                            res.error = resFromCF
-                            client.socket.write JSON.stringify(res)                        
+                            #res.error = resFromCF
+                            resObj.data = resFromCF
+                            client.socket.write JSON.stringify resObj                        
 
             else
-                res.error = "Bolt Target Port not part of local forwarding ports managed by the client"
+                res = @fillLocalErrorResponse(500,recvData.headers,"Bolt Target Port not part of local forwarding ports managed by the client")
                 client.socket.write JSON.stringify(res)
                   
 module.exports = cloudflashbolt
