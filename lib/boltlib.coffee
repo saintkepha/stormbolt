@@ -14,11 +14,11 @@ class cloudflashbolt
 
     constructor: ->
         console.log 'boltlib initialized'
-        @boltJsonObj = boltjson.readBoltJson()      
+        @boltJsonObj = ''      
 
     # Read from bolt.json config file and start bolt client or server accordingly.
     configure: (callback) ->            
-
+        @boltJsonObj = boltjson.readBoltJson()
         if @boltJsonObj.remote || @boltJsonObj.local
             local = @boltJsonObj.local
             if local
@@ -62,9 +62,9 @@ class cloudflashbolt
             #socket.id  = socketIdCounter++
             
             socket.setEncoding "utf8"
-            socket.setKeepAlive(true,1000)
+            #socket.setKeepAlive(true,1000)
             boltClientList.push socket          
-            socket.addListener "data", (data) =>                               
+            socket.once "data", (data) =>                               
                 console.log "connection from client :" + socket.remoteAddress
                 console.log "Data received: " + data                    
                 
@@ -80,15 +80,7 @@ class cloudflashbolt
                     result.sockName = cname 
                     result.caddress = socket.remoteAddress
                     console.log 'cname result : ' + JSON.stringify result     
-                    boltClientData.push result
-                else
-                    # Handel response from webservice                    
-                    console.log 'socket.name: ' + socket.name
-                    respData = {}
-                    respData.id  = socket.getPeerCertificate().subject.CN
-                    respData.data = data
-                    clientResponse.push respData
-                    console.log "final res length in listener :" + clientResponse.length
+                    boltClientData.push result                
 
             socket.addListener "close",  =>
                 console.log "bolt client is closed :" + socket.name                
@@ -154,23 +146,11 @@ class cloudflashbolt
                     serverRequest.method = request.method
                     serverRequest.target = request.header('cloudflash-bolt-target')
                     
-                    boltClientSocket.write JSON.stringify(serverRequest)
-                      
+                    boltClientSocket.write JSON.stringify(serverRequest)                      
                     
-                    setTimeout (->
-                        console.log 'boltTarget name:' + boltClientSocket.name
-                        tempBuffer = []; result = new Error "delay in receiving response!"
-                        console.log "final res length in settimeout :" + clientResponse.length
-                        for res in clientResponse
-                            if res.id == boltTarget
-                                console.log 'res.id: ' + res.id
-                                result = res.data
-                            else
-                                tempBuffer.push res
-                        console.log 'clientResponse: ' + JSON.stringify clientResponse
-                        clientResponse = tempBuffer                        
-                        callback result                        
-                    ), 15000
+                    boltClientSocket.once "data", (data) =>
+                        console.log 'data backend service:' + data                                         
+                        callback data              
                 else
                     res = @fillLocalErrorResponse 500,request.headers,"bolt cname entry not found!"                    
                     return callback(JSON.stringify res)
@@ -283,7 +263,7 @@ class cloudflashbolt
                         client.socket.write JSON.stringify resObj               
                     response.on "data", (resFromCF) ->
                         console.log "response from cloudflash: " + resFromCF 
-                        if response.statusCode == 200 || response.statusCode == 204 || response.statusCode == 202
+                        if response.statusCode == 200 || response.statusCode == 204 || response.statusCode == 202 || response.statusCode == 304
                             #console.log 'response object client: ' + util.inspect(response)  
                             resObj.data = resFromCF
                             client.socket.write JSON.stringify resObj

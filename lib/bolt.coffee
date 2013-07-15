@@ -8,6 +8,7 @@
     
     @get '/*': -> 
         console.log 'IN GET' + @request.path
+        bolt = null; bolt = new cloudflashbolt
         if @request.path == '/cname'
             bolt.listBoltClients (res) =>
                 unless res instanceof Error
@@ -29,7 +30,8 @@
                    
 
     @post '/*': ->        
-        console.log 'IN POST'        
+        console.log 'IN POST'
+        bolt = null; bolt = new cloudflashbolt    
         bolt.sendDataToClient @request, (res) =>
             resData = JSON.parse res                
             @response.status(resData.status)
@@ -38,9 +40,10 @@
                 @send resData.data
             else
                 console.log 'in else'
-                @next resData.data 
+                @next resData.data         
     @put '/*': ->        
-        console.log 'IN PUT'        
+        console.log 'IN PUT'
+        bolt = null; bolt = new cloudflashbolt      
         bolt.sendDataToClient @request, (res) =>
             resData = JSON.parse res                
             @response.status(resData.status)
@@ -52,7 +55,8 @@
                 @next resData.data 
 
     @del '/*': ->        
-        console.log 'IN DEL'        
+        console.log 'IN DEL'
+        bolt = null; bolt = new cloudflashbolt        
         bolt.sendDataToClient @request, (res) =>
             resData = JSON.parse res                
             @response.status(resData.status)
