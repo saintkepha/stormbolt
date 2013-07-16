@@ -260,12 +260,16 @@ class cloudflashbolt
                 console.log error
                 stream.write('HTTP/1.1 500 '+error+'\r\n\r\n')
                 stream.end()
+                connector.end()
 
             connector.on "error", (err) =>
                 error = "error during performing http request!"
                 console.log error
-                stream.write('HTTP/1.1 500 '+error+'\r\n\r\n')
-                stream.end()
+                try
+                    stream.write('HTTP/1.1 500 '+error+'\r\n\r\n')
+                    stream.end()
+                catch err
+                    console.log err
 
         incoming = ''
         len = 0
