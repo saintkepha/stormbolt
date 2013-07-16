@@ -192,7 +192,7 @@ class cloudflashbolt
 
     #reconnect logic for bolt client
     reconnect: (host, port) ->
-        retry = (host, port) =>
+        retry = =>
             @runClient host,port
         setTimeout(retry, 1000)
 
