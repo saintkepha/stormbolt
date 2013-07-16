@@ -100,9 +100,6 @@ class cloudflashbolt
                     console.log data
                     entry.stream.write data
 
-                request.resume()
-
-
 
     # Method to start bolt server
     runServer: ->
