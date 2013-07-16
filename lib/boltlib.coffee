@@ -76,7 +76,7 @@ class cloudflashbolt
 
                 entry.stream.on "readable", =>
                     console.log "[proxy] sending response from client"
-                    boltClient.pipe(response, {end:true})
+                    entry.stream.pipe(response, {end:true})
 
                 request.pipe(entry.stream, {end:true})
 
@@ -111,7 +111,7 @@ class cloudflashbolt
                     console.log "current bolt connections: " + boltConnections
 
             stream.on "close",  =>
-                console.log "bolt client is closed :" + stream.name
+                console.log "bolt client is closed:" + stream.name
                 boltConnections.splice(index, 1) for index, item in boltConnections when item.cname is stream.name
 
         ).listen serverPort
