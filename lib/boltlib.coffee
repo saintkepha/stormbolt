@@ -254,6 +254,8 @@ class cloudflashbolt
             connector = http.request roptions, (targetResponse) =>
                 console.log 'setting up reply back to stream'
 
+                flusher = new net.Socket
+
                 body = ''
                 targetResponse.on 'data', (chunk) =>
                     console.log 'read: '+chunk
@@ -261,10 +263,10 @@ class cloudflashbolt
 
                 targetResponse.on 'end', =>
                     console.log 'http request is over'
-                    targetResponse.read(0)
+                    flusher.close()
 
                 stream.setEncoding('utf8')
-#                targetResponse.pipe(stream, {end: false})
+                targetResponse.pipe(flusher).pipe(stream, {end: false})
                 targetResponse.resume()
 
             connector.setTimeout 5000, ->
