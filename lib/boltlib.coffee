@@ -151,7 +151,6 @@ class cloudflashbolt
                             data = boltClientSocket.read
                             console.log 'data backend service:' + data
                             callback data
-
                 else
                     res = @fillLocalErrorResponse 500,request.headers,"bolt cname entry not found!"
                     return callback(JSON.stringify res)
@@ -179,7 +178,7 @@ class cloudflashbolt
             if client.socket.authorized
                 console.log "Successfully connected to bolt server"
                 result = "forwardingPorts:#{forwardingPorts}"
-               client.socket.write result
+                client.socket.write result
             else
                 #using self signed certs for intergration testing. Later get rid of this.
                 result = "forwardingPorts:#{forwardingPorts}"
