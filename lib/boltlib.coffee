@@ -104,7 +104,7 @@ class cloudflashbolt
                     console.log "[proxy] client request ended..."
                     entry.stream.write request
 
-                request.pipe(preq)
+                #request.pipe(preq)
 
 
 
