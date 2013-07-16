@@ -93,7 +93,7 @@ class cloudflashbolt
 
                 request.on "end", =>
                     console.log "[proxy] client request closed..."
-                    entry.stream.end()
+                    entry.stream.write 'XXXXXXX'
 
                 request.pipe(entry.stream, {end: false})
                 request.resume()
