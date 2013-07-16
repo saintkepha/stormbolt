@@ -12,6 +12,10 @@ class cloudflashbolt
 
     boltConnections = []
 
+    listConnections = ->
+        for index, item in boltConnections
+            console.log index + ': ' + item.cname + ' forwarding ' + item.forwardingports
+
     constructor: (config) ->
         console.log 'boltlib initialized'
         @config = config
@@ -116,11 +120,12 @@ class cloudflashbolt
                         stream: stream,
                         forwardingports: data.split(':')[1]
 
-                    console.log "current bolt connections: " + JSON.stringify boltConnections
+                    listConnections()
 
             stream.on "close",  =>
                 console.log "bolt client is closed:" + stream.name
                 boltConnections.splice(index, 1) for index, item in boltConnections when item.cname is stream.name
+                listConnections()
 
         ).listen serverPort
 
