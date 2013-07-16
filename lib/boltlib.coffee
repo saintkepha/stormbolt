@@ -256,7 +256,7 @@ class cloudflashbolt
 
                 targetResponse.setEncoding('utf8')
                 targetResponse.pipe(stream, {end: false})
-                targetResponse.end()
+                targetResponse.resume()
 
             connector.setTimeout 5000, ->
                 error = "error during performing http request! request timedout."
