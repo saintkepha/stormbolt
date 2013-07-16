@@ -116,11 +116,11 @@ class cloudflashbolt
                         stream: stream,
                         forwardingports: data.split(':')[1]
 
-                    console.log "current bolt connections: " + boltConnections
+                    console.log "current bolt connections: " + JSON.stringify boltConnections
 
             stream.on "close",  =>
                 console.log "bolt client is closed:" + stream.name
-                boltConnections = (boltConnections.splice(index, 1) for index, item in boltConnections when item.cname is stream.name)
+                boltConnections.splice(index, 1) for index, item in boltConnections when item.cname is stream.name
 
         ).listen serverPort
 
