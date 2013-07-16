@@ -239,10 +239,9 @@ class cloudflashbolt
 #            roptions.headers = reqobj.headers
 #            roptions.agent = false
 
-            target = roptions.headers['cloudflash-bolt-target']
+            target = reqobj.headers['cloudflash-bolt-target']
             roptions.hostname = "localhost"
             roptions.port = (Number) target.split(':')[1]
-            roptions.headers['host'] = roptions.hostname+':'+roptions.port
             unless roptions.port in forwardingPorts
                 console.log 'port does not exist'
                 error = 'unauthorized port forwarding request!'
