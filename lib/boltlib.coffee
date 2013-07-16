@@ -266,6 +266,12 @@ class cloudflashbolt
                     stream.write body
                     connector.end()
 
+            connector.on "socket", (socket) =>
+                console.log "socket opened"
+
+            connector.on "response", (response) =>
+                console.log "got a response"
+
             connector.setTimeout 5000, ->
                 error = "error during performing http request! request timedout."
                 console.log error
