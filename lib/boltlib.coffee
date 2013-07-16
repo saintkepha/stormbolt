@@ -97,6 +97,7 @@ class cloudflashbolt
                 request.on "end", =>
                     console.log "[proxy] client request ended..."
                     data = request.read()
+                    console.log data
                     entry.stream.write data
 
                 request.resume()
