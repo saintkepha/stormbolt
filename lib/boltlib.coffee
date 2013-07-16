@@ -105,7 +105,7 @@ class cloudflashbolt
             stream.setEncoding "utf8"
             #socket.setKeepAlive(true,1000)
 
-            stream.once "data", ->
+            stream.once "readable", ->
                 data = stream.read()
                 console.log "Data received: " + data
 
