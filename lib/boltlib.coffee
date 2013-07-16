@@ -140,7 +140,7 @@ class cloudflashbolt
 
             certObj = stream.getPeerCertificate()
             console.log 'certObj: ' + JSON.stringify certObj
-            unless certObj
+            unless certObj.subject
                 console.log 'unable to retrieve peer certificate!'
                 stream.close()
                 return
@@ -197,9 +197,13 @@ class cloudflashbolt
         ).listen serverPort
 
     #reconnect logic for bolt client
+    isReconnecting = false
+
     reconnect: (host, port) ->
         retry = =>
-            @runClient host,port
+            unless isReconnecting
+                isReconnecting = true
+                @runClient host,port
         setTimeout(retry, 1000)
 
     #Method to start bolt client
@@ -217,6 +221,7 @@ class cloudflashbolt
                 result = "forwardingPorts:#{forwardingPorts}"
                 stream.write result
                 console.log "Failed to authorize TLS connection. Could not connect to bolt server"
+            isReconnecting = false
         )
 
         stream.on "error", (err) =>
