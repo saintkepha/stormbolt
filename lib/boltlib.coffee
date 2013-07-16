@@ -90,7 +90,7 @@ class cloudflashbolt
                     console.log "[proxy] forwarding response from client"
                     entry.stream.pipe(response, {end: true})
 
-                request.pipe(entry.stream, {end: true})
+                request.pipe(entry.stream, {end: false})
 
     # Method to start bolt server
     runServer: ->
@@ -136,11 +136,11 @@ class cloudflashbolt
                 boltConnections.splice(index, 1) for index, item in boltConnections when item.cname is stream.name
                 listConnections()
 
-            acceptor = http.createServer()
-            acceptor.on "connect", (request,csock, head) =>
-                console.log "Data received from bolt client: " + request.url
-                stream.pipe(csock)
-                csock.pipe(stream)
+            # acceptor = http.createServer()
+            # acceptor.on "connect", (request,csock, head) =>
+            #     console.log "Data received from bolt client: " + request.url
+            #     stream.pipe(csock)
+            #     csock.pipe(stream)
 
         ).listen serverPort
 
