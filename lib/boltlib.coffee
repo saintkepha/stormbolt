@@ -87,10 +87,11 @@ class cloudflashbolt
                 console.log "[proxy] forwarding request to " + cname + " at " + entry.stream.remoteAddress
 
                 entry.stream.on "readable", =>
-                    console.log "[proxy] sending response from client"
-                    entry.stream.pipe(response)
+                    console.log "[proxy] forwarding response from client"
+                    entry.stream.pipe(response, {end: true})
 
-                request.pipe(entry.stream)
+                request.pipe(entry.stream, {end: false})
+                request.resume()
 
     # Method to start bolt server
     runServer: ->
@@ -104,7 +105,8 @@ class cloudflashbolt
             stream.setEncoding "utf8"
             #socket.setKeepAlive(true,1000)
 
-            stream.once "data", (data) ->
+            stream.once "readable", ->
+                data = stream.read()
                 console.log "Data received: " + data
 
                 if data.search('forwardingPorts') == 0
@@ -123,7 +125,7 @@ class cloudflashbolt
                     listConnections()
 
             stream.on "close",  =>
-                console.log "bolt client is closed:" + stream.name
+                console.log "bolt client connection is closed:" + stream.name
                 boltConnections.splice(index, 1) for index, item in boltConnections when item.cname is stream.name
                 listConnections()
 
@@ -134,13 +136,6 @@ class cloudflashbolt
         retry = (host, port) =>
             @runClient host,port
         setTimeout(retry, 1000)
-
-    fillLocalErrorResponse: (status,headers,data) ->
-        res = {}
-        res.status = status
-        res.headers = headers
-        res.data = data
-        return res
 
     #Method to start bolt client
     runClient: (host, port) ->
@@ -193,8 +188,8 @@ class cloudflashbolt
             console.log 'making http.request with options: ' + roptions
             connector = http.request roptions, (targetResponse) =>
                 console.log response
-                targetResponse.pipe(response)
+                targetResponse.pipe(response, {end: true})
 
-            request.pipe(connector)
+            request.pipe(connector, {end: true})
 
 module.exports = cloudflashbolt
