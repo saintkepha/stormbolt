@@ -86,6 +86,13 @@ class cloudflashbolt
 
                 console.log "[proxy] forwarding request to " + cname + " at " + entry.stream.remoteAddress
 
+                # m2m = MuxDemux()
+                # m2m.on 'connection', (stream) =>
+                #     stream.on 'data', (data) =>
+                #         console.log data
+
+                # request.pipe(m2m).pipe(response)
+
                 entry.stream.on "readable", =>
                     console.log "[proxy] forwarding response from client"
                     entry.stream.pipe(response, {end: true})
@@ -135,6 +142,14 @@ class cloudflashbolt
             cname = certObj.subject.CN
             stream.name = cname
 
+            # mdm = MuxDemux()
+            # mdm.on 'connection', (bstream) =>
+            #     bstream.on 'data', (data) =>
+            #         console.log data
+
+            # stream.pipe(mdm).pipe(upstream)
+
+
             # boltConnections.push
             #     cname: cname
             #     stream: stream
@@ -183,35 +198,6 @@ class cloudflashbolt
 
     #Method to start bolt client
     runClient: (host, port) ->
-        acceptor = http.createServer().listen(7000)
-        acceptor.on "connect", (request, csock, head) =>
-            console.log "Data received from bolt server: " + request.url
-
-            csock.write('HTTP/1.1 200 Connection Established\r\n' +
-                        'Proxy-agent: Node-Proxy\r\n' +
-                        '\r\n');
-
-            target = request.headers['cloudflash-bolt-target']
-            roptions = require('url').parse(request.url);
-            roptions.hostname = "localhost"
-            roptions.port = (Number) target.split(':')[1]
-            unless roptions.port in forwardingPorts
-                console.log 'port does not exist'
-                error = 'unauthorized port forwarding request!'
-                csock.write('HTTP/1.1 500 Connection Established\r\n\r\n')
-                csock.end()
-                return
-
-            roptions.headers = request.headers;
-            roptions.method = request.method;
-            roptions.agent = false;
-            console.log 'making http.request with options: ' + roptions
-            connector = http.request roptions, (targetResponse) =>
-                console.log 'setting up reply'
-                targetResponse.pipe(csock, {end: true})
-
-            request.pipe(connector, {end: true})
-
         # try to connect to the server
         forwardingPorts = @config.local_forwarding_ports
         stream = tls.connect(port, host, options, =>
@@ -224,29 +210,7 @@ class cloudflashbolt
                 result = "forwardingPorts:#{forwardingPorts}"
                 stream.write result
                 console.log "Failed to authorize TLS connection. Could not connect to bolt server"
-
-            roptions =
-                hostname: '127.0.0.1'
-                port: 7000
-                method: 'CONNECT'
-                path: "localhost:5000"
-
-            req = http.request roptions
-            req.end()
-
-            req.on "connect", (res, socket, head) =>
-                console.log "connected, setting up pipes"
-                stream.pipe(socket, {end: true})
-                socket.pipe(stream, {end: false})
-
-            req.on "upgrade", (res, socket, head) =>
-                console.log "upgraded"
-
-            req.on "error", (err) =>
-                console.log 'error during connect to local: ' + err
         )
-
-        stream.setEncoding("utf8")
 
         stream.on "error", (err) =>
             console.log 'client error: ' + err
@@ -256,7 +220,38 @@ class cloudflashbolt
             console.log 'client closed: '
             @reconnect host, port
 
+        relay = (reqobj) =>
+            options = querystring.parse reqobj.req
+            options.headers = reqobj.headers
+            options.agent = false
+
+            target = options.headers['cloudflash-bolt-target']
+            options.hostname = "localhost"
+            options.port = (Number) target.split(':')[1]
+            unless options.port in forwardingPorts
+                console.log 'port does not exist'
+                error = 'unauthorized port forwarding request!'
+                stream.write('HTTP/1.1 500 '+error+'\r\n\r\n')
+                stream.end()
+                return
+
+            console.log 'making http.request with options: ' + options
+            connector = http.request options, (targetResponse) =>
+                console.log 'setting up reply back to stream'
+                targetResponse.pipe(stream, {end: false})
+
+        incoming = ''
+        len = 0
+
         stream.on "data", (data) =>
-            console.log 'read: ' + data
+            unless incoming
+                len = data.readUInt32LE(0)
+                incoming = data.slice(4)
+            else
+                incoming += data
+
+            # this is not a safe check
+            if incoming.length >= len
+                relay JSON.parse incoming
 
 module.exports = cloudflashbolt
