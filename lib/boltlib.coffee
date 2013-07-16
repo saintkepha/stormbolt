@@ -10,7 +10,7 @@ class cloudflashbolt
     options = ''
     client = this
 
-    boltConnections = {}
+    boltConnections = []
 
     constructor: (config) ->
         console.log 'boltlib initialized'
@@ -52,11 +52,11 @@ class cloudflashbolt
             console.log "[proxy] request from client: " + JSON.stringify request
             if request.url == '/cname'
                 res = []
-                for cname,entry in boltConnections
+                for entry in boltConnections
                     res.push
-                        cname: cname
+                        cname: entry.cname
                         forwardingports: entry.forwardingports
-                        caddress: entry.boltstream.remoteAddress
+                        caddress: entry.stream.remoteAddress
 
                 body = JSON.stringify res
                 console.log "[proxy] returning connections data: " + body
@@ -71,12 +71,12 @@ class cloudflashbolt
 
             if cname
                 console.log "[proxy] forwarding request to " + cname
-                entry = boltConnections[cname]
-                entry.boltstream.on "readable", =>
+                entry = (item for item in boltConnections when item.cname is cname)
+                entry.stream.on "readable", =>
                     console.log "[proxy] sending response from client"
                     boltClient.pipe(response, {end:true})
 
-                request.pipe(entry.boltstream, {end:true})
+                request.pipe(entry.stream, {end:true})
 
     # Method to start bolt server
     runServer: ->
@@ -101,16 +101,16 @@ class cloudflashbolt
                     cname = certObj.subject.CN
                     stream.name = cname
 
-                    boltConnections[cname] =
-                        boltstream: stream,
+                    boltConnections.push
+                        cname: cname
+                        stream: stream,
                         forwardingports: data.split(':')[1]
 
-                    for cname,entry in boltConnections
-                        console.log cname + ': ' + entry
+                    console.log "current bolt connections: " + boltConnections
 
             stream.on "close",  =>
                 console.log "bolt client is closed :" + stream.name
-                delete boltConnections[stream.name]
+                boltConnections.splice(index, 1) for index, item in boltConnections when item.cname is stream.name
 
         ).listen serverPort
 
