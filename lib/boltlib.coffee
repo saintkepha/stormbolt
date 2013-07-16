@@ -104,6 +104,11 @@ class cloudflashbolt
             stream.setEncoding "utf8"
             #socket.setKeepAlive(true,1000)
 
+            certObj = stream.getPeerCertificate()
+            console.log 'certObj: ' + JSON.stringify certObj
+            cname = certObj.subject.CN
+            stream.name = cname
+
             boltConnections.push
                 cname: cname
                 stream: stream
@@ -118,10 +123,6 @@ class cloudflashbolt
             #     if data.search('forwardingPorts') == 0
             #         # store bolt client data in local memory
             #         result = {}
-            #         certObj = stream.getPeerCertificate()
-            #         console.log 'certObj: ' + JSON.stringify certObj
-            #         cname = certObj.subject.CN
-            #         stream.name = cname
 
             #         boltConnections.push
             #             cname: cname
