@@ -86,7 +86,7 @@ class cloudflashbolt
 
                 console.log "[proxy] forwarding request to " + cname + " at " + entry.stream.remoteAddress
 
-                entry.stream.on "readable", =>
+                entry.stream.on "data", =>
                     console.log "[proxy] forwarding response from client"
                     entry.stream.pipe(response, {end: true})
 
