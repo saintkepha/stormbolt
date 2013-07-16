@@ -267,6 +267,7 @@ class cloudflashbolt
                     response.resume()
 
                 targetResponse.setEncoding('utf8')
+                stream.write targetResponse
 #                targetResponse.pipe(stream, {end: false})
                 targetResponse.resume()
 
