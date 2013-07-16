@@ -54,6 +54,7 @@ class cloudflashbolt
         acceptor = http.createServer().listen(listenPort)
         acceptor.on "request", (request,response) =>
             console.log "[proxy] request from client: " + request.url
+            request.pause()
             if request.url == '/cname'
                 res = []
                 for entry in boltConnections
@@ -90,7 +91,8 @@ class cloudflashbolt
                     console.log "[proxy] forwarding response from client"
                     entry.stream.pipe(response, {end: true})
 
-                request.pipe(entry.stream, {end: true})
+                request.pipe(entry.stream, {end: false})
+                request.resume()
 
     # Method to start bolt server
     runServer: ->
