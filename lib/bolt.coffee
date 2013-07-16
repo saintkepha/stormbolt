@@ -2,9 +2,6 @@
 
     cloudflashbolt = require('./boltlib')
     bolt = new cloudflashbolt
-    bolt.configure (res) =>
-        if res instanceof Error
-             console.log 'error: ' + res
 
     @get '/*': ->
         console.log 'IN GET' + @request.path

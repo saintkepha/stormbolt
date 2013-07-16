@@ -2,7 +2,6 @@ tls = require("tls")
 fs = require("fs")
 fileops = require("fileops")
 http = require("http")
-boltjson = require('./boltutil')
 util = require('util')
 querystring = require('querystring')
 
@@ -16,35 +15,26 @@ class cloudflashbolt
         console.log 'boltlib initialized'
         @config = config
 
-    start: ->
+    start: (callback) ->
         console.log "this should actually take place of configure below..."
-
-    # Read from bolt.json config file and start bolt client or server accordingly.
-    configure: (callback) ->
-        @config = boltjson.readBoltJson()
         if @config.remote || @config.local
-            local = @config.local
-            if local
+            if @config.local
                 options =
                     key: fs.readFileSync("#{@config.key}")
                     cert: fs.readFileSync("#{@config.cert}")
                     requestCert: true
                     rejectUnauthorized: false
                 console.log "bolt server"
-                @boltServer()
+                @runServer()
             else
                 options =
                     cert: fs.readFileSync("#{@config.cert}")
                     key: fs.readFileSync("#{@config.key}")
                 console.log "bolt client"
-                remoteHosts = @config.remote
-                listen =  @config.listen
-                if remoteHosts.length > 0
-                    for host in remoteHosts
-                        serverHost = host.split(":")[0]
-                        serverPort = host.split(":")[1]
-                        @boltClient serverHost, serverPort
-
+                for host in @config.remote
+                    serverHost = host.split(":")[0]
+                    serverPort = host.split(":")[1]
+                    @runClient host
         else
             callback new Error "Invalid bolt JSON!"
 
@@ -69,7 +59,7 @@ class cloudflashbolt
             boltClientList.push stream
 
             stream.on "readable", ->
-                data = stream.read
+                data = stream.read()
                 console.log "connection from client :" + stream.remoteAddress
                 console.log "Data received: " + data
 
@@ -153,7 +143,7 @@ class cloudflashbolt
 
                     boltClientSocket.write JSON.stringify(serverRequest), "utf8", =>
                         boltClientSocket.on "readable", =>
-                            data = boltClientSocket.read
+                            data = boltClientSocket.read()
                             console.log 'data backend service:' + data
                             callback data
                 else
@@ -200,7 +190,7 @@ class cloudflashbolt
             @reconnect host, port
 
         client.socket.on "readable", =>
-            data = client.socket.read
+            data = client.socket.read()
 
             res = {}
             console.log "Data received from bolt server: " + data
