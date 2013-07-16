@@ -142,7 +142,7 @@ class cloudflashbolt
             console.log 'certObj: ' + JSON.stringify certObj
             unless certObj.subject
                 console.log 'unable to retrieve peer certificate!'
-                stream.close()
+                stream.end()
                 return
 
             cname = certObj.subject.CN
@@ -254,6 +254,12 @@ class cloudflashbolt
             connector = http.request options, (targetResponse) =>
                 console.log 'setting up reply back to stream'
                 targetResponse.pipe(stream, {end: false})
+
+            connector.setTimeout(3000, ->
+                error = "error during performing http request! request timedout."
+                console.log error
+                stream.write('HTTP/1.1 500 '+error+'\r\n\r\n')
+                stream.end()
 
             connector.on "error", (err) =>
                 error = "error during performing http request!"
