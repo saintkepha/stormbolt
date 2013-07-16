@@ -267,7 +267,7 @@ class cloudflashbolt
                     response.resume()
 
                 targetResponse.setEncoding('utf8')
-                targetResponse.pipe(stream, {end: false})
+#                targetResponse.pipe(stream, {end: false})
                 targetResponse.resume()
 
             connector.setTimeout 5000, ->
