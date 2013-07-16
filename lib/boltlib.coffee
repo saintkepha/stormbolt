@@ -221,15 +221,16 @@ class cloudflashbolt
                 result = "forwardingPorts:#{forwardingPorts}"
                 stream.write result
                 console.log "Failed to authorize TLS connection. Could not connect to bolt server"
-            isReconnecting = false
         )
 
         stream.on "error", (err) =>
             console.log 'client error: ' + err
+            isReconnecting = false
             @reconnect host, port
 
         stream.on "close", =>
             console.log 'client closed: '
+            isReconnecting = false
             @reconnect host, port
 
         relay = (reqobj) =>
