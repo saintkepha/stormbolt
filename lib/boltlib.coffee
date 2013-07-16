@@ -152,7 +152,7 @@ class cloudflashbolt
 
     #Method to start bolt client
     runClient: (host, port) ->
-        acceptor = http.createServer().listen(7000)
+        acceptor = http.createServer().listen('/tmp/bolt.sock')
         acceptor.on "connect", (request, csock, head) =>
             console.log "Data received from bolt server: " + request.url
 
@@ -195,8 +195,7 @@ class cloudflashbolt
                 console.log "Failed to authorize TLS connection. Could not connect to bolt server"
 
             roptions =
-                hostname: "localhost"
-                port: 7000
+                socketPath: '/tmp/bolt.sock'
                 method: 'CONNECT'
                 path: "localhost:5000"
 
@@ -207,6 +206,9 @@ class cloudflashbolt
                 console.log "connected, setting up pipes"
                 stream.pipe(socket, {end: true})
                 socket.pipe(stream, {end: false})
+
+            req.on "upgrade", (res, socket, head) =>
+                console.log "upgraded"
 
             req.on "error", (err) =>
                 console.log 'error during connect to local: ' + err
