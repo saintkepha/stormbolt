@@ -234,24 +234,24 @@ class cloudflashbolt
 
         relay = (reqobj) =>
             orequest = querystring.parse reqobj.req
-            options = url.parse(orequest.url)
-            options.method = orequest.method
-            options.headers = reqobj.headers
-            options.agent = false
+            roptions = url.parse(orequest.url)
+            roptions.method = orequest.method
+            roptions.headers = reqobj.headers
+            roptions.agent = false
 
-            target = options.headers['cloudflash-bolt-target']
-            options.hostname = "localhost"
-            options.port = (Number) target.split(':')[1]
-            options.headers['host'] = options.hostname+':'+options.port
-            unless options.port in forwardingPorts
+            target = roptions.headers['cloudflash-bolt-target']
+            roptions.hostname = "localhost"
+            roptions.port = (Number) target.split(':')[1]
+            roptions.headers['host'] = roptions.hostname+':'+roptions.port
+            unless roptions.port in forwardingPorts
                 console.log 'port does not exist'
                 error = 'unauthorized port forwarding request!'
                 stream.write('HTTP/1.1 500 '+error+'\r\n\r\n')
                 stream.end()
                 return
 
-            console.log 'making http.request with options: ' + JSON.stringify options
-            connector = http.request options, (targetResponse) =>
+            console.log 'making http.request with options: ' + JSON.stringify roptions
+            connector = http.request roptions, (targetResponse) =>
                 console.log 'setting up reply back to stream'
                 targetResponse.pipe(stream, {end: false})
 
