@@ -90,7 +90,7 @@ class cloudflashbolt
                     console.log "[proxy] forwarding response from client"
                     entry.stream.pipe(response, {end: true})
 
-                request.pipe(entry.stream, {end: false})
+                request.pipe(entry.stream, {end: true})
 
     # Method to start bolt server
     runServer: ->
@@ -104,24 +104,31 @@ class cloudflashbolt
             stream.setEncoding "utf8"
             #socket.setKeepAlive(true,1000)
 
-            stream.once "readable", ->
-                data = stream.read()
-                console.log "Data received: " + data
+            boltConnections.push
+                cname: cname
+                stream: stream
+                forwardingports: '5000'
 
-                if data.search('forwardingPorts') == 0
-                    # store bolt client data in local memory
-                    result = {}
-                    certObj = stream.getPeerCertificate()
-                    console.log 'certObj: ' + JSON.stringify certObj
-                    cname = certObj.subject.CN
-                    stream.name = cname
+            listConnections()
 
-                    boltConnections.push
-                        cname: cname
-                        stream: stream,
-                        forwardingports: data.split(':')[1]
+            # stream.once "readable", ->
+            #     data = stream.read()
+            #     console.log "Data received: " + data
 
-                    listConnections()
+            #     if data.search('forwardingPorts') == 0
+            #         # store bolt client data in local memory
+            #         result = {}
+            #         certObj = stream.getPeerCertificate()
+            #         console.log 'certObj: ' + JSON.stringify certObj
+            #         cname = certObj.subject.CN
+            #         stream.name = cname
+
+            #         boltConnections.push
+            #             cname: cname
+            #             stream: stream,
+            #             forwardingports: data.split(':')[1]
+
+            #         listConnections()
 
             stream.on "close",  =>
                 console.log "bolt client connection is closed:" + stream.name
@@ -150,11 +157,11 @@ class cloudflashbolt
             if stream.authorized
                 console.log "Successfully connected to bolt server"
                 result = "forwardingPorts:#{forwardingPorts}"
-                stream.write result
+                #stream.write result
             else
                 #using self signed certs for intergration testing. Later get rid of this.
                 result = "forwardingPorts:#{forwardingPorts}"
-                stream.write result
+                #stream.write result
                 console.log "Failed to authorize TLS connection. Could not connect to bolt server"
         )
 
@@ -172,6 +179,8 @@ class cloudflashbolt
             roptions =
                 socketPath: '/tmp/csock'
                 method: 'CONNECT'
+
+            console.log "got some stuff to read"
 
             req = http.request roptions
             req.end()
