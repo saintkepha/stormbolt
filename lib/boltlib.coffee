@@ -13,8 +13,8 @@ class cloudflashbolt
     boltConnections = []
 
     listConnections = ->
-        for index, item in boltConnections
-            console.log index + ': ' + item.cname + ' forwarding ' + item.forwardingports
+        for entry in boltConnections
+            console.log entry.cname + ": " + entry.forwardingports
 
     constructor: (config) ->
         console.log 'boltlib initialized'
