@@ -254,17 +254,9 @@ class cloudflashbolt
             connector = http.request roptions, (targetResponse) =>
                 console.log 'setting up reply back to stream'
 
-                body = ''
-                connector.on 'data', (chunk) =>
-                    console.log 'read: '+chunk
-                    body += chunk
                 targetResponse.setEncoding('utf8')
                 targetResponse.pipe(stream, {end: false})
-
-                connector.on 'end', =>
-                    console.log 'http request is over'
-                    stream.write body
-                    targetResponse.end()
+                targetResponse.end()
 
             connector.setTimeout 5000, ->
                 error = "error during performing http request! request timedout."
