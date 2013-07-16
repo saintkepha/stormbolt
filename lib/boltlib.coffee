@@ -264,7 +264,8 @@ class cloudflashbolt
 
                 targetResponse.on 'end', =>
                     console.log 'http request is over'
-                    flusher.close()
+                    flusher.end()
+                    flusher.destroy()
 
                 stream.setEncoding('utf8')
                 targetResponse.pipe(flusher).pipe(stream, {end: false})
