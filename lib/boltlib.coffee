@@ -259,9 +259,10 @@ class cloudflashbolt
 
                 targetResponse.on 'end', =>
                     console.log 'http request is over'
-                    targetResponse.setEncoding('utf8')
-                    targetResponse.pipe(stream, {end: false})
-                    targetResponse.resume()
+
+                targetResponse.setEncoding('utf8')
+                targetResponse.pipe(stream, {end: false})
+                targetResponse.resume()
 
             connector.setTimeout 5000, ->
                 error = "error during performing http request! request timedout."
