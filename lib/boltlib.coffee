@@ -166,7 +166,8 @@ class cloudflashbolt
                 console.log "Failed to authorize TLS connection. Could not connect to bolt server"
 
             roptions =
-                socketPath: '/tmp/csock'
+                hostname: "localhost"
+                port: 1111
                 method: 'CONNECT'
 
             console.log "got some stuff to read"
@@ -175,6 +176,7 @@ class cloudflashbolt
             req.end()
 
             req.on "connect", (res, socket, head) =>
+                console.log "connected, setting up pipes"
                 stream.pipe(socket, {end: true})
                 socket.pipe(stream, {end: false})
         )
@@ -189,11 +191,13 @@ class cloudflashbolt
             console.log 'client closed: '
             @reconnect host, port
 
-        stream.on "readable", =>
-
-        acceptor = http.createServer().listen('/tmp/csock')
-        acceptor.on "request", (request,response) =>
+        acceptor = http.createServer().listen(1111)
+        acceptor.on "connect", (req, csock, head) =>
             console.log "Data received from bolt server: " + request.url
+
+            csock.write('HTTP/1.1 200 Connection Established\r\n' +
+                        'Proxy-agent: Node-Proxy\r\n' +
+                        '\r\n');
 
             target = request.headers['cloudflash-bolt-target']
             roptions = require('url').parse(request.url);
@@ -202,20 +206,17 @@ class cloudflashbolt
             unless roptions.port in forwardingPorts
                 console.log 'port does not exist'
                 error = 'unauthorized port forwarding request!'
-                response.writeHead(500, {
-                    'Content-Length': error.length,
-                    'Content-Type': 'text/plain' })
-                response.end()
+                csock.write('HTTP/1.1 500 Connection Established\r\n\r\n')
+                csock.end()
                 return
 
             roptions.headers = request.headers;
             roptions.method = request.method;
             roptions.agent = false;
-
             console.log 'making http.request with options: ' + roptions
             connector = http.request roptions, (targetResponse) =>
-                console.log response
-                targetResponse.pipe(response, {end: true})
+                console.log 'setting up reply'
+                targetResponse.pipe(csock, {end: true})
 
             request.pipe(connector, {end: true})
 
