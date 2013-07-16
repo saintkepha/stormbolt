@@ -3,6 +3,7 @@ fs = require("fs")
 fileops = require("fileops")
 http = require("http")
 util = require('util')
+url  = require('url')
 querystring = require('querystring')
 
 class cloudflashbolt
