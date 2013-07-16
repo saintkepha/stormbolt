@@ -257,7 +257,7 @@ class cloudflashbolt
                 connector.on 'data', (chunk) =>
                     console.log 'read: '+chunk
                     body += chunk
-
+                targetResponse.setEncoding('utf8')
                 targetResponse.pipe(stream, {end: false})
 
                 connector.on 'end', =>
@@ -285,18 +285,18 @@ class cloudflashbolt
         incoming = ''
         len = 0
 
-        stream.on "data", (data) =>
+        stream.on "data", (chunk) =>
             temp = ''
             unless incoming
-                len = data.readUInt32LE(0)
-                incoming = data.slice(4)
+                len = chunk.readUInt32LE(0)
+                incoming = chunk.slice(4)
             else
-                if incoming.length + data.length <= len
-                    incoming += data
+                if incoming.length + chunk.length <= len
+                    incoming += chunk
                 else
                     offset = len - incoming.length
-                    incoming += data.slice(0,offset)
-                    temp = data.slice(offset)
+                    incoming += chunk.slice(0,offset)
+                    temp = chunk.slice(offset)
 
             if incoming.length == len
                 console.log 'processed incoming with '+incoming.length+' out of '+len
