@@ -90,6 +90,8 @@ class cloudflashbolt
                     console.log "[proxy] forwarding response from client"
                     entry.stream.pipe(response, {end: true})
 
+                entry.stream.write 'test data'
+
                 request.pipe(entry.stream, {end: false})
 
     # Method to start bolt server
@@ -225,7 +227,7 @@ class cloudflashbolt
             console.log 'client closed: '
             @reconnect host, port
 
-        # stream.on "data", (data) =>
-        #     console.log 'read: ' + data
+        stream.on "data", (data) =>
+            console.log 'read: ' + data
 
 module.exports = cloudflashbolt
