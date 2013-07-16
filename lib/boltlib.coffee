@@ -142,6 +142,8 @@ class cloudflashbolt
                     serverRequest.target = request.header('cloudflash-bolt-target')
 
                     boltClientSocket.write JSON.stringify(serverRequest), "utf8", =>
+                        boltClientSocket.end()
+
                         boltClientSocket.on "readable", =>
                             data = boltClientSocket.read()
                             console.log 'data backend service:' + data
@@ -174,12 +176,16 @@ class cloudflashbolt
                 console.log "Successfully connected to bolt server"
                 result = "forwardingPorts:#{forwardingPorts}"
                 client.socket.write result
+                client.socket.end()
             else
                 #using self signed certs for intergration testing. Later get rid of this.
                 result = "forwardingPorts:#{forwardingPorts}"
                 client.socket.write result
+                client.socket.end()
                 console.log "Failed to authorize TLS connection. Could not connect to bolt server"
         )
+
+        client.socket.setEncoding("utf8")
 
         client.socket.on "error", (err) =>
             console.log 'client error: ' + err
@@ -245,6 +251,7 @@ class cloudflashbolt
                     console.log "error: " + err
                     res = @fillLocalErrorResponse(500,recvData.headers,err)
                     client.socket.write JSON.stringify(res)
+                    client.socket.end()
 
                 #console.log 'request object client: ' + util.inspect(request)
                 request.on "response", (response) =>
@@ -258,19 +265,23 @@ class cloudflashbolt
                     if response.statusCode == 204 &&  boltTargetPort == 5000
                         resObj.data = {"deleted":true}
                         client.socket.write JSON.stringify resObj
+                        client.socket.end()
                     response.on "data", (resFromCF) ->
                         console.log "response from cloudflash: " + resFromCF
                         if response.statusCode == 200 || response.statusCode == 204 || response.statusCode == 202 || response.statusCode == 304
                             #console.log 'response object client: ' + util.inspect(response)
                             resObj.data = resFromCF
                             client.socket.write JSON.stringify resObj
+                            client.socket.end()
                         else
                             #res.error = resFromCF
                             resObj.data = resFromCF
                             client.socket.write JSON.stringify resObj
+                            client.socket.end()
 
             else
                 res = @fillLocalErrorResponse(500,recvData.headers,"Bolt Target Port not part of local forwarding ports managed by the client")
                 client.socket.write JSON.stringify(res)
+                client.socket.end()
 
 module.exports = cloudflashbolt
