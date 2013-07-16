@@ -1,12 +1,12 @@
 @include = ->
 
     cloudflashbolt = require('./boltlib')
-    bolt = new cloudflashbolt    
+    bolt = new cloudflashbolt
     bolt.configure (res) =>
         if res instanceof Error
              console.log 'error: ' + res
-    
-    @get '/*': -> 
+
+    @get '/*': ->
         console.log 'IN GET' + @request.path
         bolt = null; bolt = new cloudflashbolt
         if @request.path == '/cname'
@@ -16,8 +16,8 @@
                 else
                     @next res
         else
-            bolt.sendDataToClient @request, (res) =>                
-                resData = JSON.parse res                
+            bolt.sendDataToClient @request, (res) =>
+                resData = JSON.parse res
                 @response.status(resData.status)
                 # commented for now as issues seen with express version
                 #@response.set(resData.headers)
@@ -25,44 +25,44 @@
                 if resData.status == 200 || resData.status == 204 || resData.status == 202
                     @send resData.data
                 else
-                    console.log 'in else' + JSON.stringify resData                    
-                    @next resData.data                
-                   
+                    console.log 'in else' + JSON.stringify resData
+                    @next resData.data
 
-    @post '/*': ->        
+
+    @post '/*': ->
         console.log 'IN POST'
-        bolt = null; bolt = new cloudflashbolt    
+        bolt = null; bolt = new cloudflashbolt
         bolt.sendDataToClient @request, (res) =>
-            resData = JSON.parse res                
+            resData = JSON.parse res
             @response.status(resData.status)
             #@response.set(resData.headers)
             if resData.status == 200 || resData.status == 204 || resData.status == 202
                 @send resData.data
             else
                 console.log 'in else'
-                @next resData.data         
-    @put '/*': ->        
+                @next resData.data
+    @put '/*': ->
         console.log 'IN PUT'
-        bolt = null; bolt = new cloudflashbolt      
+        bolt = null; bolt = new cloudflashbolt
         bolt.sendDataToClient @request, (res) =>
-            resData = JSON.parse res                
+            resData = JSON.parse res
             @response.status(resData.status)
             #@response.set(resData.headers)
             if resData.status == 200 || resData.status == 204 || resData.status == 202
                 @send resData.data
             else
                 console.log 'in else'
-                @next resData.data 
+                @next resData.data
 
-    @del '/*': ->        
+    @del '/*': ->
         console.log 'IN DEL'
-        bolt = null; bolt = new cloudflashbolt        
+        bolt = null; bolt = new cloudflashbolt
         bolt.sendDataToClient @request, (res) =>
-            resData = JSON.parse res                
+            resData = JSON.parse res
             @response.status(resData.status)
             #@response.set(resData.headers)
             if resData.status == 200 || resData.status == 204 || resData.status == 202
                 @send resData.data
             else
                 console.log 'in else'
-                @next resData.data 
+                @next resData.data
