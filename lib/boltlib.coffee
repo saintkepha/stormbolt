@@ -254,12 +254,14 @@ class cloudflashbolt
             connector = http.request roptions, (targetResponse) =>
                 console.log 'setting up reply back to stream'
 
+                body = ''
                 targetResponse.on 'data', (chunk) =>
                     console.log 'read: '+chunk
+                    body += chunk
 
                 targetResponse.on 'end', =>
                     console.log 'http request is over'
-                    stream.write 'asdf'
+                    stream.write body
 
                 stream.setEncoding('utf8')
                 targetResponse.pipe(stream, {end: false})
