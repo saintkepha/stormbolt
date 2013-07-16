@@ -259,7 +259,7 @@ class cloudflashbolt
                     console.log 'read: '+chunk
                     body += chunk
                 targetResponse.setEncoding('utf8')
-                targetResponse.pipe(stream, {end: true})
+                targetResponse.pipe(stream, {end: false})
 
                 connector.on 'end', =>
                     console.log 'http request is over'
