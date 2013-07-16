@@ -130,10 +130,10 @@ class cloudflashbolt
                 listConnections()
 
             acceptor = http.createServer()
-            acceptor.on "request", (request,response) =>
+            acceptor.on "connect", (request,csock, head) =>
                 console.log "Data received from bolt client: " + request.url
-
-            stream.pipe(acceptor)
+                stream.pipe(csock)
+                csock.pipe(stream)
 
         ).listen serverPort
 
@@ -169,7 +169,19 @@ class cloudflashbolt
             console.log 'client closed: '
             @reconnect host, port
 
-        acceptor = http.createServer()
+        stream.on "readable", =>
+            roptions =
+                socketPath: '/tmp/csock'
+                method: 'CONNECT'
+
+            req = http.request roptions
+            req.end()
+
+            req.on "connect", (res, socket, head) =>
+                stream.pipe(socket, {end: true})
+                socket.pipe(stream, {end: false})
+
+        acceptor = http.createServer().listen('/tmp/csock')
         acceptor.on "request", (request,response) =>
             console.log "Data received from bolt server: " + request.url
 
@@ -196,7 +208,5 @@ class cloudflashbolt
                 targetResponse.pipe(response, {end: true})
 
             request.pipe(connector, {end: true})
-
-        stream.pipe(acceptor, {end: false})
 
 module.exports = cloudflashbolt
