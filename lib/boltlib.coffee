@@ -264,7 +264,7 @@ class cloudflashbolt
                     console.log 'http request is over'
 
                 stream.setEncoding('utf8')
-                targetResponse.pipe(flusher).pipe(stream)
+                targetResponse.pipe(stream)
                 targetResponse.resume()
 
             connector.setTimeout 5000, ->
