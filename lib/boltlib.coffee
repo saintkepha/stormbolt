@@ -50,7 +50,7 @@ class cloudflashbolt
         acceptor = http.createServer().listen(listenPort)
         acceptor.on "request", (request,response) =>
             console.log "[proxy] request from client: " + request
-            if request.path == '/cname'
+            if request.url == '/cname'
                 res = []
                 for cname,entry in boltConnections
                     res.push
@@ -66,14 +66,16 @@ class cloudflashbolt
                 return
 
             target = request.headers['cloudflash-bolt-target']
-            cname = target.split(':')[0]
+            cname = target.split(':')[0] if target
 
-            entry = boltConnections[cname]
-            entry.stream.on "readable", =>
-                console.log "[proxy] sending response from client"
-                boltClient.pipe(response, {end:true})
+            if cname
+                console.log "[proxy] forwarding request to " + cname
+                entry = boltConnections[cname]
+                entry.stream.on "readable", =>
+                    console.log "[proxy] sending response from client"
+                    boltClient.pipe(response, {end:true})
 
-            request.pipe(entry.stream, {end:true})
+                request.pipe(entry.stream, {end:true})
 
     # Method to start bolt server
     runServer: ->
@@ -151,7 +153,7 @@ class cloudflashbolt
             console.log('request ' + request.url);
 
             target = request.headers['cloudflash-bolt-target']
-            roptions = url.parse(request.url);
+            roptions = require('url').parse(request.url);
             roptions.hostname = "localhost"
             roptions.port = (Number) target.split(':')[1]
             unless roptions.port in forwardingPorts
