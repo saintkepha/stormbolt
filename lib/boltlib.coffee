@@ -112,7 +112,7 @@ class cloudflashbolt
                         body: body
 
                     buf = new Buffer 4
-                    buf.writeUInt32LE(data.length)
+                    buf.writeUInt32LE(data.length,0)
 
                     console.log data
                     entry.stream.write buf
