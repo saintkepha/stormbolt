@@ -258,16 +258,18 @@ class cloudflashbolt
             connector.setTimeout 3000, ->
                 error = "error during performing http request! request timedout."
                 console.log error
-                stream.write('HTTP/1.1 500 '+error+'\r\n\r\n')
-                stream.end()
-                connector.end()
+                try
+                    stream.write('HTTP/1.1 500 '+error+'\r\n\r\n')
+                    connector.end()
+                catch err
+                    console.log err
 
             connector.on "error", (err) =>
                 error = "error during performing http request!"
                 console.log error
                 try
                     stream.write('HTTP/1.1 500 '+error+'\r\n\r\n')
-                    stream.end()
+                    connector.end()
                 catch err
                     console.log err
 
