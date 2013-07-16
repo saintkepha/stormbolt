@@ -140,6 +140,11 @@ class cloudflashbolt
 
             certObj = stream.getPeerCertificate()
             console.log 'certObj: ' + JSON.stringify certObj
+            unless certObj
+                console.log 'unable to retrieve peer certificate!'
+                stream.close()
+                return
+
             cname = certObj.subject.CN
             stream.name = cname
 
