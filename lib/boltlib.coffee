@@ -239,7 +239,7 @@ class cloudflashbolt
             roptions = url.parse(orequest.url)
             roptions.method = orequest.method
             roptions.agent = false
-#            roptions.headers = reqobj.headers
+            roptions.headers = reqobj.headers
 
             target = reqobj.headers['cloudflash-bolt-target']
             roptions.hostname = "localhost"
