@@ -12,30 +12,33 @@ class cloudflashbolt
     options = ''; clientResponse = []
     client = this
 
-    constructor: ->
+    constructor: (config) ->
         console.log 'boltlib initialized'
-        @boltJsonObj = ''
+        @config = config
+
+    start: ->
+        console.log "this should actually take place of configure below..."
 
     # Read from bolt.json config file and start bolt client or server accordingly.
     configure: (callback) ->
-        @boltJsonObj = boltjson.readBoltJson()
-        if @boltJsonObj.remote || @boltJsonObj.local
-            local = @boltJsonObj.local
+        @config = boltjson.readBoltJson()
+        if @config.remote || @config.local
+            local = @config.local
             if local
                 options =
-                    key: fs.readFileSync("#{@boltJsonObj.key}")
-                    cert: fs.readFileSync("#{@boltJsonObj.cert}")
+                    key: fs.readFileSync("#{@config.key}")
+                    cert: fs.readFileSync("#{@config.cert}")
                     requestCert: true
                     rejectUnauthorized: false
                 console.log "bolt server"
                 @boltServer()
             else
                 options =
-                    cert: fs.readFileSync("#{@boltJsonObj.cert}")
-                    key: fs.readFileSync("#{@boltJsonObj.key}")
+                    cert: fs.readFileSync("#{@config.cert}")
+                    key: fs.readFileSync("#{@config.key}")
                 console.log "bolt client"
-                remoteHosts = @boltJsonObj.remote
-                listen =  @boltJsonObj.listen
+                remoteHosts = @config.remote
+                listen =  @config.listen
                 if remoteHosts.length > 0
                     for host in remoteHosts
                         serverHost = host.split(":")[0]
@@ -53,55 +56,57 @@ class cloudflashbolt
 
     # Method to start bolt server
     boltServer: ->
-        local = @boltJsonObj.local
+        local = @config.local
         console.log 'in start bolt: ' + local
         serverPort = local.split(":")[1]
         console.log "server port:" + serverPort
-        tls.createServer(options, (socket) =>
+        tls.createServer(options, (stream) =>
             console.log "TLS connection established with VCG client"
             #socket.id  = socketIdCounter++
 
-            socket.setEncoding "utf8"
+            stream.setEncoding "utf8"
             #socket.setKeepAlive(true,1000)
-            boltClientList.push socket
-            socket.once "data", (data) =>
-                console.log "connection from client :" + socket.remoteAddress
+            boltClientList.push stream
+
+            stream.on "readable", ->
+                data = stream.read
+                console.log "connection from client :" + stream.remoteAddress
                 console.log "Data received: " + data
 
                 if data.search('forwardingPorts') == 0
                     # store bolt client data in local memory
                     result = {}
-                    certObj = socket.getPeerCertificate()
+                    certObj = stream.getPeerCertificate()
                     console.log 'certObj: ' + JSON.stringify certObj
                     cname = certObj.subject.CN
                     result.forwardingports = data.split(':')[1]
                     result.cname = cname
-                    socket.name = cname
+                    stream.name = cname
                     result.sockName = cname
-                    result.caddress = socket.remoteAddress
+                    result.caddress = stream.remoteAddress
                     console.log 'cname result : ' + JSON.stringify result
                     boltClientData.push result
 
-            socket.addListener "close",  =>
-                console.log "bolt client is closed :" + socket.name
+            stream.on "close",  =>
+                console.log "bolt client is closed :" + stream.name
                 boltClientDataTemp = []
                 console.log "bolt client list size before disconnect " + boltClientData.length
                 for clientData in boltClientData
-                    if clientData.sockName != socket.name
+                    if clientData.sockName != stream.name
                         boltClientDataTemp.push clientData
 
                 boltClientData = boltClientDataTemp
                 console.log "bolt client list size after disconnect " + boltClientData.length
 
-                console.log "boltclientlist socket size before disconnect " + boltClientList.length
-                #remove socket data from local memory
+                console.log "boltclientlist stream size before disconnect " + boltClientList.length
+                #remove stream data from local memory
                 boltClientListTemp = []
-                for socket1 in boltClientList
-                    if socket  != socket1
-                        boltClientListTemp.push socket1
+                for stream1 in boltClientList
+                    if stream  != stream1
+                        boltClientListTemp.push stream1
 
                 boltClientList = boltClientListTemp
-                console.log "boltclientlist socket size after disconnect " + boltClientList.length
+                console.log "boltclientlist stream size after disconnect " + boltClientList.length
 
         ).listen serverPort
 
@@ -173,7 +178,7 @@ class cloudflashbolt
     #Method to start bolt client
     boltClient: (host, port) ->
         # try to connect to the server
-        forwardingPorts = @boltJsonObj.local_forwarding_ports
+        forwardingPorts = @config.local_forwarding_ports
         client.socket = tls.connect(port, host, options, =>
             if client.socket.authorized
                 console.log "Successfully connected to bolt server"

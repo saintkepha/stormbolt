@@ -1,4 +1,4 @@
-argv = require 'optimist'
+argv = require('optimist')
     .usage('Start cloudflash-bolt with a configuration file.\nUsage: $0')
     .demand('f')
     .default('f','/etc/bolt/bolt.json')
@@ -10,14 +10,18 @@ config = ''
 fileops = require("fileops")
 res =  fileops.fileExistsSync argv.file
 unless res instanceof Error
-    boltContent = fileops.readFileSync filepath
+    boltContent = fileops.readFileSync argv.file
     config = JSON.parse boltContent
 else
     return new Error "file does not exist! " + res
 
 if config.listen
-    listenPort = listen.split(":")[1]
+    listenPort = config.listen.split(":")[1]
     console.log 'listenPort: ' + listenPort
+
+#cloudflashbolt = require './lib/boltlib'
+#bolt = new cloudflashbolt config
+#bolt.start
 
 {@app} = require('zappajs') listenPort, ->
     @configure =>
