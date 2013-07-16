@@ -152,8 +152,8 @@ class cloudflashbolt
 
     #Method to start bolt client
     runClient: (host, port) ->
-        acceptor = http.createServer().listen(1111)
-        acceptor.on "connect", (req, csock, head) =>
+        acceptor = http.createServer().listen(7000)
+        acceptor.on "connect", (request, csock, head) =>
             console.log "Data received from bolt server: " + request.url
 
             csock.write('HTTP/1.1 200 Connection Established\r\n' +
@@ -196,10 +196,9 @@ class cloudflashbolt
 
             roptions =
                 hostname: "localhost"
-                port: 1111
+                port: 7000
                 method: 'CONNECT'
-
-            console.log "got some stuff to read"
+                path: "localhost:5000"
 
             req = http.request roptions
             req.end()
@@ -223,5 +222,7 @@ class cloudflashbolt
             console.log 'client closed: '
             @reconnect host, port
 
+        # stream.on "data", (data) =>
+        #     console.log 'read: ' + data
 
 module.exports = cloudflashbolt
