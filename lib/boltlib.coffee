@@ -70,7 +70,8 @@ class cloudflashbolt
             cname = target.split(':')[0] if target
 
             if cname
-                entry = (item for item in boltConnections when item.cname is cname)
+                match = (item for item in boltConnections when item.cname is cname)
+                entry = match[0] if match.length
                 console.log "[proxy] forwarding request to " + cname + " at " + entry.stream.remoteAddress
 
                 entry.stream.on "readable", =>
