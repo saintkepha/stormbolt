@@ -7,9 +7,10 @@ querystring = require('querystring')
 
 class cloudflashbolt
 
-    boltClientList = []; boltClientData = []; boltClientSocket = ''
-    options = ''; clientResponse = []
+    options = ''
     client = this
+
+    boltConnections = {}
 
     constructor: (config) ->
         console.log 'boltlib initialized'
@@ -38,11 +39,41 @@ class cloudflashbolt
         else
             callback new Error "Invalid bolt JSON!"
 
-    listBoltClients: (callback) ->
-        res = []
-        for clientData in boltClientData
-            res.push clientData
-        callback(res)
+        @runProxy()
+
+    runProxy: ->
+        if @config.listen
+            listenPort = config.listen.split(":")[1]
+            console.log 'running proxy on listenPort: ' + listenPort
+
+        # after initial data, invoke HTTP server listener on port
+        acceptor = http.createServer().listen(listenPort)
+        acceptor.on "request", (request,response) =>
+            console.log "[proxy] request from client: " + request
+            if request.path == '/cname'
+                res = []
+                for cname,entry in boltConnections
+                    res.push
+                        cname: cname
+                        forwardingports: entry.forwardingports
+                        caddress: entry.stream.remoteAddress
+
+                body = JSON.stringify res
+                response.writeHead(200, {
+                    'Content-Length': body.length,
+                    'Content-Type': 'application/json' })
+                response.end(body,"utf8")
+                return
+
+            target = request.header('cloudflash-bolt-target')
+            cname = target.split(':')[0]
+
+            entry = boltConnections[cname]
+            entry.stream.on "readable", =>
+                console.log "[proxy] sending response from client"
+                boltClient.pipe(response, {end:true})
+
+            request.pipe(entry.stream, {end:true})
 
     # Method to start bolt server
     runServer: ->
@@ -56,105 +87,30 @@ class cloudflashbolt
 
             stream.setEncoding "utf8"
             #socket.setKeepAlive(true,1000)
-            boltClientList.push stream
 
-            stream.on "readable", ->
-                data = stream.read()
+            stream.once "connection", ->
                 console.log "connection from client :" + stream.remoteAddress
-                console.log "Data received: " + data
 
-                if data.search('forwardingPorts') == 0
-                    # store bolt client data in local memory
-                    result = {}
-                    certObj = stream.getPeerCertificate()
-                    console.log 'certObj: ' + JSON.stringify certObj
-                    cname = certObj.subject.CN
-                    result.forwardingports = data.split(':')[1]
-                    result.cname = cname
-                    stream.name = cname
-                    result.sockName = cname
-                    result.caddress = stream.remoteAddress
-                    console.log 'cname result : ' + JSON.stringify result
-                    boltClientData.push result
+                stream.once "data", (data) ->
+                    console.log "Data received: " + data
+
+                    if data.search('forwardingPorts') == 0
+                        # store bolt client data in local memory
+                        result = {}
+                        certObj = stream.getPeerCertificate()
+                        console.log 'certObj: ' + JSON.stringify certObj
+                        cname = certObj.subject.CN
+                        stream.name = cname
+
+                        boltConnections[cname] =
+                            stream: stream,
+                            forwardingports: data.split(':')[1]
 
             stream.on "close",  =>
                 console.log "bolt client is closed :" + stream.name
-                boltClientDataTemp = []
-                console.log "bolt client list size before disconnect " + boltClientData.length
-                for clientData in boltClientData
-                    if clientData.sockName != stream.name
-                        boltClientDataTemp.push clientData
-
-                boltClientData = boltClientDataTemp
-                console.log "bolt client list size after disconnect " + boltClientData.length
-
-                console.log "boltclientlist stream size before disconnect " + boltClientList.length
-                #remove stream data from local memory
-                boltClientListTemp = []
-                for stream1 in boltClientList
-                    if stream  != stream1
-                        boltClientListTemp.push stream1
-
-                boltClientList = boltClientListTemp
-                console.log "boltclientlist stream size after disconnect " + boltClientList.length
+                delete boltConnections[stream.name]
 
         ).listen serverPort
-
-    #Method to forward equests to bolt clients
-    sendDataToClient: (request, callback) ->
-        #console.log 'request object server: ' + util.inspect(request)
-        if request.header('cloudflash-bolt-target')
-                boltTarget = request.header('cloudflash-bolt-target')
-                boltTarget = boltTarget.split(":")[0]
-                entry = ''; serverRequest = {}
-                # check for cname existence
-                for clientData in boltClientData
-                    if clientData.cname == boltTarget
-                        entry = clientData
-                        break
-                # if cname exist process request
-                if entry
-                    for socket in boltClientList
-                        if socket.name == entry.sockName
-                            boltClientSocket = socket
-                            console.log "client exists"
-                            break
-
-                    console.log "server conn address :" + boltClientSocket.remoteAddress
-                    #console.log "request body :" + util.inspect(request.body)
-                    if request.method == "POST" || request.method == "PUT"
-                        serverRequest.body = request.body
-                        if request.header('content-type')
-                            serverRequest.header = request.header('content-type')
-                        serverRequest.length = request.header('Content-Length')
-                        if  request.header('Accept')
-                            serverRequest.accept = request.header('Accept')
-                        if  request.header('X-Auth-Token')
-                            serverRequest.authorization = request.header('X-Auth-Token')
-
-                    if request.method == "GET"
-                        if  request.header('X-Auth-Token')
-                            serverRequest.authorization = request.header('X-Auth-Token')
-
-                    serverRequest.headers = request.headers
-                    serverRequest.path = request.path
-                    serverRequest.method = request.method
-                    serverRequest.target = request.header('cloudflash-bolt-target')
-
-                    boltClientSocket.write JSON.stringify(serverRequest), "utf8", =>
-                        boltClientSocket.end()
-
-                        boltClientSocket.on "readable", =>
-                            data = boltClientSocket.read()
-                            console.log 'data backend service:' + data
-                            callback data
-                else
-                    res = @fillLocalErrorResponse 500,request.headers,"bolt cname entry not found!"
-                    return callback(JSON.stringify res)
-        else
-            console.log 'bolt target missing'
-            res = @fillLocalErrorResponse 500,request.headers,"bolt target missing!"
-            return callback(JSON.stringify res)
 
     #reconnect logic for bolt client
     reconnect: (host, port) ->
@@ -171,117 +127,55 @@ class cloudflashbolt
     runClient: (host, port) ->
         # try to connect to the server
         forwardingPorts = @config.local_forwarding_ports
-        client.socket = tls.connect(port, host, options, =>
-            if client.socket.authorized
+        stream = tls.connect(port, host, options, =>
+            if stream.authorized
                 console.log "Successfully connected to bolt server"
                 result = "forwardingPorts:#{forwardingPorts}"
-                client.socket.write result
-                client.socket.end()
+                stream.write result
             else
                 #using self signed certs for intergration testing. Later get rid of this.
                 result = "forwardingPorts:#{forwardingPorts}"
-                client.socket.write result
-                client.socket.end()
+                stream.write result
                 console.log "Failed to authorize TLS connection. Could not connect to bolt server"
         )
 
-        client.socket.setEncoding("utf8")
+        stream.setEncoding("utf8")
 
-        client.socket.on "error", (err) =>
+        stream.on "error", (err) =>
             console.log 'client error: ' + err
             @reconnect host, port
 
-        client.socket.on "close", =>
+        stream.on "close", =>
             console.log 'client closed: '
             @reconnect host, port
 
-        client.socket.on "readable", =>
-            data = client.socket.read()
+        acceptor = http.createServer().listen(stream)
+        acceptor.on "request", (request,response) =>
+            console.log "Data received from bolt server: " + request
+            console.log('request ' + request.url);
 
-            res = {}
-            console.log "Data received from bolt server: " + data
-            recvData = JSON.parse data
+            target = request.header('cloudflash-bolt-target')
+            roptions = url.parse(request.url);
+            roptions.hostname = "localhost"
+            roptions.port = (Number) target.split(':')[1]
+            unless roptions.port in forwardingPorts
+                console.log 'port does not exist'
+                error = 'unauthorized port forwarding request!'
+                response.writeHead(500, {
+                    'Content-Length': error.length,
+                    'Content-Type': 'text/plain' })
+                response.end()
+                return
 
-            boltTarget = recvData.target
-            boltTargetPort = boltTarget.split(":")[1]
-            boltTargetPort = (Number) boltTargetPort
-            console.log 'boltTargetPort: ' + boltTargetPort
-            portexists = false
-            console.log 'forwardingPorts: ' + forwardingPorts
-            #check boltTargetPort is part of forwardingPorts
-            for localPort in forwardingPorts
-                if localPort == boltTargetPort
-                    console.log 'port exist'
-                    portexists = true
-                    break
+            roptions.headers = request.headers;
+            roptions.method = request.method;
+            roptions.agent = false;
 
-            if portexists
-                request = new http.ClientRequest(
-                    hostname: "localhost"
-                    port: boltTargetPort
-                    path: recvData.path
-                    method: recvData.method
-                )
+            console.log 'making http.request with options: ' + roptions
+            connector = http.request roptions, (targetResponse) =>
+                console.log response
+                targetResponse.pipe(response, {end:true} )
 
-                if recvData.method == "POST" || recvData.method == "PUT"
-                    if recvData.header
-                        request.setHeader("Content-Type",recvData.header)
-
-                    if boltTargetPort != 5000
-                        request.setHeader("Content-Length",recvData.length)
-
-                    if recvData.accept
-                        request.setHeader("Accept",recvData.accept)
-                    if recvData.authorization
-                        request.setHeader("X-Auth-Token",recvData.authorization)
-
-                    if recvData.header.indexOf("application/json") == 0
-                        request.write JSON.stringify(recvData.body)
-                    else
-                        console.log "http request data" + querystring.stringify(recvData.body)
-                        request.write querystring.stringify(recvData.body)
-
-                if recvData.method == "GET"
-                    if recvData.authorization
-                        request.setHeader("X-Auth-Token",recvData.authorization)
-
-                request.end()
-
-                request.on "error", (err) =>
-                    console.log "error: " + err
-                    res = @fillLocalErrorResponse(500,recvData.headers,err)
-                    client.socket.write JSON.stringify(res)
-                    client.socket.end()
-
-                #console.log 'request object client: ' + util.inspect(request)
-                request.on "response", (response) =>
-                    resObj = {}
-                    console.log "STATUS: " + response.statusCode
-                    console.log("HEADERS: " + JSON.stringify(response.headers))
-                    response.setEncoding "utf8"
-                    resObj.headers = response.headers
-                    resObj.status = response.statusCode
-                    #Latest Modules like cloudflash-ffproxy / cloudflash-uproxy return 204 without data
-                    if response.statusCode == 204 &&  boltTargetPort == 5000
-                        resObj.data = {"deleted":true}
-                        client.socket.write JSON.stringify resObj
-                        client.socket.end()
-                    response.on "data", (resFromCF) ->
-                        console.log "response from cloudflash: " + resFromCF
-                        if response.statusCode == 200 || response.statusCode == 204 || response.statusCode == 202 || response.statusCode == 304
-                            #console.log 'response object client: ' + util.inspect(response)
-                            resObj.data = resFromCF
-                            client.socket.write JSON.stringify resObj
-                            client.socket.end()
-                        else
-                            #res.error = resFromCF
-                            resObj.data = resFromCF
-                            client.socket.write JSON.stringify resObj
-                            client.socket.end()
-
-            else
-                res = @fillLocalErrorResponse(500,recvData.headers,"Bolt Target Port not part of local forwarding ports managed by the client")
-                client.socket.write JSON.stringify(res)
-                client.socket.end()
+            request.pipe(connector, {end:true} )
 
 module.exports = cloudflashbolt
