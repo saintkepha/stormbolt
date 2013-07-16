@@ -91,6 +91,7 @@ class cloudflashbolt
                     entry.stream.pipe(response, {end: true})
 
                 request.pipe(entry.stream, {end: false})
+                request.end()
 
     # Method to start bolt server
     runServer: ->
