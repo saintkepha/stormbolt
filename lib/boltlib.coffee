@@ -49,7 +49,7 @@ class cloudflashbolt
         # after initial data, invoke HTTP server listener on port
         acceptor = http.createServer().listen(listenPort)
         acceptor.on "request", (request,response) =>
-            console.log "[proxy] request from client: " + request
+            console.log "[proxy] request from client: " + JSON.stringify request
             if request.url == '/cname'
                 res = []
                 for cname,entry in boltConnections
@@ -105,7 +105,7 @@ class cloudflashbolt
                         stream: stream,
                         forwardingports: data.split(':')[1]
 
-                    console.log "current data in boltConnections: " + boltConnections
+                    console.log "current data in boltConnections: " + JSON.stringify boltConnections
 
             stream.on "close",  =>
                 console.log "bolt client is closed :" + stream.name
@@ -152,7 +152,7 @@ class cloudflashbolt
 
         acceptor = http.createServer().listen(stream)
         acceptor.on "request", (request,response) =>
-            console.log "Data received from bolt server: " + request
+            console.log "Data received from bolt server: " + JSON.stringify request
             console.log('request ' + request.url);
 
             target = request.headers['cloudflash-bolt-target']
