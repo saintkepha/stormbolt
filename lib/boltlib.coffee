@@ -76,9 +76,9 @@ class cloudflashbolt
 
                 entry.stream.on "readable", =>
                     console.log "[proxy] sending response from client"
-                    entry.stream.pipe(response, {end:true})
+                    entry.stream.pipe(response)
 
-                request.pipe(entry.stream, {end:true})
+                request.pipe(entry.stream)
 
     # Method to start bolt server
     runServer: ->
@@ -112,7 +112,7 @@ class cloudflashbolt
 
             stream.on "close",  =>
                 console.log "bolt client is closed:" + stream.name
-                boltConnections.splice(index, 1) for index, item in boltConnections when item.cname is stream.name
+                boltConnections = (boltConnections.splice(index, 1) for index, item in boltConnections when item.cname is stream.name)
 
         ).listen serverPort
 
@@ -178,8 +178,8 @@ class cloudflashbolt
             console.log 'making http.request with options: ' + roptions
             connector = http.request roptions, (targetResponse) =>
                 console.log response
-                targetResponse.pipe(response, {end:true} )
+                targetResponse.pipe(response)
 
-            request.pipe(connector, {end:true} )
+            request.pipe(connector)
 
 module.exports = cloudflashbolt
