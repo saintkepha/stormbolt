@@ -259,7 +259,7 @@ class cloudflashbolt
 
                 targetResponse.on 'end', =>
                     console.log 'http request is over'
-                    stream.write ''
+                    stream.write 'asdf'
 
                 stream.setEncoding('utf8')
                 targetResponse.pipe(stream, {end: false})
