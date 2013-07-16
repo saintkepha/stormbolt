@@ -232,6 +232,7 @@ class cloudflashbolt
             target = options.headers['cloudflash-bolt-target']
             options.hostname = "localhost"
             options.port = (Number) target.split(':')[1]
+            options.headers['host'] = options.hostname+':'+options.port
             unless options.port in forwardingPorts
                 console.log 'port does not exist'
                 error = 'unauthorized port forwarding request!'
@@ -245,7 +246,10 @@ class cloudflashbolt
                 targetResponse.pipe(stream, {end: false})
 
             connector.on "error", (err) =>
-                console.log "error during performing http request!"
+                error = "error during performing http request!"
+                console.log error
+                stream.write('HTTP/1.1 500 '+error+'\r\n\r\n')
+                stream.end()
 
         incoming = ''
         len = 0
