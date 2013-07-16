@@ -4,7 +4,7 @@ fileops = require("fileops")
 http = require("http")
 util = require('util')
 url  = require('url')
-net = requre('net')
+net = require('net')
 querystring = require('querystring')
 
 class cloudflashbolt
