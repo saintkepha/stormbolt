@@ -100,10 +100,15 @@ class cloudflashbolt
                 # preq.on "response", (pres) =>
                 #     pres.pipe(response)
 
+                body = ''
+
+                request.on "data", (chunk) =>
+                    body += chunk
+
                 request.on "end", =>
                     console.log "[proxy] client request ended..."
-                    data = request.socket.read()
-                    entry.stream.write data
+                    console.log body
+                    entry.stream.write body
 
                 request.resume()
                 #request.pipe(preq)
