@@ -118,6 +118,8 @@ class cloudflashbolt
 
             listConnections()
 
+            stream.write 'BLAH!'
+
             # stream.once "readable", ->
             #     data = stream.read()
             #     console.log "Data received: " + data
