@@ -43,7 +43,7 @@ class cloudflashbolt
 
     runProxy: ->
         if @config.listen
-            listenPort = config.listen.split(":")[1]
+            listenPort = @config.listen.split(":")[1]
             console.log 'running proxy on listenPort: ' + listenPort
 
         # after initial data, invoke HTTP server listener on port
@@ -65,7 +65,7 @@ class cloudflashbolt
                 response.end(body,"utf8")
                 return
 
-            target = request.header('cloudflash-bolt-target')
+            target = request.getHeader('cloudflash-bolt-target')
             cname = target.split(':')[0]
 
             entry = boltConnections[cname]
@@ -82,29 +82,25 @@ class cloudflashbolt
         serverPort = local.split(":")[1]
         console.log "server port:" + serverPort
         tls.createServer(options, (stream) =>
-            console.log "TLS connection established with VCG client"
-            #socket.id  = socketIdCounter++
+            console.log "TLS connection established with VCG client from: " + stream.remoteAddress
 
             stream.setEncoding "utf8"
             #socket.setKeepAlive(true,1000)
 
-            stream.once "connection", ->
-                console.log "connection from client :" + stream.remoteAddress
+            stream.once "data", (data) ->
+                console.log "Data received: " + data
 
-                stream.once "data", (data) ->
-                    console.log "Data received: " + data
+                if data.search('forwardingPorts') == 0
+                    # store bolt client data in local memory
+                    result = {}
+                    certObj = stream.getPeerCertificate()
+                    console.log 'certObj: ' + JSON.stringify certObj
+                    cname = certObj.subject.CN
+                    stream.name = cname
 
-                    if data.search('forwardingPorts') == 0
-                        # store bolt client data in local memory
-                        result = {}
-                        certObj = stream.getPeerCertificate()
-                        console.log 'certObj: ' + JSON.stringify certObj
-                        cname = certObj.subject.CN
-                        stream.name = cname
-
-                        boltConnections[cname] =
-                            stream: stream,
-                            forwardingports: data.split(':')[1]
+                    boltConnections[cname] =
+                        stream: stream,
+                        forwardingports: data.split(':')[1]
 
             stream.on "close",  =>
                 console.log "bolt client is closed :" + stream.name
@@ -154,7 +150,7 @@ class cloudflashbolt
             console.log "Data received from bolt server: " + request
             console.log('request ' + request.url);
 
-            target = request.header('cloudflash-bolt-target')
+            target = request.getHeader('cloudflash-bolt-target')
             roptions = url.parse(request.url);
             roptions.hostname = "localhost"
             roptions.port = (Number) target.split(':')[1]
