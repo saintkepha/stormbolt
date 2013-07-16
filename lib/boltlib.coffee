@@ -59,6 +59,7 @@ class cloudflashbolt
                         caddress: entry.stream.remoteAddress
 
                 body = JSON.stringify res
+                console.log "[proxy] returning connections data: " + body
                 response.writeHead(200, {
                     'Content-Length': body.length,
                     'Content-Type': 'application/json' })
@@ -103,6 +104,8 @@ class cloudflashbolt
                     boltConnections[cname] =
                         stream: stream,
                         forwardingports: data.split(':')[1]
+
+                    console.log "current data in boltConnections: " + boltConnections
 
             stream.on "close",  =>
                 console.log "bolt client is closed :" + stream.name
