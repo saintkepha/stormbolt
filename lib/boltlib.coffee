@@ -53,6 +53,11 @@ class cloudflashbolt
         # after initial data, invoke HTTP server listener on port
         acceptor = http.createServer().listen(listenPort)
         acceptor.on "request", (request,response) =>
+            body = ''
+            request.on "data", (chunk) =>
+                console.log 'read: ' + chunk
+                body += chunk
+
             console.log "[proxy] request from client: " + request.url
             request.pause()
             if request.url == '/cname'
@@ -99,11 +104,6 @@ class cloudflashbolt
 
                 # preq.on "response", (pres) =>
                 #     pres.pipe(response)
-
-                body = ''
-
-                request.on "data", (chunk) =>
-                    body += chunk
 
                 request.on "end", =>
                     console.log "[proxy] client request ended..."
