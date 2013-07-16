@@ -129,10 +129,11 @@ class cloudflashbolt
                 boltConnections.splice(index, 1) for index, item in boltConnections when item.cname is stream.name
                 listConnections()
 
-            acceptor = http.createServer().listen(stream)
+            acceptor = http.createServer()
             acceptor.on "request", (request,response) =>
                 console.log "Data received from bolt client: " + request.url
 
+            stream.pipe(acceptor)
 
         ).listen serverPort
 
@@ -168,7 +169,7 @@ class cloudflashbolt
             console.log 'client closed: '
             @reconnect host, port
 
-        acceptor = http.createServer().listen(stream)
+        acceptor = http.createServer()
         acceptor.on "request", (request,response) =>
             console.log "Data received from bolt server: " + request.url
 
@@ -195,5 +196,7 @@ class cloudflashbolt
                 targetResponse.pipe(response, {end: true})
 
             request.pipe(connector, {end: true})
+
+        stream.pipe(acceptor, {end: false})
 
 module.exports = cloudflashbolt
