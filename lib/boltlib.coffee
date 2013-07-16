@@ -152,45 +152,6 @@ class cloudflashbolt
 
     #Method to start bolt client
     runClient: (host, port) ->
-        # try to connect to the server
-        forwardingPorts = @config.local_forwarding_ports
-        stream = tls.connect(port, host, options, =>
-            if stream.authorized
-                console.log "Successfully connected to bolt server"
-                result = "forwardingPorts:#{forwardingPorts}"
-                stream.write result
-            else
-                #using self signed certs for intergration testing. Later get rid of this.
-                result = "forwardingPorts:#{forwardingPorts}"
-                stream.write result
-                console.log "Failed to authorize TLS connection. Could not connect to bolt server"
-
-            roptions =
-                hostname: "localhost"
-                port: 1111
-                method: 'CONNECT'
-
-            console.log "got some stuff to read"
-
-            req = http.request roptions
-            req.end()
-
-            req.on "connect", (res, socket, head) =>
-                console.log "connected, setting up pipes"
-                stream.pipe(socket, {end: true})
-                socket.pipe(stream, {end: false})
-        )
-
-        stream.setEncoding("utf8")
-
-        stream.on "error", (err) =>
-            console.log 'client error: ' + err
-            @reconnect host, port
-
-        stream.on "close", =>
-            console.log 'client closed: '
-            @reconnect host, port
-
         acceptor = http.createServer().listen(1111)
         acceptor.on "connect", (req, csock, head) =>
             console.log "Data received from bolt server: " + request.url
@@ -219,5 +180,48 @@ class cloudflashbolt
                 targetResponse.pipe(csock, {end: true})
 
             request.pipe(connector, {end: true})
+
+        # try to connect to the server
+        forwardingPorts = @config.local_forwarding_ports
+        stream = tls.connect(port, host, options, =>
+            if stream.authorized
+                console.log "Successfully connected to bolt server"
+                result = "forwardingPorts:#{forwardingPorts}"
+                stream.write result
+            else
+                #using self signed certs for intergration testing. Later get rid of this.
+                result = "forwardingPorts:#{forwardingPorts}"
+                stream.write result
+                console.log "Failed to authorize TLS connection. Could not connect to bolt server"
+
+            roptions =
+                hostname: "localhost"
+                port: 1111
+                method: 'CONNECT'
+
+            console.log "got some stuff to read"
+
+            req = http.request roptions
+            req.end()
+
+            req.on "connect", (res, socket, head) =>
+                console.log "connected, setting up pipes"
+                stream.pipe(socket, {end: true})
+                socket.pipe(stream, {end: false})
+
+            req.on "error", (err) =>
+                console.log 'error during connect to local: ' + err
+        )
+
+        stream.setEncoding("utf8")
+
+        stream.on "error", (err) =>
+            console.log 'client error: ' + err
+            @reconnect host, port
+
+        stream.on "close", =>
+            console.log 'client closed: '
+            @reconnect host, port
+
 
 module.exports = cloudflashbolt
