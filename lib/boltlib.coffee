@@ -253,9 +253,9 @@ class cloudflashbolt
             console.log 'making http.request with options: ' + JSON.stringify roptions
             connector = http.request roptions, (targetResponse) =>
                 console.log 'setting up reply back to stream'
-                targetResponse.pipe(stream, {end: false})
+                targetResponse.pipe(stream, {end: true})
 
-            connector.setTimeout 3000, ->
+            connector.setTimeout 5000, ->
                 error = "error during performing http request! request timedout."
                 console.log error
                 try
