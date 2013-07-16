@@ -200,6 +200,7 @@ class cloudflashbolt
     runClient: (host, port) ->
         # try to connect to the server
         forwardingPorts = @config.local_forwarding_ports
+        console.log "making connection to bolt server at: "+host+':'+port
         stream = tls.connect(port, host, options, =>
             if stream.authorized
                 console.log "Successfully connected to bolt server"
@@ -235,10 +236,13 @@ class cloudflashbolt
                 stream.end()
                 return
 
-            console.log 'making http.request with options: ' + options
+            console.log 'making http.request with options: ' + JSON.stringify options
             connector = http.request options, (targetResponse) =>
                 console.log 'setting up reply back to stream'
                 targetResponse.pipe(stream, {end: false})
+
+            connector.on "error", (err) =>
+                console.log "error during performing http request!"
 
         incoming = ''
         len = 0
@@ -252,6 +256,7 @@ class cloudflashbolt
 
             # this is not a safe check
             if incoming.length >= len
+                console.log 'processed incoming with '+incoming.length+' out of '+len
                 relay JSON.parse incoming
 
 module.exports = cloudflashbolt
