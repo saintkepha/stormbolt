@@ -275,15 +275,21 @@ class cloudflashbolt
         len = 0
 
         stream.on "data", (data) =>
+            temp = ''
             unless incoming
                 len = data.readUInt32LE(0)
                 incoming = data.slice(4)
             else
-                incoming += data
+                if incoming.length + data.length <= len
+                    incoming += data
+                else
+                    offset = len - incoming.length
+                    incoming += data.slice(0,offset)
+                    temp = data.slice(offset)
 
-            # this is not a safe check
-            if incoming.length >= len
+            if incoming.length == len
                 console.log 'processed incoming with '+incoming.length+' out of '+len
                 relay JSON.parse incoming
+                incoming = temp
 
 module.exports = cloudflashbolt
