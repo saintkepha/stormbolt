@@ -264,22 +264,13 @@ class cloudflashbolt
                 connector.on 'end', =>
                     console.log 'http request is over'
                     stream.write body
-                    connector.end()
-
-            connector.on "socket", (socket) =>
-                console.log "socket opened"
-
-            connector.on "response", (response) =>
-                console.log "got a response"
+                    targetResponse.end()
 
             connector.setTimeout 5000, ->
                 error = "error during performing http request! request timedout."
                 console.log error
                 try
-                    console.log 'about to send headers'
                     stream.write('HTTP/1.1 500 '+error+'\r\n\r\n')
-                    console.log 'about to close connector'
-                    connector.end()
                 catch err
                     console.log err
 
@@ -288,9 +279,10 @@ class cloudflashbolt
                 console.log error
                 try
                     stream.write('HTTP/1.1 500 '+error+'\r\n\r\n')
-                    connector.end()
                 catch err
                     console.log err
+            connector.end()
+
 
         incoming = ''
         len = 0
