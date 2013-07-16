@@ -222,7 +222,9 @@ class cloudflashbolt
             @reconnect host, port
 
         relay = (reqobj) =>
-            options = querystring.parse reqobj.req
+            orequest = querystring.parse reqobj.req
+            options = url.parse(orequest.url)
+            options.method = orequest.method
             options.headers = reqobj.headers
             options.agent = false
 
