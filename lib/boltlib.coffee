@@ -65,7 +65,7 @@ class cloudflashbolt
                 response.end(body,"utf8")
                 return
 
-            target = request.getHeader('cloudflash-bolt-target')
+            target = request.headers['cloudflash-bolt-target']
             cname = target.split(':')[0]
 
             entry = boltConnections[cname]
@@ -150,7 +150,7 @@ class cloudflashbolt
             console.log "Data received from bolt server: " + request
             console.log('request ' + request.url);
 
-            target = request.getHeader('cloudflash-bolt-target')
+            target = request.headers['cloudflash-bolt-target']
             roptions = url.parse(request.url);
             roptions.hostname = "localhost"
             roptions.port = (Number) target.split(':')[1]
