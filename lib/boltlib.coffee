@@ -54,6 +54,7 @@ class cloudflashbolt
         acceptor = http.createServer().listen(listenPort)
         acceptor.on "request", (request,response) =>
             console.log "[proxy] request from client: " + request.url
+            request.pause()
             if request.url == '/cname'
                 res = []
                 for entry in boltConnections
@@ -79,7 +80,7 @@ class cloudflashbolt
                 unless entry
                     error = "no such cloudflash-bolt-target: "+target
                     response.writeHead(404, {
-                        'Content-Length': body.length,
+                        'Content-Length': error.length,
                         'Content-Type': 'application/json' })
                     response.end(body,"utf8")
                     return
@@ -90,9 +91,8 @@ class cloudflashbolt
                     console.log "[proxy] forwarding response from client"
                     entry.stream.pipe(response, {end: true})
 
-                entry.stream.write 'test data'
-
-                request.pipe(entry.stream, {end: false})
+                request.pipe(entry.stream)
+                request.resume()
 
     # Method to start bolt server
     runServer: ->
@@ -126,10 +126,15 @@ class cloudflashbolt
                     # store bolt client data in local memory
                     result = {}
 
-                    boltConnections.push
-                        cname: cname
-                        stream: stream,
-                        forwardingports: data.split(':')[1]
+                    match = (item for item in boltConnections when item.cname is cname)
+                    entry = match[0] if match.length
+                    if entry
+                        entry.stream = stream
+                    else
+                        boltConnections.push
+                            cname: cname
+                            stream: stream,
+                            forwardingports: data.split(':')[1]
 
                     listConnections()
 
