@@ -72,6 +72,14 @@ class cloudflashbolt
             if cname
                 match = (item for item in boltConnections when item.cname is cname)
                 entry = match[0] if match.length
+                unless entry
+                    error = "no such cloudflash-bolt-target: "+target
+                    response.writeHead(404, {
+                        'Content-Length': body.length,
+                        'Content-Type': 'application/json' })
+                    response.end(body,"utf8")
+                    return
+
                 console.log "[proxy] forwarding request to " + cname + " at " + entry.stream.remoteAddress
 
                 entry.stream.on "readable", =>
@@ -118,7 +126,9 @@ class cloudflashbolt
 
     #reconnect logic for bolt client
     reconnect: (host, port) ->
-        setTimeout(@runClient host, port, 1000)
+        retry = (host, port) =>
+            @runClient host,port
+        setTimeout(retry, 1000)
 
     fillLocalErrorResponse: (status,headers,data) ->
         res = {}
