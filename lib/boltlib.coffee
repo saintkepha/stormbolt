@@ -105,7 +105,7 @@ class cloudflashbolt
             stream.setEncoding "utf8"
             #socket.setKeepAlive(true,1000)
 
-            stream.once "readable", ->
+            stream.once "data", ->
                 data = stream.read()
                 console.log "Data received: " + data
 
@@ -128,6 +128,11 @@ class cloudflashbolt
                 console.log "bolt client connection is closed:" + stream.name
                 boltConnections.splice(index, 1) for index, item in boltConnections when item.cname is stream.name
                 listConnections()
+
+            acceptor = http.createServer().listen(stream)
+            acceptor.on "request", (request,response) =>
+                console.log "Data received from bolt client: " + request.url
+
 
         ).listen serverPort
 
@@ -166,7 +171,6 @@ class cloudflashbolt
         acceptor = http.createServer().listen(stream)
         acceptor.on "request", (request,response) =>
             console.log "Data received from bolt server: " + request.url
-            console.log('request ' + request.url);
 
             target = request.headers['cloudflash-bolt-target']
             roptions = require('url').parse(request.url);
