@@ -91,6 +91,9 @@ class cloudflashbolt
                     console.log "[proxy] forwarding response from client"
                     entry.stream.pipe(response, {end: true})
 
+                request.on "pipe", =>
+                    console.log "[proxy] client request piped..."
+
                 request.on "end", =>
                     console.log "[proxy] client request ended..."
                     request.pipe(entry.stream, {end: false})
