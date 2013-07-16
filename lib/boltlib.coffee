@@ -276,7 +276,9 @@ class cloudflashbolt
                 error = "error during performing http request! request timedout."
                 console.log error
                 try
+                    console.log 'about to send headers'
                     stream.write('HTTP/1.1 500 '+error+'\r\n\r\n')
+                    console.log 'about to close connector'
                     connector.end()
                 catch err
                     console.log err
