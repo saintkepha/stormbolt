@@ -56,7 +56,7 @@ class cloudflashbolt
                     res.push
                         cname: cname
                         forwardingports: entry.forwardingports
-                        caddress: entry.stream.remoteAddress
+                        caddress: entry.boltstream.remoteAddress
 
                 body = JSON.stringify res
                 console.log "[proxy] returning connections data: " + body
@@ -72,11 +72,11 @@ class cloudflashbolt
             if cname
                 console.log "[proxy] forwarding request to " + cname
                 entry = boltConnections[cname]
-                entry.stream.on "readable", =>
+                entry.boltstream.on "readable", =>
                     console.log "[proxy] sending response from client"
                     boltClient.pipe(response, {end:true})
 
-                request.pipe(entry.stream, {end:true})
+                request.pipe(entry.boltstream, {end:true})
 
     # Method to start bolt server
     runServer: ->
@@ -102,7 +102,7 @@ class cloudflashbolt
                     stream.name = cname
 
                     boltConnections[cname] =
-                        stream: stream,
+                        boltstream: stream,
                         forwardingports: data.split(':')[1]
 
                     console.log "current data in boltConnections: " + JSON.stringify boltConnections
