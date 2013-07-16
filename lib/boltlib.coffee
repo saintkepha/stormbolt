@@ -90,6 +90,8 @@ class cloudflashbolt
                     console.log "[proxy] forwarding response from client"
                     entry.stream.pipe(response, {end: true})
 
+                entry.stream.write request.url
+
                 request.pipe(entry.stream, {end: false})
 
     # Method to start bolt server
