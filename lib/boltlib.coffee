@@ -94,17 +94,15 @@ class cloudflashbolt
                 request.on "pipe", =>
                     console.log "[proxy] client request piped..."
 
-                proxy = http.createClient()
-                preq = proxy.request(request.method,request.url,request.headers)
+                # proxy = http.createClient()
+                # preq = proxy.request(request.method,request.url,request.headers)
 
-                preq.on "response", (pres) =>
-                    pres.pipe(response)
+                # preq.on "response", (pres) =>
+                #     pres.pipe(response)
 
                 request.on "end", =>
                     console.log "[proxy] client request ended..."
-                    data = JSON.stringify request
-                    console.log data
-                    entry.stream.write data
+                    entry.stream.write request
 
                 request.pipe(preq)
 
