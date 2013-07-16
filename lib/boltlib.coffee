@@ -96,9 +96,12 @@ class cloudflashbolt
 
                 request.on "end", =>
                     console.log "[proxy] client request ended..."
-                    data = request.read()
+                    data = JSON.stringify request
                     console.log data
                     entry.stream.write data
+
+                request.resume()
+
 
 
     # Method to start bolt server
