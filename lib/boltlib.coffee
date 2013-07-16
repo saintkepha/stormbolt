@@ -34,7 +34,7 @@ class cloudflashbolt
                 for host in @config.remote
                     serverHost = host.split(":")[0]
                     serverPort = host.split(":")[1]
-                    @runClient host
+                    @runClient serverHost, serverPort
         else
             callback new Error "Invalid bolt JSON!"
 
@@ -45,7 +45,7 @@ class cloudflashbolt
         callback(res)
 
     # Method to start bolt server
-    boltServer: ->
+    runServer: ->
         local = @config.local
         console.log 'in start bolt: ' + local
         serverPort = local.split(":")[1]
@@ -156,7 +156,7 @@ class cloudflashbolt
 
     #reconnect logic for bolt client
     reconnect: (host, port) ->
-        setTimeout(@boltClient host, port, 1000)
+        setTimeout(@runClient host, port, 1000)
 
     fillLocalErrorResponse: (status,headers,data) ->
         res = {}
@@ -166,7 +166,7 @@ class cloudflashbolt
         return res
 
     #Method to start bolt client
-    boltClient: (host, port) ->
+    runClient: (host, port) ->
         # try to connect to the server
         forwardingPorts = @config.local_forwarding_ports
         client.socket = tls.connect(port, host, options, =>
