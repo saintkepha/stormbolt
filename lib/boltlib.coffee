@@ -91,8 +91,14 @@ class cloudflashbolt
                     console.log "[proxy] forwarding response from client"
                     entry.stream.pipe(response, {end: true})
 
-                request.pipe(entry.stream)
+                request.on "close", =>
+                    console.log "[proxy] client request closed..."
+                    entry.stream.end()
+
+                request.pipe(entry.stream, {end: false})
                 request.resume()
+
+
 
     # Method to start bolt server
     runServer: ->
