@@ -7,6 +7,9 @@ url  = require('url')
 net = require('net')
 querystring = require('querystring')
 
+#Workaround - fix it later, Avoids DEPTH_ZERO_SELF_SIGNED_CERT error for self-signed certs
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0" 
+
 class cloudflashbolt
 
     options = ''
