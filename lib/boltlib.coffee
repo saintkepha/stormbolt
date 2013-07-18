@@ -8,7 +8,7 @@ net = require('net')
 querystring = require('querystring')
 
 #Workaround - fix it later, Avoids DEPTH_ZERO_SELF_SIGNED_CERT error for self-signed certs
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0" 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 
 class cloudflashbolt
 
@@ -189,7 +189,8 @@ class cloudflashbolt
 
             stream.on "close",  =>
                 console.log "bolt client connection is closed:" + stream.name
-                boltConnections.splice(index, 1) for index, item in boltConnections when item.cname is stream.name
+                #boltConnections.splice(index, 1) for index, item in boltConnections when item.cname is stream.name
+                console.log "found match: "item.cname for index, item in boltConnections when item.cname is stream.name
                 listConnections()
 
             # acceptor = http.createServer()
