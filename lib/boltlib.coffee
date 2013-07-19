@@ -85,7 +85,8 @@ class cloudflashbolt
                     error = "no such cloudflash-bolt-target: "+target
                     response.writeHead(404, {
                         'Content-Length': error.length,
-                        'Content-Type': 'application/json' })
+                        'Content-Type': 'application/json',
+                        'Connection': 'close' })
                     response.end(body,"utf8")
                     return
 
