@@ -190,7 +190,7 @@ class cloudflashbolt
             stream.on "close",  =>
                 console.log "bolt client connection is closed:" + stream.name
                 #boltConnections.splice(index, 1) for index, item in boltConnections when item.cname is stream.name
-                console.log index+':'+entry.cname+' ? '+stream.name for index, entry in boltConnections
+                console.log index+':'+entry.cname+' ? '+stream.name for entry, index in boltConnections
                 console.log "found match: " + item.cname for index, item in boltConnections when item.cname is stream.name
                 listConnections()
 
