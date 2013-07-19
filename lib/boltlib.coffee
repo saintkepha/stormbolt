@@ -79,10 +79,12 @@ class cloudflashbolt
             cname = target.split(':')[0] if target
 
             if cname
+                listConnections()
                 match = (item for item in boltConnections when item.cname is cname)
                 entry = match[0] if match.length
                 unless entry
                     error = "no such cloudflash-bolt-target: "+target
+                    console.log error
                     response.writeHead(404, {
                         'Content-Length': error.length,
                         'Content-Type': 'application/json',
