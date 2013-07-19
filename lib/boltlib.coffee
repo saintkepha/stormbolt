@@ -278,7 +278,7 @@ class cloudflashbolt
                 targetResponse.pipe(stream)
                 targetResponse.resume()
 
-            connector.setTimeout 5000, ->
+            connector.setTimeout 20000, ->
                 error = "error during performing http request! request timedout."
                 console.log error
                 try
