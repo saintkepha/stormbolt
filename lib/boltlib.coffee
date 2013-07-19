@@ -188,10 +188,9 @@ class cloudflashbolt
                     listConnections()
 
             stream.on "close",  =>
-                console.log "bolt client connection is closed:" + stream.name
-                #boltConnections.splice(index, 1) for index, item in boltConnections when item.cname is stream.name
-                console.log index+':'+entry.cname+' ? '+stream.name for entry, index in boltConnections
-                console.log "found match: " + item.cname for index, item in boltConnections when item.cname is stream.name
+                console.log "bolt client connection is closed for ID: " + stream.name
+                console.log "found match: " + item.cname for item,index in boltConnections when item.cname is stream.name
+                boltConnections.splice(index, 1) for item,index in boltConnections when item.cname is stream.name
                 listConnections()
 
             # acceptor = http.createServer()
