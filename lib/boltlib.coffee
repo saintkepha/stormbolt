@@ -192,9 +192,12 @@ class cloudflashbolt
 
             stream.on "close",  =>
                 console.log "bolt client connection is closed for ID: " + stream.name
-                console.log "found match: " + item.cname for item,index in boltConnections when item.cname is stream.name
-                boltConnections.splice(index, 1) for item,index in boltConnections when item.cname is stream.name
-                listConnections()
+                try
+                    console.log "found match: " + item.cname for item,index in boltConnections when item.cname is stream.name
+                    boltConnections.splice(index, 1) for item,index in boltConnections when item.cname is stream.name
+                    listConnections()
+                catch err
+                    console.log err
 
             # acceptor = http.createServer()
             # acceptor.on "connect", (request,csock, head) =>
