@@ -290,8 +290,12 @@ class cloudflashbolt
                     stream.write('HTTP/1.1 500 '+error+'\r\n\r\n')
                 catch err
                     console.log err
-            connector.end()
 
+            if reqobj.body
+                console.log 'sending http.request body from reqobj: '+reqobj.body
+                connector.write reqobj.body
+
+            connector.end()
 
         incoming = ''
         len = 0
