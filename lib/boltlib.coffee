@@ -87,8 +87,8 @@ class cloudflashbolt
                     console.log error
                     response.writeHead(404, {
                         'Content-Length': error.length,
-                        'Content-Type': 'application/json',
-                        'Connection': 'close' })
+                        'Content-Type': 'application/json'})
+                        #'Connection': 'close' })
                     response.end(body,"utf8")
                     return
 
@@ -194,7 +194,9 @@ class cloudflashbolt
                 console.log "bolt client connection is closed for ID: " + stream.name
                 try
                     console.log "found match: " + item.cname for item,index in boltConnections when item.cname is stream.name
-                    boltConnections.splice(index, 1) for item,index in boltConnections when item.cname is stream.name
+                    if item.cname for item,index in boltConnections when item.cname is stream.name
+                        console.log "Splicing connection: " + item.cname
+                        boltConnections.splice(index, 1) 
                     listConnections()
                 catch err
                     console.log err
@@ -278,7 +280,7 @@ class cloudflashbolt
                 targetResponse.pipe(stream)
                 targetResponse.resume()
 
-            connector.setTimeout 5000, ->
+            connector.setTimeout 20000, ->
                 error = "error during performing http request! request timedout."
                 console.log error
                 try
