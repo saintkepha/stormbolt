@@ -1,6 +1,6 @@
 {
   "name": "cloudflash-bolt",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "dependencies": {
 	  "dirty": "0.9.x",
 	  "request": "2.9.x",

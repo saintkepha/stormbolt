@@ -296,7 +296,7 @@ class cloudflashbolt
                 catch err
                     console.log err
 
-            if reqobj.body
+            if(reqobj.body && reqobj.body.length)
                 console.log 'sending http.request body from reqobj: '+reqobj.body
                 connector.write reqobj.body
 
