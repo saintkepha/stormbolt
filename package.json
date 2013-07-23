@@ -20,5 +20,5 @@
     "type": "git",
     "url": "git://github.com/clearpath-networks/cloudflash-bolt.git"
   },
-  "main": "./lib/boltlib.coffee"
+  "main": "./lib/bolt.coffee"
 }
