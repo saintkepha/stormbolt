@@ -87,8 +87,8 @@ class cloudflashbolt
                     console.log error
                     response.writeHead(404, {
                         'Content-Length': error.length,
-                        'Content-Type': 'application/json'})
-                        #'Connection': 'close' })
+                        'Content-Type': 'application/json',
+                        'Connection': 'close' })
                     response.end(body,"utf8")
                     return
 
@@ -196,7 +196,7 @@ class cloudflashbolt
                     console.log "found match: " + item.cname for item,index in boltConnections when item.cname is stream.name
                     if item.cname for item,index in boltConnections when item.cname is stream.name
                         console.log "Splicing connection: " + item.cname
-                        boltConnections.splice(index, 1) 
+                        boltConnections.splice(boltConnections.indexOf('item.cname'), 1)
                     listConnections()
                 catch err
                     console.log err
