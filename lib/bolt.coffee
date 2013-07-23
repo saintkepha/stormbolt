@@ -194,12 +194,12 @@ class cloudflashbolt
                 console.log "bolt client connection is closed for ID: " + stream.name
                 try
                     console.log "found match: " + item.cname for item,index in boltConnections when item.cname is stream.name
-					for item,index in boltConnections when item.cname is stream.name
-					    if item.cname
-					        console.log "Splicing connection: " + item.cname
+                    for item,index in boltConnections when item.cname is stream.name
+                        if item.cname
+                            console.log "Splicing connection: " + item.cname
                             #boltConnections.splice(boltConnections.indexOf('item.cname'), 1)
                             boltConnections.splice(index, 1)
-	                        console.log "Spliced connection: " + stream.name
+                            console.log "Spliced connection: " + stream.name
                     listConnections()
                 catch err
                     console.log err
