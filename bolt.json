@@ -1,8 +1,0 @@
-{
-  "cert": "/home/sbusa/cloudflash-bolt/controllerserver.pem",     
-  "key": "/home/sbusa/cloudflash-bolt/controllerserver.key",
-  "ca": "",
-  "remote": [],
-  "local": "localhost:443",
-  "listen": "localhost:9000"
-}
