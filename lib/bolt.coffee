@@ -96,8 +96,8 @@ class cloudflashbolt
                 if entry.mux
                     relay = entry.mux.createStream('relay:'+ port,{allowHalfOpen:true})
 
-                    relay.write request.method + ' ' + request.url + " HTTP/1.1"
-                    relay.write 'cloudflash-bolt-target: '+request.headers['cloudflash-bolt-target']
+                    relay.write request.method + ' ' + request.url + " HTTP/1.1\r\n"
+                    relay.write 'cloudflash-bolt-target: '+request.headers['cloudflash-bolt-target']+"\r\n"
                     relay.write "\r\n"
                     #relay.write "some test data"
                     #relay.end()
