@@ -229,21 +229,26 @@ class cloudflashbolt
                             break
 
                         incoming = ''
+                        request = null
+
                         _stream.on 'readable', =>
                             console.log "some data is now readable!"
 
                         _stream.on 'data', (chunk) =>
-                            console.log "received some data: "+chunk
-                            incoming += chunk
+
+                            unless incoming
+                                try
+                                    console.log "request received: "+chunk
+                                    request = JSON.parse chunk
+                                catch err
+                                    console.log "invalid relay request!"
+                                    _stream.end()
+                            else
+                                console.log "received some data: "+chunk
+                                incoming += chunk
 
                         _stream.on 'end',  =>
-                            try
-                                console.log "relaying following request to local:#{target} - "
-                                request = JSON.parse incoming
-                                console.log request
-                            catch err
-                                console.log "invalid relay request!"
-                                return
+                            console.log "relaying following request to local:#{target} - "
 
                             roptions = url.parse request.url
                             roptions.method = request.method
@@ -251,11 +256,14 @@ class cloudflashbolt
                             roptions.agent = false
                             roptions.port = target
 
+                            console.log JSON.stringify roptions
+
                             relay = http.request roptions, (reply) =>
                                 console.log "sending back reply"
                                 reply.setEncoding 'utf8'
                                 reply.pipe(_stream, {end:true})
 
+                            relay.write incoming if incoming
                             relay.end()
 
                             # relay = net.connect target
