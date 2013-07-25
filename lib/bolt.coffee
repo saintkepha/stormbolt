@@ -234,7 +234,13 @@ class cloudflashbolt
 
                             relay = net.connect target
                             relay.write incoming
-                            relay.pipe(_stream, {end:true})
+
+                            #relay.pipe(_stream, {end:true})
+
+                            relay.on "data", (chunk) =>
+                                console.log "received data: "+chunk
+                                relay.write chunk
+
                             relay.end()
 
                             relay.setTimeout 20000, ->
