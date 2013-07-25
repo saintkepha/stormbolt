@@ -126,7 +126,7 @@ class cloudflashbolt
                     relay.on "end", =>
                         console.log "no more data in relay"
 
-                    request.on "data", (chunk), =>
+                    request.on "data", (chunk) =>
                         console.log "read some data: "+chunk
 
                     request.on "end", =>
