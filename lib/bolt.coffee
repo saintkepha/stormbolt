@@ -1,11 +1,9 @@
 tls = require("tls")
 fs = require("fs")
-fileops = require("fileops")
 http = require("http")
-util = require('util')
-url  = require('url')
 net = require('net')
-querystring = require('querystring')
+
+MuxDemux = require('mux-demux')
 
 #Workaround - fix it later, Avoids DEPTH_ZERO_SELF_SIGNED_CERT error for self-signed certs
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
@@ -76,7 +74,7 @@ class cloudflashbolt
                 return
 
             target = request.headers['cloudflash-bolt-target']
-            cname = target.split(':')[0] if target
+            [ cname, port ] = target.split(':') if target
 
             if cname
                 listConnections()
@@ -94,44 +92,20 @@ class cloudflashbolt
 
                 console.log "[proxy] forwarding request to " + cname + " at " + entry.stream.remoteAddress
 
-                # m2m = MuxDemux()
-                # m2m.on 'connection', (stream) =>
-                #     stream.on 'data', (data) =>
-                #         console.log data
+                if entry.mux
+                    relay = entry.mux.createStream('relay:'+ port)
+                    request.pipe(relay).pipe(response)
 
-                # request.pipe(m2m).pipe(response)
+    addConnection: (data) ->
+        match = (item for item in boltConnections when item.cname is cname)
+        entry = match[0] if match.length
+        if entry
+            entry.stream = data.stream
+            entry.mux = data.mux
+        else
+            boltConnections.push data
 
-                entry.stream.on "readable", =>
-                    console.log "[proxy] forwarding response from client"
-                    entry.stream.pipe(response, {end: true})
-
-                request.on "pipe", =>
-                    console.log "[proxy] client request piped..."
-
-                # proxy = http.createClient()
-                # preq = proxy.request(request.method,request.url,request.headers)
-
-                # preq.on "response", (pres) =>
-                #     pres.pipe(response)
-
-                body = ''
-                request.on "data", (chunk) =>
-                    console.log 'read: ' + chunk
-                    body += chunk
-
-                request.on "end", =>
-                    console.log "[proxy] client request ended..."
-                    data = JSON.stringify
-                        req: querystring.stringify request
-                        headers: request.headers
-                        body: body
-
-                    buf = new Buffer 4
-                    buf.writeUInt32LE(data.length,0)
-
-                    console.log data
-                    entry.stream.write buf
-                    entry.stream.write data
+        listConnections()
 
     # Method to start bolt server
     runServer: ->
@@ -142,7 +116,7 @@ class cloudflashbolt
         tls.createServer(options, (stream) =>
             console.log "TLS connection established with VCG client from: " + stream.remoteAddress
 
-            stream.setEncoding "utf8"
+            #stream.setEncoding "utf8"
             #socket.setKeepAlive(true,1000)
 
             certObj = stream.getPeerCertificate()
@@ -154,41 +128,17 @@ class cloudflashbolt
 
             cname = certObj.subject.CN
             stream.name = cname
+            stream.pipe(mx = MuxDemux).pipe(stream)
 
-            # mdm = MuxDemux()
-            # mdm.on 'connection', (bstream) =>
-            #     bstream.on 'data', (data) =>
-            #         console.log data
-
-            # stream.pipe(mdm).pipe(upstream)
-
-
-            # boltConnections.push
-            #     cname: cname
-            #     stream: stream
-            #     forwardingports: '5000'
-
-            # listConnections()
-
-            stream.once "readable", ->
-                data = stream.read()
-                console.log "Data received: " + data
-
+            capability = mx.createReadStream('capability')
+            capability.on 'data', (data) =>
+                console.log "received capability info from bolt client: " + data
                 if data.search('forwardingPorts') == 0
-                    # store bolt client data in local memory
-                    result = {}
-
-                    match = (item for item in boltConnections when item.cname is cname)
-                    entry = match[0] if match.length
-                    if entry
-                        entry.stream = stream
-                    else
-                        boltConnections.push
-                            cname: cname
-                            stream: stream,
-                            forwardingports: data.split(':')[1]
-
-                    listConnections()
+                    @addConnection
+                        cname: cname
+                        stream: stream,
+                        mux: mx,
+                        forwardingports: data.split(':')[1]
 
             stream.on "close",  =>
                 console.log "bolt client connection is closed for ID: " + stream.name
@@ -203,12 +153,6 @@ class cloudflashbolt
                     listConnections()
                 catch err
                     console.log err
-
-            # acceptor = http.createServer()
-            # acceptor.on "connect", (request,csock, head) =>
-            #     console.log "Data received from bolt client: " + request.url
-            #     stream.pipe(csock)
-            #     csock.pipe(stream)
 
         ).listen serverPort
 
@@ -230,13 +174,40 @@ class cloudflashbolt
         stream = tls.connect(port, host, options, =>
             if stream.authorized
                 console.log "Successfully connected to bolt server"
-                result = "forwardingPorts:#{forwardingPorts}"
-                stream.write result
             else
-                #using self signed certs for intergration testing. Later get rid of this.
-                result = "forwardingPorts:#{forwardingPorts}"
-                stream.write result
-                console.log "Failed to authorize TLS connection. Could not connect to bolt server"
+                console.log "Failed to authorize TLS connection. Could not connect to bolt server (ignored for now)"
+
+            stream.pipe(mx=MuxDemux).pipe(stream)
+
+            # capability = mx.createWriteStream('capability')
+            # capability.write "forwardingPorts:#{forwardingPorts}"
+            # capability.end()
+
+            mx.on "connection", (_stream) =>
+                [ action, target ] = _stream.meta.split(':')
+                switch action
+                    when 'capability'
+                        _stream.write "forwardingPorts:#{forwardingPorts}"
+                        _stream.end()
+
+                    when 'relay' && target in forwardingPorts
+                        incoming = ''
+                        _stream.on 'data', (chunk) =>
+                            incoming += chunk
+
+                        _stream.on 'end', =>
+                            relay = net.connect target
+                            relay.write incoming
+                            relay.pipe(_stream, {end:true})
+
+                            relay.setTimeout 20000, ->
+                                console.log "error during performing relay action! request timedout."
+                                _stream.end()
+
+                    else
+                        console.log "unsupported action/target supplied by mux connection: #{action}/#{target}"
+                        _stream.end()
+
         )
 
         stream.on "error", (err) =>
@@ -248,82 +219,5 @@ class cloudflashbolt
             console.log 'client closed: '
             isReconnecting = false
             @reconnect host, port
-
-        relay = (reqobj) =>
-            orequest = querystring.parse reqobj.req
-            roptions = url.parse(orequest.url)
-            roptions.method = orequest.method
-            roptions.headers = reqobj.headers
-            roptions.agent = false
-
-            target = reqobj.headers['cloudflash-bolt-target']
-            roptions.hostname = "localhost"
-            roptions.port = (Number) target.split(':')[1]
-            unless roptions.port in forwardingPorts
-                console.log 'port does not exist'
-                error = 'unauthorized port forwarding request!'
-                stream.write('HTTP/1.1 500 '+error+'\r\n\r\n')
-                stream.end()
-                return
-
-            console.log 'making http.request with options: ' + JSON.stringify roptions
-            connector = http.request roptions, (targetResponse) =>
-                console.log 'setting up reply back to stream'
-
-                body = ''
-                targetResponse.on 'data', (chunk) =>
-                    console.log 'read: '+chunk
-                    body += chunk
-
-                targetResponse.on 'end', =>
-                    console.log 'http request is over'
-
-                stream.setEncoding('utf8')
-                #targetResponse.pipe(stream, {end:false})
-                targetResponse.pipe(stream)
-                targetResponse.resume()
-
-            connector.setTimeout 20000, ->
-                error = "error during performing http request! request timedout."
-                console.log error
-                try
-                    stream.write('HTTP/1.1 500 '+error+'\r\n\r\n')
-                catch err
-                    console.log err
-
-            connector.on "error", (err) =>
-                error = "error during performing http request!"
-                console.log error
-                try
-                    stream.write('HTTP/1.1 500 '+error+'\r\n\r\n')
-                catch err
-                    console.log err
-
-            if(reqobj.body && reqobj.body.length)
-                console.log 'sending http.request body from reqobj: '+reqobj.body
-                connector.write reqobj.body
-
-            connector.end()
-
-        incoming = ''
-        len = 0
-
-        stream.on "data", (chunk) =>
-            temp = ''
-            unless incoming
-                len = chunk.readUInt32LE(0)
-                incoming = chunk.slice(4)
-            else
-                if incoming.length + chunk.length <= len
-                    incoming += chunk
-                else
-                    offset = len - incoming.length
-                    incoming += chunk.slice(0,offset)
-                    temp = chunk.slice(offset)
-
-            if incoming.length == len
-                console.log 'processed incoming with '+incoming.length+' out of '+len
-                relay JSON.parse incoming
-                incoming = temp
 
 module.exports = cloudflashbolt
