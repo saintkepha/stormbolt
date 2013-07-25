@@ -128,7 +128,7 @@ class cloudflashbolt
 
             cname = certObj.subject.CN
             stream.name = cname
-            stream.pipe(mx = MuxDemux).pipe(stream)
+            stream.pipe(mx = MuxDemux()).pipe(stream)
 
             capability = mx.createReadStream('capability')
             capability.on 'data', (data) =>
