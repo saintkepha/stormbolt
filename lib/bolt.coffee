@@ -246,9 +246,6 @@ class cloudflashbolt
                         incoming = ''
                         request = null
 
-                        _stream.on 'readable', =>
-                            console.log "some data is now readable!"
-
                         _stream.on 'data', (chunk) =>
 
                             unless request
@@ -285,15 +282,6 @@ class cloudflashbolt
 
                             relay.write incoming if incoming
                             relay.end()
-
-                            # relay = net.connect target
-                            # relay.setEncoding 'utf8'
-                            # relay.write incoming
-                            # relay.pipe(_stream, {end:true})
-
-                            # relay.on "data", (chunk) =>
-                            #     console.log "received data: "+chunk
-                            #     _stream.write chunk
 
                             relay.on 'end', =>
                                 console.log "no more data"
