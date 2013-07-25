@@ -236,7 +236,7 @@ class cloudflashbolt
 
                         _stream.on 'data', (chunk) =>
 
-                            unless incoming
+                            unless request
                                 try
                                     console.log "request received: "+chunk
                                     request = JSON.parse chunk
