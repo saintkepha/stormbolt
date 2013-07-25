@@ -101,7 +101,10 @@ class cloudflashbolt
                     relay.write "\r\n"
                     #relay.write "some test data"
                     #relay.end()
-                    request.pipe(relay).pipe(response)
+                    request.pipe(relay)
+
+                    relay.on "data", (chunk) =>
+                        console.log "received some data: "+chunk
 
                     request.on "end", =>
                         console.log "no more data in the request..."
