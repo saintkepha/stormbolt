@@ -133,7 +133,7 @@ class cloudflashbolt
                         console.log "no more data in the request..."
 
     addConnection: (data) ->
-        match = (item for item in boltConnections when item.cname is cname)
+        match = (item for item in boltConnections when item.cname is data.cname)
         entry = match[0] if match.length
         if entry
             entry.stream = data.stream
@@ -171,7 +171,7 @@ class cloudflashbolt
                 console.log "received capability info from bolt client: " + data
                 if data.search('forwardingPorts') == 0
                     @addConnection
-                        cname: cname
+                        cname: cname,
                         stream: stream,
                         mux: mx,
                         forwardingports: data.split(':')[1]
