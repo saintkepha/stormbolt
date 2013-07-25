@@ -96,6 +96,7 @@ class cloudflashbolt
 
                 if entry.mux
                     relay = entry.mux.createStream('relay:'+ port, {allowHalfOpen:true})
+                    relay.setEncoding 'utf8'
 
                     relay.write JSON.stringify
                         method:  request.method,
@@ -307,7 +308,6 @@ class cloudflashbolt
                                 _stream.write JSON.stringify
                                     statusCode: 500,
                                     headers: null
-                                relay.pipe(_stream)
                                 _stream.end()
 
                     else
