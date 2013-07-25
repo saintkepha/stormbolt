@@ -234,16 +234,15 @@ class cloudflashbolt
 
                             relay = net.connect target
                             relay.write incoming
+                            relay.pipe(_stream, {end:true})
 
-                            #relay.pipe(_stream, {end:true})
+                            # relay.on "data", (chunk) =>
+                            #     console.log "received data: "+chunk
+                            #     _stream.write chunk
 
-                            relay.on "data", (chunk) =>
-                                console.log "received data: "+chunk
-                                _stream.write chunk
-
-                            relay.on "end", =>
-                                console.log "no more data"
-                                relay.end()
+                            # relay.on "end", =>
+                            #     console.log "no more data"
+                            #     relay.end()
 
                             relay.setTimeout 20000, ->
                                 console.log "error during performing relay action! request timedout."
