@@ -187,7 +187,7 @@ class cloudflashbolt
             else
                 console.log "Failed to authorize TLS connection. Could not connect to bolt server (ignored for now)"
 
-            stream.pipe(mx=MuxDemux).pipe(stream)
+            stream.pipe(mx=MuxDemux()).pipe(stream)
 
             # capability = mx.createWriteStream('capability')
             # capability.write "forwardingPorts:#{forwardingPorts}"
