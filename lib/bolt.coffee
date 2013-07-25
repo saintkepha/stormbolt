@@ -108,10 +108,8 @@ class cloudflashbolt
 
                     request.setEncoding 'utf8'
                     request.pipe(relay)
-                    #.pipe(response)
 
                     relayResponse = null
-
                     relay.on "data", (chunk) =>
 
                         unless relayResponse
@@ -127,6 +125,9 @@ class cloudflashbolt
 
                     relay.on "end", =>
                         console.log "no more data in relay"
+
+                    request.on "data", (chunk), =>
+                        console.log "read some data: "+chunk
 
                     request.on "end", =>
                         console.log "no more data in the request..."
