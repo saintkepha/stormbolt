@@ -255,6 +255,7 @@ class cloudflashbolt
                                 console.log "sending back reply"
                                 reply.pipe(_stream, {end:true})
 
+                            relay.setEncoding 'utf8'
                             relay.end()
 
                             # relay = net.connect target
