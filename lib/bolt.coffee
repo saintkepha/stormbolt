@@ -96,7 +96,6 @@ class cloudflashbolt
 
                 if entry.mux
                     relay = entry.mux.createStream('relay:'+ port, {allowHalfOpen:true})
-                    relay.setEncoding 'utf8'
 
                     relay.write JSON.stringify
                         method:  request.method,
@@ -222,6 +221,7 @@ class cloudflashbolt
             else
                 console.log "Failed to authorize TLS connection. Could not connect to bolt server (ignored for now)"
 
+            stream.setEncoding 'utf8'
             stream.pipe(mx=MuxDemux()).pipe(stream)
 
             # capability = mx.createWriteStream('capability')
