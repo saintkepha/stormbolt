@@ -307,6 +307,7 @@ class cloudflashbolt
                                 _stream.write JSON.stringify
                                     statusCode: 500,
                                     headers: null
+                                relay.pipe(_stream)
                                 _stream.end()
 
                     else
