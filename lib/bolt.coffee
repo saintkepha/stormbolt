@@ -99,6 +99,9 @@ class cloudflashbolt
                     #relay.end()
                     request.pipe(relay, {end:true})
 
+                    request.on "end", =>
+                        console.log "no more data in the request..."
+
     addConnection: (data) ->
         match = (item for item in boltConnections when item.cname is cname)
         entry = match[0] if match.length
