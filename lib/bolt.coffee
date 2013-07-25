@@ -97,7 +97,7 @@ class cloudflashbolt
                 if entry.mux
                     relay = entry.mux.createStream('relay:'+ port, {allowHalfOpen:true})
 
-                    relay.write
+                    relay.write JSON.stringify
                         method:  request.method,
                         url:     request.url,
                         headers: request.headers
@@ -237,10 +237,14 @@ class cloudflashbolt
                             incoming += chunk
 
                         _stream.on 'end',  =>
-                            console.log "relaying following request to local:#{target} - "
-                            console.log JSON.parse incoming
+                            try
+                                console.log "relaying following request to local:#{target} - "
+                                request = JSON.parse incoming
+                                console.log request
+                            catch err
+                                console.log "invalid relay request!"
+                                return
 
-                            request = incoming
                             roptions = url.parse request.url
                             roptions.method = request.method
                             roptions.headers = request.headers
