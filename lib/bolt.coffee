@@ -304,6 +304,7 @@ class cloudflashbolt
                             relay.on 'error', (err) ->
                                 console.log "[relay request failed with following error]"
                                 console.log err
+                                _stream.setEncoding 'utf8'
                                 _stream.write JSON.stringify
                                     statusCode: 500,
                                     headers: null
