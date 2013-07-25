@@ -94,7 +94,7 @@ class cloudflashbolt
                 console.log "[proxy] forwarding request to " + cname + " at " + entry.stream.remoteAddress
 
                 if entry.mux
-                    relay = entry.mux.createStream('relay:'+ port)
+                    relay = entry.mux.createStream('relay:'+ port, {allowHalfOpen:true})
 
                     relay.write request.method + ' ' + request.url + " HTTP/1.1\r\n"
                     relay.write 'cloudflash-bolt-target: '+request.headers['cloudflash-bolt-target']+"\r\n"
