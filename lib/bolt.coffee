@@ -238,8 +238,9 @@ class cloudflashbolt
 
                         _stream.on 'end',  =>
                             console.log "relaying following request to local:#{target} - "
-                            console.log incoming
-                            request = JSON.parse incoming
+                            console.log JSON.parse incoming
+
+                            request = incoming
                             roptions = url.parse request.url
                             roptions.method = request.method
                             roptions.headers = request.headers
