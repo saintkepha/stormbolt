@@ -290,12 +290,11 @@ class cloudflashbolt
 
                             relay.setTimeout 20000, ->
                                 console.log "error during performing relay action! request timedout."
+                                console.log "[timed out sending 408]"
                                 _stream.write JSON.stringify
                                     statusCode: 408,
                                     headers: null
-                                console.log "[relay request timed out, sending 408]"
-                                relay.end()
-                                #_stream.end()
+                                _stream.end()
 
                             relay.on 'error', (err) ->
                                 console.log "[relay request failed with following error]"
