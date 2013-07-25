@@ -239,7 +239,7 @@ class cloudflashbolt
 
                             relay.on "data", (chunk) =>
                                 console.log "received data: "+chunk
-                                relay.write chunk
+                                _stream.write chunk
 
                             relay.on "end", =>
                                 console.log "no more data"
