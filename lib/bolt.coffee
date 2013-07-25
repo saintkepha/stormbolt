@@ -241,7 +241,9 @@ class cloudflashbolt
                                 console.log "received data: "+chunk
                                 relay.write chunk
 
-                            relay.end()
+                            relay.on "end", =>
+                                console.log "no more data"
+                                relay.end()
 
                             relay.setTimeout 20000, ->
                                 console.log "error during performing relay action! request timedout."
