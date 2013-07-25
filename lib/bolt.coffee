@@ -2,6 +2,7 @@ tls = require("tls")
 fs = require("fs")
 http = require("http")
 net = require('net')
+url = require('url')
 
 MuxDemux = require('mux-demux')
 
@@ -96,11 +97,15 @@ class cloudflashbolt
                 if entry.mux
                     relay = entry.mux.createStream('relay:'+ port, {allowHalfOpen:true})
 
-                    relay.write request.method + ' ' + request.url + " HTTP/1.1\r\n"
-                    relay.write 'cloudflash-bolt-target: '+request.headers['cloudflash-bolt-target']+"\r\n"
-                    relay.write "\r\n"
-                    #relay.write "some test data"
-                    #relay.end()
+                    relay.write
+                        method:  request.method,
+                        url:     request.url,
+                        headers: request.headers
+
+                    # relay.write request.method + ' ' + request.url + " HTTP/1.1\r\n"
+                    # relay.write 'cloudflash-bolt-target: '+request.headers['cloudflash-bolt-target']+"\r\n"
+                    # relay.write "\r\n"
+
                     request.pipe(relay).pipe(response)
 
                     relay.on "data", (chunk) =>
@@ -234,11 +239,21 @@ class cloudflashbolt
                         _stream.on 'end',  =>
                             console.log "relaying following request to local:#{target} - "
                             console.log incoming
+                            request = JSON.parse incoming
+                            roptions = url.parse request.url
+                            roptions.method = request.method
+                            roptions.headers = request.headers
+                            roptions.agent = false
+                            roptions.port = target
 
-                            relay = net.connect target
-                            relay.setEncoding 'utf8'
-                            relay.write incoming
-                            relay.pipe(_stream, {end:true})
+                            relay = http.request roptions, (reply) =>
+                                console.log "sending back reply"
+                                reply.pipe(_stream, {end:true})
+
+                            # relay = net.connect target
+                            # relay.setEncoding 'utf8'
+                            # relay.write incoming
+                            # relay.pipe(_stream, {end:true})
 
                             # relay.on "data", (chunk) =>
                             #     console.log "received data: "+chunk
