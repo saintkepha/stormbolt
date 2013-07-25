@@ -1,24 +1,22 @@
-boltjson = require('./lib/commonfunction')
+argv = require('optimist')
+    .usage('Start cloudflash-bolt with a configuration file.\nUsage: $0')
+    .demand('f')
+    .default('f','/etc/bolt/bolt.json')
+    .alias('f', 'file')
+    .describe('f', 'location of bolt configuration file')
+    .argv
 
-listenPort = '';
-boltJsonObj = boltjson.readBoltJson()
-listen = boltJsonObj.listen
-if listen
-    listenPort = listen.split(":")[1]
-    console.log 'listenPort: ' + listenPort
+config = ''
+fileops = require("fileops")
+res =  fileops.fileExistsSync argv.file
+unless res instanceof Error
+    boltContent = fileops.readFileSync argv.file
+    config = JSON.parse boltContent
+else
+    return new Error "file does not exist! " + res
 
-# start the bolt web service
-
-{@app} = require('zappajs') listenPort, ->
-    @configure =>
-      @use 'bodyParser', 'methodOverride', @app.router, 'static'
-      @set 'basepath': '/v1.0'
-
-    @configure
-      development: => @use errorHandler: {dumpExceptions: on, showStack: on}
-      production: => @use 'errorHandler'
-
-    @enable 'serve jquery', 'minify'
-
-    @include './lib/bolt'
-
+cloudflashbolt = require './lib/bolt'
+bolt = new cloudflashbolt config
+bolt.start (res) ->
+    if res instanceof Error
+        console.log 'error: ' + res
