@@ -202,6 +202,7 @@ class cloudflashbolt
                         _stream.end()
 
                     when 'relay'
+                        target = (Number) target
                         unless target in forwardingPorts
                             console.log "request for relay to unsupported target port: #{target}"
                             _stream.end()
@@ -212,12 +213,19 @@ class cloudflashbolt
                             incoming += chunk
 
                         _stream.on 'end', =>
+                            console.log "relaying following request to local:#{target} - "
+                            console.log incoming
+
                             relay = net.connect target
                             relay.write incoming
                             relay.pipe(_stream, {end:true})
 
                             relay.setTimeout 20000, ->
                                 console.log "error during performing relay action! request timedout."
+                                _stream.end()
+
+                            relay.on 'error', (err) ->
+                                console.log err
                                 _stream.end()
 
                     else
