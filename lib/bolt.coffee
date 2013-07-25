@@ -95,6 +95,8 @@ class cloudflashbolt
 
                 if entry.mux
                     relay = entry.mux.createStream('relay:'+ port,{allowHalfOpen:true})
+                    relay.write "some test data"
+                    relay.end()
                     request.pipe(relay, {end:true}).pipe(response, {end:true})
 
     addConnection: (data) ->
