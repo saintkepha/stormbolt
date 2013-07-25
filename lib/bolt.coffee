@@ -96,7 +96,7 @@ class cloudflashbolt
                 if entry.mux
                     relay = entry.mux.createStream('relay:'+ port,{allowHalfOpen:true})
 
-                    relay.write request.method + ' ' + request.url + "HTTP/1.1\r\n"
+                    relay.write request.method + ' ' + request.url + " HTTP/1.1"
                     relay.write 'cloudflash-bolt-target: '+request.headers['cloudflash-bolt-target']
                     relay.write "\r\n"
                     #relay.write "some test data"
@@ -225,14 +225,14 @@ class cloudflashbolt
                             console.log "received some data: "+chunk
                             incoming += chunk
 
-                        _stream.on 'end', (chunk) =>
-                            incoming += chunk
+                        _stream.on 'end',  =>
                             console.log "relaying following request to local:#{target} - "
                             console.log incoming
 
                             relay = net.connect target
                             relay.write incoming
                             relay.pipe(_stream, {end:true})
+                            relay.end()
 
                             relay.setTimeout 20000, ->
                                 console.log "error during performing relay action! request timedout."
