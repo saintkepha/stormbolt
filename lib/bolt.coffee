@@ -152,9 +152,6 @@ class cloudflashbolt
         tls.createServer(options, (stream) =>
             console.log "TLS connection established with VCG client from: " + stream.remoteAddress
 
-            #stream.setEncoding "utf8"
-            #socket.setKeepAlive(true,1000)
-
             certObj = stream.getPeerCertificate()
             console.log 'certObj: ' + JSON.stringify certObj
             unless certObj.subject
@@ -226,10 +223,6 @@ class cloudflashbolt
             stream.setEncoding 'utf8'
             stream.pipe(mx=MuxDemux()).pipe(stream)
 
-            # capability = mx.createWriteStream('capability')
-            # capability.write "forwardingPorts:#{forwardingPorts}"
-            # capability.end()
-
             mx.on "connection", (_stream) =>
                 [ action, target ] = _stream.meta.split(':')
                 switch action
@@ -271,31 +264,38 @@ class cloudflashbolt
 
                             console.log JSON.stringify roptions
 
+                            timeout = false
                             relay = http.request roptions, (reply) =>
-                                console.log "sending back reply"
-                                reply.setEncoding 'utf8'
+                                unless timeout
+                                    console.log "sending back reply"
+                                    reply.setEncoding 'utf8'
 
-                                _stream.write JSON.stringify
-                                    statusCode: reply.statusCode,
-                                    headers: reply.headers
-
-                                reply.pipe(_stream, {end:true})
+                                    try
+                                        _stream.write JSON.stringify
+                                            statusCode: reply.statusCode,
+                                            headers: reply.headers
+                                        reply.pipe(_stream, {end:true})
+                                    catch err
+                                        console.log "unable to write response back to requestor upstream bolt! error: " + err
 
                             relay.write incoming if incoming
                             relay.end()
 
                             relay.on 'end', =>
                                 console.log "no more data"
-                                relay.end()
 
                             relay.setTimeout 20000, ->
                                 console.log "error during performing relay action! request timedout."
-                                _stream.write JSON.stringify
-                                    statusCode: 408,
-                                    headers: null
+                                timeout = true
+                                try
+                                    _stream.write JSON.stringify
+                                        statusCode: 408,
+                                        headers: null
+                                    _stream.end()
+                                catch err
+                                    console.log "unable to write response code back to requestor upstream bolt! error: " + err
+
                                 console.log "[relay request timed out, sending 408]"
-                                relay.end()
-                                #_stream.end()
 
                             relay.on 'error', (err) ->
                                 console.log "[relay request failed with following error]"
