@@ -140,6 +140,16 @@ class cloudflashbolt
                         mux: mx,
                         forwardingports: data.split(':')[1]
 
+            mx.on 'connection', (_stream) =>
+                console.log "some connection?"
+
+            mx.on 'error', =>
+                console.log "some error with mux connection"
+                stream.destroy()
+
+            stream.on 'error', =>
+                mx.destroy()
+
             stream.on "close",  =>
                 console.log "bolt client connection is closed for ID: " + stream.name
                 try
