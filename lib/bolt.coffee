@@ -16,6 +16,7 @@ class cloudflashbolt
     boltConnections = []
 
     listConnections = ->
+        console.log '[active bolt connections]'
         for entry in boltConnections
             console.log entry.cname + ": " + entry.forwardingports
 
@@ -200,7 +201,12 @@ class cloudflashbolt
                         _stream.write "forwardingPorts:#{forwardingPorts}"
                         _stream.end()
 
-                    when 'relay' && target in forwardingPorts
+                    when 'relay'
+                        unless target in forwardingPorts
+                            console.log "request for relay to unsupported target port: #{target}"
+                            _stream.end()
+                            break
+
                         incoming = ''
                         _stream.on 'data', (chunk) =>
                             incoming += chunk
