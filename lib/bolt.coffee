@@ -95,9 +95,10 @@ class cloudflashbolt
 
                 if entry.mux
                     relay = entry.mux.createStream('relay:'+ port,{allowHalfOpen:true})
-                    relay.write "some test data"
-                    relay.end()
+                    #relay.write "some test data"
+                    #relay.end()
                     request.pipe(relay, {end:true}).pipe(response, {end:true})
+                    request.end()
 
     addConnection: (data) ->
         match = (item for item in boltConnections when item.cname is cname)
