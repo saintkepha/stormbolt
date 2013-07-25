@@ -94,8 +94,8 @@ class cloudflashbolt
                 console.log "[proxy] forwarding request to " + cname + " at " + entry.stream.remoteAddress
 
                 if entry.mux
-                    relay = entry.mux.createStream('relay:'+ port)
-                    request.pipe(relay).pipe(response)
+                    relay = entry.mux.createStream('relay:'+ port,{allowHalfOpen:true})
+                    request.pipe(relay, {end:true}).pipe(response, {end:true})
 
     addConnection: (data) ->
         match = (item for item in boltConnections when item.cname is cname)
@@ -210,6 +210,7 @@ class cloudflashbolt
 
                         incoming = ''
                         _stream.on 'data', (chunk) =>
+                            console.log "received some data: "+chunk
                             incoming += chunk
 
                         _stream.on 'end', =>
