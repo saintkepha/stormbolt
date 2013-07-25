@@ -106,10 +106,23 @@ class cloudflashbolt
                     # relay.write 'cloudflash-bolt-target: '+request.headers['cloudflash-bolt-target']+"\r\n"
                     # relay.write "\r\n"
 
-                    request.pipe(relay).pipe(response)
+                    request.pipe(relay)
+                    #.pipe(response)
+
+                    relayResponse = null
 
                     relay.on "data", (chunk) =>
-                        console.log "received some data: "+chunk
+
+                        unless relayResponse
+                            try
+                                console.log "relay response received: "+chunk
+                                relayResponse = JSON.parse chunk
+                                response.writeHead(relayResponse.statusCode, relayResponse.headers)
+                                relay.pipe(response)
+                            catch err
+                                console.log "invalid relay response!"
+                                relay.end()
+                                return
 
                     relay.on "end", =>
                         console.log "no more data in relay"
@@ -261,6 +274,11 @@ class cloudflashbolt
                             relay = http.request roptions, (reply) =>
                                 console.log "sending back reply"
                                 reply.setEncoding 'utf8'
+
+                                _stream.write JSON.stringify
+                                    statusCode: reply.statusCode,
+                                    headers: reply.headers
+
                                 reply.pipe(_stream, {end:true})
 
                             relay.write incoming if incoming
@@ -284,6 +302,7 @@ class cloudflashbolt
                                 _stream.end()
 
                             relay.on 'error', (err) ->
+                                console.log "[relay request failed with following error]"
                                 console.log err
                                 _stream.end()
 
