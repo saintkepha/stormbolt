@@ -98,7 +98,6 @@ class cloudflashbolt
                     #relay.write "some test data"
                     #relay.end()
                     request.pipe(relay, {end:true}).pipe(response, {end:true})
-                    request.end()
 
     addConnection: (data) ->
         match = (item for item in boltConnections when item.cname is cname)
@@ -212,11 +211,15 @@ class cloudflashbolt
                             break
 
                         incoming = ''
+                        _stream.on 'readable', =>
+                            console.log "some data is now readable!"
+
                         _stream.on 'data', (chunk) =>
                             console.log "received some data: "+chunk
                             incoming += chunk
 
-                        _stream.on 'end', =>
+                        _stream.on 'end', (chunk) =>
+                            incoming += chunk
                             console.log "relaying following request to local:#{target} - "
                             console.log incoming
 
