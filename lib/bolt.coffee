@@ -293,7 +293,7 @@ class cloudflashbolt
                             #     console.log "received data: "+chunk
                             #     _stream.write chunk
 
-                            relay.on "end", =>
+                            relay.on 'end', =>
                                 console.log "no more data"
                                 relay.end()
 
@@ -304,6 +304,10 @@ class cloudflashbolt
                             relay.on 'error', (err) ->
                                 console.log "[relay request failed with following error]"
                                 console.log err
+                                _stream.write JSON.stringify
+                                    statusCode: 500,
+                                    headers: null
+                                _stream.write err
                                 _stream.end()
 
                     else
