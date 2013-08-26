@@ -220,6 +220,7 @@ class cloudflashbolt
             else
                 console.log "Failed to authorize TLS connection. Could not connect to bolt server (ignored for now)"
 
+            stream.setKeepAlive(true, 100 * 1000) #Send keep-alive every 100 seconds
             stream.setEncoding 'utf8'
             stream.pipe(mx=MuxDemux()).pipe(stream)
 
