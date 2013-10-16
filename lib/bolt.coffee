@@ -27,23 +27,38 @@ class cloudflashbolt
 
     start: (callback) ->
         console.log "this should actually take place of configure below..."
+        
+        ca = []                                                            
+        chain = fs.readFileSync "#{@config.ca}", 'utf8'                    
+        chain = chain.split "\n"                                           
+        cacert = []                                                        
+        for line in chain when line.length isnt 0                          
+            cacert.push line                                               
+            if line.match /-END CERTIFICATE-/                              
+                ca.push cacert.join "\n"                                   
+                cacert = []                                      
+        
         if @config.remote || @config.local
             if @config.local
                 options =
                     key: fs.readFileSync("#{@config.key}")
                     cert: fs.readFileSync("#{@config.cert}")
+                    ca: ca
                     requestCert: true
-                    rejectUnauthorized: false
+                    rejectUnauthorized: false 
                 console.log "bolt server"
                 @runServer()
             else
                 options =
                     cert: fs.readFileSync("#{@config.cert}")
                     key: fs.readFileSync("#{@config.key}")
+                    ca: ca
+                    requestCert: true
                 console.log "bolt client"
                 for host in @config.remote
                     serverHost = host.split(":")[0]
                     serverPort = host.split(":")[1]
+                    console.log serverHost + ": " + serverPort 
                     @runClient serverHost, serverPort
         else
             callback new Error "Invalid bolt JSON!"
