@@ -158,6 +158,16 @@ class cloudflashbolt
 
         listConnections()
 
+    isEmptyOrNullObject: (jsonObj) ->
+        if (!jsonObj)
+            return true
+        else
+            for val in jsonObj
+                if(jsonObj.hasOwnProperty(val))
+                    return false
+
+            return true
+
     # Method to start bolt server
     runServer: ->
         local = @config.local
@@ -168,8 +178,9 @@ class cloudflashbolt
             console.log "TLS connection established with VCG client from: " + stream.remoteAddress
 
             certObj = stream.getPeerCertificate()
-            console.log 'certObj: ' + JSON.stringify certObj
-            unless certObj.subject
+            jsonObj = JSON.stringify certObj 
+            console.log 'certObj: ' + jsonObj 
+            if @isEmptyOrNullObject jsonObj 
                 console.log 'unable to retrieve peer certificate!'
                 stream.end()
                 return
