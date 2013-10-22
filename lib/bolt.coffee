@@ -147,8 +147,8 @@ class cloudflashbolt
         if (!jsonObj)
             return true
         else
-            for val in jsonObj
-                if(jsonObj.hasOwnProperty(val))
+            for key, val of jsonObj
+                if(jsonObj.hasOwnProperty(key))
                     return false
 
             return true
@@ -165,7 +165,7 @@ class cloudflashbolt
             certObj = stream.getPeerCertificate()
             jsonObj = JSON.stringify certObj 
             console.log 'certObj: ' + jsonObj 
-            if @isEmptyOrNullObject jsonObj 
+            if @isEmptyOrNullObject certObj
                 console.log 'unable to retrieve peer certificate!'
                 stream.end()
                 return
