@@ -7,7 +7,7 @@ url = require('url')
 MuxDemux = require('mux-demux')
 
 #Workaround - fix it later, Avoids DEPTH_ZERO_SELF_SIGNED_CERT error for self-signed certs
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+#process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 
 class cloudflashbolt
 
@@ -45,7 +45,7 @@ class cloudflashbolt
                     cert: fs.readFileSync("#{@config.cert}")
                     ca: ca
                     requestCert: true
-                    rejectUnauthorized: false 
+                    rejectUnauthorized: true 
                 console.log "bolt server"
                 @runServer()
             else
@@ -73,7 +73,7 @@ class cloudflashbolt
         # after initial data, invoke HTTP server listener on port
         acceptor = http.createServer().listen(listenPort)
         acceptor.on "request", (request,response) =>
-            console.log "[proxy] request from client: " + request.url
+            #console.log "[proxy] request from client: " + request.url
             if request.url == '/cname'
                 res = []
                 for entry in boltConnections
@@ -83,7 +83,7 @@ class cloudflashbolt
                         caddress: entry.stream.remoteAddress
 
                 body = JSON.stringify res
-                console.log "[proxy] returning connections data: " + body
+                #console.log "[proxy] returning connections data: " + body
                 response.writeHead(200, {
                     'Content-Length': body.length,
                     'Content-Type': 'application/json' })
@@ -160,12 +160,13 @@ class cloudflashbolt
 
     isEmptyOrNullObject: (jsonObj) ->
         if (!jsonObj)
+            console.log 'jsonObj not object'
             return true
         else
             for key, val of jsonObj
                 if(jsonObj.hasOwnProperty(key))
                     return false
-
+            console.log 'jsonObj is empty'
             return true
 
     # Method to start bolt server
@@ -176,13 +177,16 @@ class cloudflashbolt
         console.log "server port:" + serverPort
         tls.createServer(options, (stream) =>
             console.log "TLS connection established with VCG client from: " + stream.remoteAddress
+            console.log 'Debugging null certs issue : server authorizationError: ' + stream.authorizationError
 
             certObj = stream.getPeerCertificate()
             jsonObj = JSON.stringify certObj 
             console.log 'certObj: ' + jsonObj 
             if @isEmptyOrNullObject certObj
                 console.log 'unable to retrieve peer certificate!'
+                console.log 'server connected ' + stream.authorized ? 'authorized' : 'unauthorized'
                 stream.end()
+                console.log 'stream end after certObj{}'
                 return
 
             cname = certObj.subject.CN
