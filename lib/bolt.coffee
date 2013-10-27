@@ -331,10 +331,14 @@ class cloudflashbolt
                             relay.on 'error', (err) ->
                                 console.log "[relay request failed with following error]"
                                 console.log err
-                                _stream.write JSON.stringify
-                                    statusCode: 500,
-                                    headers: null
-                                _stream.end()
+                                try
+                                    _stream.write JSON.stringify
+                                        statusCode: 500,
+                                        headers: null
+                                    _stream.end()
+                                catch err
+                                    console.log "unable to write response code back to requestor upstream bolt! error: " + err
+                                console.log "[relay request error, sending 500]"
 
                     else
                         console.log "unsupported action/target supplied by mux connection: #{action}/#{target}"
