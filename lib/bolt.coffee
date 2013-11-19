@@ -3,6 +3,7 @@ fs = require("fs")
 http = require("http")
 net = require('net')
 url = require('url')
+exec = require('child_process').exec
 
 MuxDemux = require('mux-demux')
 
@@ -73,6 +74,7 @@ class cloudflashbolt
         # after initial data, invoke HTTP server listener on port
         acceptor = http.createServer().listen(listenPort)
         acceptor.on "request", (request,response) =>
+            broadcast = false
             #console.log "[proxy] request from client: " + request.url
             if request.url == '/cname'
                 res = []
@@ -89,13 +91,17 @@ class cloudflashbolt
                     'Content-Type': 'application/json' })
                 response.end(body,"utf8")
                 return
+            else if request.url == '/broadcast'
+                broadcast = true
+                request.url = '/modules'
+                console.log 'broadcast: ' + broadcast 
 
             target = request.headers['cloudflash-bolt-target']
             [ cname, port ] = target.split(':') if target
-
+             
             if cname
                 listConnections()
-                match = (item for item in boltConnections when item.cname is cname)
+                match = (item for item in boltConnections when item.cname is cname)                
                 entry = match[0] if match.length
                 unless entry
                     error = "no such cloudflash-bolt-target: "+target
@@ -123,11 +129,11 @@ class cloudflashbolt
 
                     request.setEncoding 'utf8'
                     request.pipe(relay)
-
+                    timeout = false
                     relayResponse = null
                     relay.on "data", (chunk) =>
-
                         unless relayResponse
+                          unless timeout
                             try
                                 console.log "relay response received: "+chunk
                                 relayResponse = JSON.parse chunk
@@ -139,13 +145,23 @@ class cloudflashbolt
                                 return
 
                     relay.on "end", =>
-                        console.log "no more data in relay"
+                        console.log "no more data in relay"                          
 
                     request.on "data", (chunk) =>
                         console.log "read some data: "+chunk
 
                     request.on "end", =>
                         console.log "no more data in the request..."
+                    
+                    response.setTimeout 10000, =>
+                        console.log "error during performing relay action! request timedout. server proxy"
+                        timeout = true
+                        if broadcast
+                            @removeConnection entry.stream.name
+
+                        console.log "[relay request timed out, from client]"
+                    
+                        
 
     addConnection: (data) ->
         match = (item for item in boltConnections when item.cname is data.cname)
@@ -157,6 +173,19 @@ class cloudflashbolt
             boltConnections.push data
 
         listConnections()
+
+    removeConnection: (streamName) ->
+        try
+            console.log "found match: " + item.cname for item,index in boltConnections when item.cname is streamName
+            for item,index in boltConnections when item.cname is streamName
+                if item.cname
+                    console.log "Splicing connection: " + item.cname
+                    #boltConnections.splice(boltConnections.indexOf('item.cname'), 1)
+                    boltConnections.splice(index, 1)
+                    console.log "Spliced connection: " + streamName
+            listConnections()
+        catch err
+            console.log err
 
     isEmptyOrNullObject: (jsonObj) ->
         if (!jsonObj)
@@ -177,8 +206,7 @@ class cloudflashbolt
         console.log "server port:" + serverPort
         tls.createServer(options, (stream) =>
             console.log "TLS connection established with VCG client from: " + stream.remoteAddress
-            console.log 'Debugging null certs issue : server authorizationError: ' + stream.authorizationError
-
+            console.log 'Debugging null certs issue : server authorizationError: ' + stream.authorizationError            
             certObj = stream.getPeerCertificate()
             jsonObj = JSON.stringify certObj 
             console.log 'certObj: ' + jsonObj 
@@ -205,29 +233,32 @@ class cloudflashbolt
 
             mx.on 'connection', (_stream) =>
                 console.log "some connection?"
-
+               
             mx.on 'error', =>
                 console.log "some error with mux connection"
-                stream.destroy()
-
+                stream.destroy()         
+            
             stream.on 'error', =>
                 mx.destroy()
-
+            
             stream.on "close",  =>
                 console.log "bolt client connection is closed for ID: " + stream.name
-                try
-                    console.log "found match: " + item.cname for item,index in boltConnections when item.cname is stream.name
-                    for item,index in boltConnections when item.cname is stream.name
-                        if item.cname
-                            console.log "Splicing connection: " + item.cname
-                            #boltConnections.splice(boltConnections.indexOf('item.cname'), 1)
-                            boltConnections.splice(index, 1)
-                            console.log "Spliced connection: " + stream.name
-                    listConnections()
-                catch err
-                    console.log err
+                @removeConnection stream.name            
 
         ).listen serverPort
+       
+        setInterval ( ->
+            try
+                for client in boltConnections
+                    if client.stream.name
+                        console.log 'client broadcast fwd port: ' + client.forwardingports
+                        cmd = "curl -siS localhost:9000/broadcast -H 'cloudflash-bolt-target: #{client.stream.name}:#{client.forwardingports}' -H 'Accept: application/json' -X GET"
+                        exec cmd, (error, stdout, stderror) =>
+                            if error instanceof Error
+                                console.log 'cmd error: ' + error
+            catch err
+                console.log 'error in client broadcast' + err
+        ), 60000
 
     #reconnect logic for bolt client
     isReconnecting = false
@@ -354,6 +385,6 @@ class cloudflashbolt
         stream.on "close", =>
             console.log 'client closed: '
             isReconnecting = false
-            @reconnect host, port
+            @reconnect host, port        
 
 module.exports = cloudflashbolt
