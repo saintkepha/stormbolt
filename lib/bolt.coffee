@@ -1,9 +1,8 @@
 tls = require("tls")
 fs = require("fs")
 http = require("http")
-net = require('net')
 url = require('url')
-exec = require('child_process').exec
+
 
 MuxDemux = require('mux-demux')
 
@@ -91,10 +90,9 @@ class cloudflashbolt
                     'Content-Type': 'application/json' })
                 response.end(body,"utf8")
                 return
+
             else if request.url == '/broadcast'
                 broadcast = true
-                request.url = '/modules'
-                console.log 'broadcast: ' + broadcast 
 
             target = request.headers['cloudflash-bolt-target']
             [ cname, port ] = target.split(':') if target
@@ -116,7 +114,10 @@ class cloudflashbolt
                 console.log "[proxy] forwarding request to " + cname + " at " + entry.stream.remoteAddress
 
                 if entry.mux
-                    relay = entry.mux.createStream('relay:'+ port, {allowHalfOpen:true})
+                    if broadcast
+                        relay = entry.mux.createStream('heartbeat:'+ 'heartbeat', {allowHalfOpen:true})
+                    else
+                        relay = entry.mux.createStream('relay:'+ port, {allowHalfOpen:true})
 
                     relay.write JSON.stringify
                         method:  request.method,
@@ -129,11 +130,9 @@ class cloudflashbolt
 
                     request.setEncoding 'utf8'
                     request.pipe(relay)
-                    timeout = false
                     relayResponse = null
                     relay.on "data", (chunk) =>
                         unless relayResponse
-                          unless timeout
                             try
                                 console.log "relay response received: "+chunk
                                 relayResponse = JSON.parse chunk
@@ -152,8 +151,8 @@ class cloudflashbolt
 
                     request.on "end", =>
                         console.log "no more data in the request..."
-                    
-                    response.setTimeout 10000, =>
+
+                    response.setTimeout 1000, =>
                         console.log "error during performing relay action! request timedout. server proxy"
                         timeout = true
                         if broadcast
@@ -246,18 +245,23 @@ class cloudflashbolt
                 @removeConnection stream.name            
 
         ).listen serverPort
-       
-        setInterval ( ->
+
+        setInterval ( =>
             try
                 for client in boltConnections
                     if client.stream.name
-                        console.log 'client broadcast fwd port: ' + client.forwardingports
-                        cmd = "curl -siS localhost:9000/broadcast -H 'cloudflash-bolt-target: #{client.stream.name}:#{client.forwardingports}' -H 'Accept: application/json' -X GET"
-                        exec cmd, (error, stdout, stderror) =>
-                            if error instanceof Error
-                                console.log 'cmd error: ' + error
+                        options =
+                            host: '127.0.0.1',
+                            port: 9000,
+                            path: '/broadcast',
+                            method: 'GET', 
+                            headers:
+                                'Content-Type':'application/json',
+                                'cloudflash-bolt-target': "#{client.stream.name}:0"
+                        req = http.request(options)
+                        req.end()                 
             catch err
-                console.log 'error in client broadcast' + err
+                console.log 'error in client broadcast : ' + err
         ), 60000
 
     #reconnect logic for bolt client
@@ -279,8 +283,7 @@ class cloudflashbolt
             if stream.authorized
                 console.log "Successfully connected to bolt server"
             else
-                console.log "Failed to authorize TLS connection. Could not connect to bolt server (ignored for now)"
-
+                console.log "Failed to authorize TLS connection. Could not connect to bolt server (ignored for now)"            
             stream.setKeepAlive(true, 60 * 1000) #Send keep-alive every 60 seconds
             stream.setEncoding 'utf8'
             stream.pipe(mx=MuxDemux()).pipe(stream)
@@ -291,6 +294,36 @@ class cloudflashbolt
                     when 'capability'
                         _stream.write "forwardingPorts:#{forwardingPorts}"
                         _stream.end()
+
+                    when 'heartbeat'                       
+                        target = (String) target                        
+                        incoming = ''
+                        console.log 'in client ' + target
+
+                        _stream.on 'data', (chunk) =>
+                            unless request                            
+                                try
+                                    console.log "request received heartbeat: "+ chunk
+                                    request = JSON.parse chunk
+                                    console.log "sending back reply from heartbeat"                            
+                                    _stream.write JSON.stringify
+                                        statusCode: 200,
+                                        headers:
+                                            'Content-Type':'application/json',
+                                            'Content-Length': 0
+                                    _stream.end()
+                                    #_stream.pipe(_stream, {end:true})                           
+
+                                catch err
+                                    console.log "invalid heartbeat request!"
+                                    _stream.end()
+                            else
+                                console.log "received some data in heartbeat : "+chunk
+                                incoming += chunk
+                           
+
+                        _stream.on 'end',  =>
+                            console.log "heartbeat reply end.."     
 
                     when 'relay'
                         target = (Number) target
@@ -303,7 +336,6 @@ class cloudflashbolt
                         request = null
 
                         _stream.on 'data', (chunk) =>
-
                             unless request
                                 try
                                     console.log "request received: "+chunk
@@ -331,7 +363,6 @@ class cloudflashbolt
                                 unless timeout
                                     console.log "sending back reply"
                                     reply.setEncoding 'utf8'
-
                                     try
                                         _stream.write JSON.stringify
                                             statusCode: reply.statusCode,
