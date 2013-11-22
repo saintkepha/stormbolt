@@ -152,7 +152,7 @@ class cloudflashbolt
                     request.on "end", =>
                         console.log "no more data in the request..."
 
-                    response.setTimeout 1000, =>
+                    response.setTimeout 5000, =>
                         console.log "error during performing relay action! request timedout. server proxy"
                         timeout = true
                         if broadcast
