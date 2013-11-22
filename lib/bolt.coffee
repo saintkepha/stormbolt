@@ -152,13 +152,12 @@ class cloudflashbolt
                     request.on "end", =>
                         console.log "no more data in the request..."
 
-                    response.setTimeout 5000, =>
-                        console.log "error during performing relay action! request timedout. server proxy"
-                        timeout = true
-                        if broadcast
+                    if broadcast
+                        response.setTimeout 5000, =>
+                            console.log "error during performing relay action! request timedout. server proxy"
+                            timeout = true
                             @removeConnection entry.stream.name
-
-                        console.log "[relay request timed out, from client]"
+                            console.log "[relay request timed out, from client]"
                     
                         
 
