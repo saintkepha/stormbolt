@@ -250,6 +250,7 @@ class cloudflashbolt
             try
                 for client in boltConnections
                     if client.stream.name
+                        console.log 'Checking heartbeat..' 
                         options =
                             host: '127.0.0.1',
                             port: 9000,
