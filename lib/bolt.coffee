@@ -3,7 +3,6 @@ fs = require("fs")
 http = require("http")
 url = require('url')
 
-
 MuxDemux = require('mux-demux')
 
 #Workaround - fix it later, Avoids DEPTH_ZERO_SELF_SIGNED_CERT error for self-signed certs
@@ -134,9 +133,9 @@ class cloudflashbolt
                     relay.on "data", (chunk) =>
                         unless relayResponse
                             try
-                                console.log "relay response received: "+chunk
+                                console.log "relay response received: "+ chunk
                                 relayResponse = JSON.parse chunk
-                                response.writeHead(relayResponse.statusCode, relayResponse.headers)
+                                response.writeHead(relayResponse.statusCode, relayResponse.headers)                                
                                 relay.pipe(response)
                             catch err
                                 console.log "invalid relay response!"
@@ -153,13 +152,14 @@ class cloudflashbolt
                         console.log "no more data in the request..."
 
                     if broadcast
-                        response.setTimeout 20000, =>
-                            console.log "error during performing relay action! request timedout. server proxy"
-                            timeout = true
-                            @removeConnection entry.stream.name
-                            console.log "[relay request timed out, from client]"
-                    
-                        
+                        response.setTimeout 10000, =>
+                            try
+                                console.log 'heartbeat error during performing relay action! request timedout.'                            
+                                response.writeHead(500, null)                                
+                                response.end()
+                                return
+                            catch err
+                                console.log 'heartbeat error reply 500 response'                  
 
     addConnection: (data) ->
         match = (item for item in boltConnections when item.cname is data.cname)
@@ -222,12 +222,14 @@ class cloudflashbolt
             capability = mx.createReadStream('capability')
             capability.on 'data', (data) =>
                 console.log "received capability info from bolt client: " + data
+                                
                 if data.search('forwardingPorts') == 0
                     @addConnection
                         cname: cname,
                         stream: stream,
                         mux: mx,
                         forwardingports: data.split(':')[1]
+                    
 
             mx.on 'connection', (_stream) =>
                 console.log "some connection?"
@@ -245,25 +247,44 @@ class cloudflashbolt
 
         ).listen serverPort
 
+        
         setInterval ( =>
             try
                 for client in boltConnections
+                    count = 0                    
                     if client.stream.name
-                        console.log 'Checking heartbeat..' 
-                        options =
-                            host: '127.0.0.1',
-                            port: 9000,
-                            path: '/broadcast',
-                            method: 'GET', 
-                            headers:
-                                'Content-Type':'application/json',
-                                'cloudflash-bolt-target': "#{client.stream.name}:0"
-                        req = http.request(options)
-                        req.end()                 
+                        console.log 'Checking heartbeat..'
+                        @beatConnect client.stream.name, count, false
             catch err
                 console.log 'error in client broadcast : ' + err
         ), 60000
 
+    beatConnect: (streamName, count, connect) ->        
+        retry = =>                                    
+            unless connect                
+                connect = true
+                options =
+                    host: '127.0.0.1',
+                    port: 9000,
+                    path: '/broadcast',
+                    method: 'GET', 
+                    headers:
+                        'Content-Type':'application/json',
+                        'cloudflash-bolt-target': "#{streamName}:0"
+                req = http.request options,(res) =>
+                    console.log 'in heartbeat http response statusCode: ' + JSON.stringify res.statusCode
+                    if res.statusCode == 500 
+                        if count < 3
+                            connect = false
+                            count++                            
+                            req.end()
+                            retry()
+                        else
+                            @removeConnection streamName                                         
+                req.end()
+        retry() if count == 0
+            
+  
     #reconnect logic for bolt client
     isReconnecting = false
 
