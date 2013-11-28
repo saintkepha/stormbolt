@@ -274,11 +274,11 @@ class cloudflashbolt
                 req = http.request options,(res) =>
                     console.log 'in heartbeat http response statusCode: ' + JSON.stringify res.statusCode
                     if res.statusCode == 500 
-                        if count < 3
+                        if count < 5
                             connect = false
                             count++                            
                             req.end()
-                            retry()
+                            setTimeout(retry, 3000)
                         else
                             @removeConnection streamName                                         
                 req.end()
