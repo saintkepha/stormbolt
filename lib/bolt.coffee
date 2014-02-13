@@ -319,6 +319,7 @@ class cloudflashbolt
                     when 'heartbeat'                       
                         target = (String) target                        
                         incoming = ''
+                        request = null
                         console.log 'in client ' + target
 
                         _stream.on 'data', (chunk) =>
