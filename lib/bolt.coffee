@@ -293,7 +293,7 @@ class cloudflashbolt
             unless isReconnecting
                 isReconnecting = true
                 @runClient host,port
-         setTimeout(retry, 1000)
+        setTimeout(retry, 1000)
 
     #Method to start bolt client
     runClient: (host, port) ->
@@ -443,7 +443,6 @@ class cloudflashbolt
             console.log 'client closed: '
             isReconnecting = false
             unless calledReconnectOnce
-                console.log "in close"
                 @reconnect host, port        
 
 module.exports = cloudflashbolt
