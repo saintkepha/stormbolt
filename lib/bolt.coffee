@@ -14,7 +14,6 @@ class cloudflashbolt
     client = this
 
     boltConnections = []
-
     listConnections = ->
         console.log '[active bolt connections]'
         for entry in boltConnections
@@ -287,19 +286,20 @@ class cloudflashbolt
   
     #reconnect logic for bolt client
     isReconnecting = false
+    calledReconnectOnce = false
 
     reconnect: (host, port) ->
         retry = =>
             unless isReconnecting
                 isReconnecting = true
                 @runClient host,port
-        setTimeout(retry, 1000)
+         setTimeout(retry, 1000)
 
     #Method to start bolt client
     runClient: (host, port) ->
         # try to connect to the server
-        forwardingPorts = @config.local_forwarding_ports
         console.log "making connection to bolt server at: "+host+':'+port
+        calledReconnectOnce = false
         stream = tls.connect(port, host, options, =>
             if stream.authorized
                 console.log "Successfully connected to bolt server"
@@ -308,6 +308,8 @@ class cloudflashbolt
             stream.setKeepAlive(true, 60 * 1000) #Send keep-alive every 60 seconds
             stream.setEncoding 'utf8'
             stream.pipe(mx=MuxDemux()).pipe(stream)
+
+            forwardingPorts = @config.local_forwarding_ports
 
             mx.on "connection", (_stream) =>
                 [ action, target ] = _stream.meta.split(':')
@@ -432,12 +434,16 @@ class cloudflashbolt
 
         stream.on "error", (err) =>
             console.log 'client error: ' + err
+            #stream.end()
             isReconnecting = false
+            calledReconnectOnce = true
             @reconnect host, port
 
         stream.on "close", =>
             console.log 'client closed: '
             isReconnecting = false
-            @reconnect host, port        
+            unless calledReconnectOnce
+                console.log "in close"
+                @reconnect host, port        
 
 module.exports = cloudflashbolt
