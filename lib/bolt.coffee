@@ -106,7 +106,7 @@ class cloudflashbolt
                         'Content-Length': error.length,
                         'Content-Type': 'application/json',
                         'Connection': 'close' })
-                    response.end(body,"utf8")
+                    response.end(error,"utf8")
                     return
 
                 console.log "[proxy] forwarding request to " + cname + " at " + entry.stream.remoteAddress
