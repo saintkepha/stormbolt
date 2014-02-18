@@ -201,7 +201,7 @@ class cloudflashbolt
         console.log 'in start bolt: ' + local
         serverPort = local.split(":")[1]
         console.log "server port:" + serverPort
-        tls.createServer(options, (stream) =>
+        serverConnection = tls.createServer options, (stream) =>
             console.log "TLS connection established with VCG client from: " + stream.remoteAddress
             console.log 'Debugging null certs issue : server authorizationError: ' + stream.authorizationError            
             certObj = stream.getPeerCertificate()
@@ -244,7 +244,17 @@ class cloudflashbolt
                 console.log "bolt client connection is closed for ID: " + stream.name
                 @removeConnection stream.name            
 
-        ).listen serverPort
+        serverConnection.listen serverPort
+        serverConnection.on 'error', (err) ->
+            console.log 'server connection error :' + err.message
+            try
+                message = String(err.message)
+                if (message.indexOf ('ECONNRESET')) >= 0
+                    console.log 'throw error: ' + 'ECONNRESET'
+                    throw new Error err
+            catch e
+                console.log 'error e' + e
+                #process.exit(1)
 
         
         setInterval ( =>
@@ -295,8 +305,17 @@ class cloudflashbolt
                 @runClient host,port
         setTimeout(retry, 1000)
 
+    # Garbage collect every 2 sec
+    # Run node with --expose-gc
+    if gc?
+        setInterval (
+            () -> gc()
+        ), 2000
+
+
     #Method to start bolt client
     runClient: (host, port) ->
+        tls.SLAB_BUFFER_SIZE = 100 * 1024
         # try to connect to the server
         console.log "making connection to bolt server at: "+host+':'+port
         calledReconnectOnce = false
@@ -433,8 +452,7 @@ class cloudflashbolt
         )
 
         stream.on "error", (err) =>
-            console.log 'client error: ' + err
-            #stream.end()
+            console.log 'client error: ' + err            
             isReconnecting = false
             calledReconnectOnce = true
             @reconnect host, port
