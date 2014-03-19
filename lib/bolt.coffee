@@ -14,7 +14,6 @@ class cloudflashbolt
     client = this
 
     boltConnections = []
-
     listConnections = ->
         console.log '[active bolt connections]'
         for entry in boltConnections
@@ -107,7 +106,7 @@ class cloudflashbolt
                         'Content-Length': error.length,
                         'Content-Type': 'application/json',
                         'Connection': 'close' })
-                    response.end(body,"utf8")
+                    response.end(error,"utf8")
                     return
 
                 console.log "[proxy] forwarding request to " + cname + " at " + entry.stream.remoteAddress
@@ -202,7 +201,7 @@ class cloudflashbolt
         console.log 'in start bolt: ' + local
         serverPort = local.split(":")[1]
         console.log "server port:" + serverPort
-        tls.createServer(options, (stream) =>
+        serverConnection = tls.createServer options, (stream) =>
             console.log "TLS connection established with VCG client from: " + stream.remoteAddress
             console.log 'Debugging null certs issue : server authorizationError: ' + stream.authorizationError            
             certObj = stream.getPeerCertificate()
@@ -245,7 +244,17 @@ class cloudflashbolt
                 console.log "bolt client connection is closed for ID: " + stream.name
                 @removeConnection stream.name            
 
-        ).listen serverPort
+        serverConnection.listen serverPort
+        serverConnection.on 'error', (err) ->
+            console.log 'server connection error :' + err.message
+            try
+                message = String(err.message)
+                if (message.indexOf ('ECONNRESET')) >= 0
+                    console.log 'throw error: ' + 'ECONNRESET'
+                    throw new Error err
+            catch e
+                console.log 'error e' + e
+                #process.exit(1)
 
         
         setInterval ( =>
@@ -287,6 +296,7 @@ class cloudflashbolt
   
     #reconnect logic for bolt client
     isReconnecting = false
+    calledReconnectOnce = false
 
     reconnect: (host, port) ->
         retry = =>
@@ -295,11 +305,20 @@ class cloudflashbolt
                 @runClient host,port
         setTimeout(retry, 1000)
 
+    # Garbage collect every 2 sec
+    # Run node with --expose-gc
+    if gc?
+        setInterval (
+            () -> gc()
+        ), 2000
+
+
     #Method to start bolt client
     runClient: (host, port) ->
+        tls.SLAB_BUFFER_SIZE = 100 * 1024
         # try to connect to the server
-        forwardingPorts = @config.local_forwarding_ports
         console.log "making connection to bolt server at: "+host+':'+port
+        calledReconnectOnce = false
         stream = tls.connect(port, host, options, =>
             if stream.authorized
                 console.log "Successfully connected to bolt server"
@@ -308,6 +327,8 @@ class cloudflashbolt
             stream.setKeepAlive(true, 60 * 1000) #Send keep-alive every 60 seconds
             stream.setEncoding 'utf8'
             stream.pipe(mx=MuxDemux()).pipe(stream)
+
+            forwardingPorts = @config.local_forwarding_ports
 
             mx.on "connection", (_stream) =>
                 [ action, target ] = _stream.meta.split(':')
@@ -319,6 +340,7 @@ class cloudflashbolt
                     when 'heartbeat'                       
                         target = (String) target                        
                         incoming = ''
+                        request = null
                         console.log 'in client ' + target
 
                         _stream.on 'data', (chunk) =>
@@ -430,13 +452,15 @@ class cloudflashbolt
         )
 
         stream.on "error", (err) =>
-            console.log 'client error: ' + err
+            console.log 'client error: ' + err            
             isReconnecting = false
+            calledReconnectOnce = true
             @reconnect host, port
 
         stream.on "close", =>
             console.log 'client closed: '
             isReconnecting = false
-            @reconnect host, port        
+            unless calledReconnectOnce
+                @reconnect host, port        
 
 module.exports = cloudflashbolt
