@@ -11,6 +11,8 @@ MuxDemux = require('mux-demux')
 class cloudflashbolt
 
     options = ''
+    beatInterval = ''
+    beatRetry = ''
     client = this
 
     boltConnections = []
@@ -35,6 +37,11 @@ class cloudflashbolt
             if line.match /-END CERTIFICATE-/                              
                 ca.push cacert.join "\n"                                   
                 cacert = []                                      
+
+        if @config.beatParams
+            beatInterval = @config.beatParams.split(":")[0]
+            beatRetry = @config.beatParams.split(":")[1]
+            console.log beatInterval + ": " + beatRetry
         
         if @config.remote || @config.local
             if @config.local
@@ -262,11 +269,11 @@ class cloudflashbolt
                 for client in boltConnections
                     count = 0                    
                     if client.stream.name
-                        console.log 'Checking heartbeat..'
+                        #console.log 'Checking heartbeat..'
                         @beatConnect client.stream.name, count, false
             catch err
                 console.log 'error in client broadcast : ' + err
-        ), 60000
+        ), beatInterval
 
     beatConnect: (streamName, count, connect) ->        
         retry = =>                                    
@@ -283,7 +290,7 @@ class cloudflashbolt
                 req = http.request options,(res) =>
                     console.log 'in heartbeat http response statusCode: ' + JSON.stringify res.statusCode
                     if res.statusCode == 500 
-                        if count < 5
+                        if count < beatRetry
                             connect = false
                             count++                            
                             req.end()
