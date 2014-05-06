@@ -29,7 +29,7 @@ class stormflashbolt
     #array of the active BoltConnection Objects.
     boltConnections = []
     
-    #Bolt Server clean up the Client connection at every cleanupInterval.
+    #Bolt Server cleans up the Client connection at every cleanupInterval.
     cleanupInterval= (5 * 1000) # 5 seconds
 
     listConnections = ->
@@ -278,6 +278,7 @@ class stormflashbolt
                         
             mx.on 'error', =>
                 util.log "some error with mux connection"
+                #TODO - What happens when Mux goes into error, should we call removeConnection here?
                 stream.destroy()         
             
             stream.on 'error', =>
@@ -342,16 +343,17 @@ class stormflashbolt
 
             forwardingPorts = @config.local_forwarding_ports
             # beacon stream(duplex) creation
-            ds=mx.createStream('beacon:beacon',{allowHalfOpen:true})
+            # here bStream indicates "beacon stream"
+            bStream=mx.createStream('beacon:beacon',{allowHalfOpen:true})
 
-            ds.on 'data', (data) =>
+            bStream.on 'data', (data) =>
                 beaconRspCount++
                 util.log "received beacon response data: " + data
                 util.log "beaconRspCount " + beaconRspCount
 
             timerhandler=setInterval(()->
                 beaconReqCount++
-                ds.write "Beacon-Request:#{beaconInterval}:#{beaconRetry}"
+                bStream.write "Beacon-Request:#{beaconInterval}:#{beaconRetry}"
                 util.log "Beacon Request sent, beaconReqCount : " + beaconReqCount
             ,beaconInterval)
 
