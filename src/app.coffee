@@ -16,6 +16,7 @@ else
     return new Error "file does not exist! " + res
 
 cloudflashbolt = require './lib/bolt'
+
 bolt = new cloudflashbolt config
 bolt.start (res) ->
     if res instanceof Error
