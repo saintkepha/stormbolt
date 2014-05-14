@@ -1,4 +1,4 @@
-EventEmitter = require('event').EventEmitter
+EventEmitter = require('events').EventEmitter
 
 #Workaround - fix it later, Avoids DEPTH_ZERO_SELF_SIGNED_CERT error for self-signed certs
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
@@ -12,6 +12,7 @@ class StormBolt extends EventEmitter
     http = require("http")
     url = require('url')
     MuxDemux = require('mux-demux')
+    async = require('async')
 
     schema =
         name: "storm"
@@ -30,7 +31,6 @@ class StormBolt extends EventEmitter
             beaconInterval: { type: "integer" }
             beaconRetry:    { type: "integer" }
 
-    #Bolt Server cleans up the Client connection at every cleanupInterval.
 
     constructor: (config) ->
         @log 'constructor called with:\n'+ @inspect config if config?
@@ -43,14 +43,14 @@ class StormBolt extends EventEmitter
 
         try
             unless @config.cert instanceof Buffer
-                @config.cert = fs.readFileSync "{@config.cert}"
+                @config.cert = fs.readFileSync "#{@config.cert}",'utf8'
 
             unless @config.key instanceof Buffer
-                @config.key =  fs.readFileSync "{@config.key}"
+                @config.key =  fs.readFileSync "#{@config.key}",'utf8'
 
             unless @config.ca instanceof Buffer
                 ca = []
-                chain = fs.readFileSync "{@config.ca}", 'utf8'
+                chain = fs.readFileSync "#{@config.ca}", 'utf8'
                 chain = chain.split "\n"
                 cacert = []
                 for line in chain when line.length isnt 0
@@ -66,6 +66,8 @@ class StormBolt extends EventEmitter
         @repeatInterval = 5 # in seconds
 
         @connections = connections = {}
+
+        @log "Successfully done the constructor..."
 
         # setup event handlers for server events
         @on 'server.connect', (cname, stream, mx) =>
@@ -103,7 +105,7 @@ class StormBolt extends EventEmitter
                 rejectUnauthorized: true
 
             running = true
-            async.whilest(
+            async.whilst(
                 () => # test condition
                     running
                 (repeat) =>
@@ -142,7 +144,7 @@ class StormBolt extends EventEmitter
                     unless connected
                         uplink = @config.uplinks[i++]
                         [ host, port ] = uplink.split(':')
-                        @connect host,port
+                        @connect host,port,
                             key: @config.key
                             cert: @config.cert
                             ca: @config.ca
@@ -156,7 +158,7 @@ class StormBolt extends EventEmitter
         @relay(@config.relayPort) if @config.allowRelay
 
     log: (message) ->
-        @log "#{@constructor.name} - #{message}"
+        util.log "#{@constructor.name} - #{message}"
 
     inspect: util.inspect
 
@@ -247,6 +249,7 @@ class StormBolt extends EventEmitter
     # Method to start bolt server
     listen: (port, options) ->
         @log "server port:" + port
+        @log "options: " + @inspect options
         server = tls.createServer options, (stream) =>
             try
                 @log "TLS connection established with VCG client from: " + stream.remoteAddress
@@ -255,16 +258,21 @@ class StormBolt extends EventEmitter
                 cname = certObj.subject.CN
 
                 stream.name = cname
-                server.emit 'connection', cname, stream
+                server.emit 'connection1', cname, stream
+
                 @log 'server connected ' + stream.authorized ? 'authorized' : 'unauthorized'
+                #@emit 'server.connect', cname, stream, mx
+
             catch error
                 @log 'unable to retrieve peer certificate and authorize connection!'
                 stream.end()
                 return
 
-        server.on 'connection', (cname, stream) =>
+        server.on 'connection1', (cname, stream) =>
+#            @log 'connection event triggered ' + @inspect cname
+#            @log @inspect stream
             stream.pipe(mx = MuxDemux()).pipe(stream)
-            @emit 'server.connection', cname, stream, mx
+            @emit 'server.connect', cname, stream, mx
 
             stream.on "close", =>
                 @log "Bolt client connection is closed for ID: " + stream.name
@@ -289,17 +297,17 @@ class StormBolt extends EventEmitter
                 #process.exit(1)
 
         server.listen port
-        return server
+        #return server
 
     #reconnect logic for bolt client
     isReconnecting = false
     calledReconnectOnce = false
 
-    reconnect: (host, port) ->
+    reconnect: (host, port,options) ->
         retry = =>
             unless isReconnecting
                 isReconnecting = true
-                @connect host,port
+                @connect host,port,options
         setTimeout(retry, 1000)
 
     #Method to start bolt client
@@ -307,6 +315,7 @@ class StormBolt extends EventEmitter
         tls.SLAB_BUFFER_SIZE = 100 * 1024
         # try to connect to the server
         @log "making connection to bolt server at: "+host+':'+port
+        @log @inspect options
         calledReconnectOnce = false
         stream = tls.connect(port, host, options, =>
             if stream.authorized
@@ -436,15 +445,22 @@ class StormBolt extends EventEmitter
             isReconnecting = false
             calledReconnectOnce = true
             @emit 'client.disconnect', stream
-            @reconnect host, port
+            @reconnect host, port,
+                key: @config.key
+                cert: @config.cert
+                ca: @config.ca
+                requestCert: true
 
         stream.on "close", =>
             @log 'client closed: '
             isReconnecting = false
             @emit 'client.disconnect', stream
             unless calledReconnectOnce
-                @reconnect host, port
-
+                @reconnect host, port,
+                    key: @config.key
+                    cert: @config.cert
+                    ca: @config.ca
+                    requestCert: true
         return stream
 
 module.exports = StormBolt
