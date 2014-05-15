@@ -13,6 +13,7 @@ class StormBolt extends EventEmitter
     url = require('url')
     MuxDemux = require('mux-demux')
     async = require('async')
+    extend = require('util')._extend
 
     schema =
         name: "storm"
@@ -34,10 +35,12 @@ class StormBolt extends EventEmitter
 
     constructor: (config) ->
         @log 'constructor called with:\n'+ @inspect config if config?
+        res = validate config, schema
+        @log 'validation of input config: '+ @inspect res
 
         # need to setup some basic defaults...
         @config = require('../package').config
-        @config = extend(@config, config) if config? and validate(config, schema).valid
+        @config = extend(@config, config) if config? and res.valid
 
         @log "constructor initialized with:\n" + @inspect @config
 
@@ -172,7 +175,7 @@ class StormBolt extends EventEmitter
         unless port? and port > 0
             @log "need to pass in valid port for performing relay"
             return
-        
+
         @log 'starting the relay on port ' + port
         # after initial data, invoke HTTP server listener on port
         acceptor = http.createServer().listen(port)
@@ -260,7 +263,7 @@ class StormBolt extends EventEmitter
                 cname = certObj.subject.CN
 
                 stream.name = cname
-           
+
                 server.emit 'newconnection', cname, stream
 
                 @log 'server connected ' + stream.authorized ? 'authorized' : 'unauthorized'
