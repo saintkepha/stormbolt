@@ -67,29 +67,30 @@ class StormBolt extends EventEmitter
 
         @connections = connections = {}
 
-        @log "Successfully done the constructor..."
-
         # setup event handlers for server events
         @on 'server.connect', (cname, stream, mx) =>
+            @log "server connect event triggered for cname - " + cname
             capability = mx.createReadStream 'capability'
             capability.on 'data', (capa) =>
-                @log "received capability info from client: "+capa
+                @log "received capability info from client: " + capa
                 # check for forwardingPorts?
                 connections[cname] =
                     stream: stream
                     mux: mx
                     allowedPorts: capa.split(',') ? []
                     validity: @config.beaconValidity
-
+                @log "Added new client in the connections list , cname -  " + cname
+                #@list()
                 # should we close mux?
             bstream = mx.createStream 'beacon', { allowHalfOpen:true }
             bstream.on 'data', (beacon) =>
-                @log "received beacon from client: "+beacon
+                @log "received beacon from client: " + beacon
                 connections[cname].validity = @config.beaconValidity # reset
                 bstream.write "beacon:reply"
                 #bstream.end()
 
         @on 'server.disconnect', (cname, stream, mx) =>
+            @log "server disconnect event triggered for cname - " + cname
             mx.close()
             connections[cname] = null
 
@@ -171,21 +172,22 @@ class StormBolt extends EventEmitter
         unless port? and port > 0
             @log "need to pass in valid port for performing relay"
             return
-
+        
+        @log 'starting the relay on port ' + port
         # after initial data, invoke HTTP server listener on port
         acceptor = http.createServer().listen(port)
         acceptor.on "request", (request,response) =>
             #@log "[proxy] request from client: " + request.url
             if request.url == '/cname'
                 res = []
-                for entry in @connections
+                for key, entry of @connections
                     res.push
-                        cname: entry.cname
-                        forwardingports: entry.forwardingports
+                        cname: key
+                        forwardingports: entry.allowedPorts
                         caddress: entry.stream.remoteAddress
 
                 body = JSON.stringify res
-                #@log "[proxy] returning connections data: " + body
+                @log "[proxy] returning connections data: " + body
                 response.writeHead(200, {
                     'Content-Length': body.length,
                     'Content-Type': 'application/json' })
@@ -249,7 +251,7 @@ class StormBolt extends EventEmitter
     # Method to start bolt server
     listen: (port, options) ->
         @log "server port:" + port
-        @log "options: " + @inspect options
+        #@log "options: " + @inspect options
         server = tls.createServer options, (stream) =>
             try
                 @log "TLS connection established with VCG client from: " + stream.remoteAddress
@@ -258,19 +260,19 @@ class StormBolt extends EventEmitter
                 cname = certObj.subject.CN
 
                 stream.name = cname
-                server.emit 'connection1', cname, stream
+           
+                server.emit 'newconnection', cname, stream
 
                 @log 'server connected ' + stream.authorized ? 'authorized' : 'unauthorized'
-                #@emit 'server.connect', cname, stream, mx
 
             catch error
                 @log 'unable to retrieve peer certificate and authorize connection!'
                 stream.end()
                 return
 
-        server.on 'connection1', (cname, stream) =>
-#            @log 'connection event triggered ' + @inspect cname
-#            @log @inspect stream
+        server.on 'newconnection', (cname, stream) =>
+            @log 'connection event triggered ' + @inspect cname
+
             stream.pipe(mx = MuxDemux()).pipe(stream)
             @emit 'server.connect', cname, stream, mx
 
@@ -297,8 +299,8 @@ class StormBolt extends EventEmitter
                 #process.exit(1)
 
         server.listen port
-        #return server
-
+        return server
+        ### comment the reconnect logic
     #reconnect logic for bolt client
     isReconnecting = false
     calledReconnectOnce = false
@@ -309,21 +311,22 @@ class StormBolt extends EventEmitter
                 isReconnecting = true
                 @connect host,port,options
         setTimeout(retry, 1000)
-
+###
     #Method to start bolt client
     connect: (host, port, options) ->
         tls.SLAB_BUFFER_SIZE = 100 * 1024
         # try to connect to the server
         @log "making connection to bolt server at: "+host+':'+port
-        @log @inspect options
+        #@log @inspect options
         calledReconnectOnce = false
         stream = tls.connect(port, host, options, =>
             if stream.authorized
                 @log "Successfully connected to bolt server"
-                @emit 'client.connection', stream
+#                @emit 'client.connection', stream
             else
                 @log "Failed to authorize TLS connection. Could not connect to bolt server (ignored for now)"
 
+            @emit 'client.connection', stream
             stream.setKeepAlive(true, 60 * 1000) #Send keep-alive every 60 seconds
             stream.setEncoding 'utf8'
             stream.pipe(mx=MuxDemux()).pipe(stream)
@@ -346,7 +349,7 @@ class StormBolt extends EventEmitter
                             @log "received beacon reply: #{data}"
 
                         @log 'sending beacons...'
-                        async.whilest(
+                        async.whilst(
                             () => # test to make sure deviation between sent and received does not exceed beaconRetry
                                 bsent - breply < @config.beaconRetry
                             (repeat) => # send some beacons
@@ -445,22 +448,22 @@ class StormBolt extends EventEmitter
             isReconnecting = false
             calledReconnectOnce = true
             @emit 'client.disconnect', stream
-            @reconnect host, port,
-                key: @config.key
-                cert: @config.cert
-                ca: @config.ca
-                requestCert: true
+#            @reconnect host, port,
+#                key: @config.key
+#                cert: @config.cert
+#                ca: @config.ca
+#                requestCert: true
 
         stream.on "close", =>
             @log 'client closed: '
             isReconnecting = false
             @emit 'client.disconnect', stream
-            unless calledReconnectOnce
-                @reconnect host, port,
-                    key: @config.key
-                    cert: @config.cert
-                    ca: @config.ca
-                    requestCert: true
+#            unless calledReconnectOnce
+#                @reconnect host, port,
+#                    key: @config.key
+#                    cert: @config.cert
+#                    ca: @config.ca
+#                    requestCert: true
         return stream
 
 module.exports = StormBolt
