@@ -115,12 +115,16 @@ class StormBolt extends EventEmitter
                 (repeat) =>
                     for key,entry of @connections
                         do (key,entry) =>
-                            return unless entry?
+                            return unless entry? and entry.mx? and entry.stream?
                             entry.validity -= @repeatInterval
                             unless entry.validity > 1
-                                entry.mx.close()
-                                entry.stream.destroy()
-                                @connections[key] = null
+                                try
+                                    entry.mx.close()
+                                    entry.stream.destroy()
+                                catch err
+                                    @log "unable to properly terminate expired client connection: "+err
+                                delete @connections[key]
+                                @log "removed expired client connection from #{key}"
                     setTimeout(repeat, @repeatInterval * 1000)
                 (err) =>
                     @log "bolt server no longer running, validity checker stopping..."
@@ -303,18 +307,7 @@ class StormBolt extends EventEmitter
 
         server.listen port
         return server
-        ### comment the reconnect logic
-    #reconnect logic for bolt client
-    isReconnecting = false
-    calledReconnectOnce = false
 
-    reconnect: (host, port,options) ->
-        retry = =>
-            unless isReconnecting
-                isReconnecting = true
-                @connect host,port,options
-        setTimeout(retry, 1000)
-###
     #Method to start bolt client
     connect: (host, port, options) ->
         tls.SLAB_BUFFER_SIZE = 100 * 1024
@@ -339,6 +332,10 @@ class StormBolt extends EventEmitter
             mx.on "connection", (_stream) =>
                 [ action, target ] = _stream.meta.split(':')
                 @log "Client: action #{action}  target #{target}"
+
+                _stream.on 'error', (err) =>
+                    @log "Client: mux stream for #{_stream.meta} has error: "+err
+
                 switch action
                     when 'capability'
                         @log 'sending capability information...'
@@ -356,10 +353,12 @@ class StormBolt extends EventEmitter
                             () => # test to make sure deviation between sent and received does not exceed beaconRetry
                                 bsent - breply < @config.beaconRetry
                             (repeat) => # send some beacons
+                                @log "sending beacon..."
                                 _stream.write "Beacon"
                                 bsent++
                                 setTimeout(repeat, @config.beaconInterval * 1000)
                             (err) => # finally
+                                err ?= "beacon retry timeout, server no longer responding"
                                 @log "final call on sending beacons, exiting with: " + (err ? "no errors")
                         )
 
@@ -448,25 +447,11 @@ class StormBolt extends EventEmitter
 
         stream.on "error", (err) =>
             @log 'client error: ' + err
-            isReconnecting = false
-            calledReconnectOnce = true
             @emit 'client.disconnect', stream
-#            @reconnect host, port,
-#                key: @config.key
-#                cert: @config.cert
-#                ca: @config.ca
-#                requestCert: true
 
         stream.on "close", =>
             @log 'client closed: '
-            isReconnecting = false
             @emit 'client.disconnect', stream
-#            unless calledReconnectOnce
-#                @reconnect host, port,
-#                    key: @config.key
-#                    cert: @config.cert
-#                    ca: @config.ca
-#                    requestCert: true
         return stream
 
 module.exports = StormBolt
