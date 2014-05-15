@@ -87,7 +87,7 @@ class StormBolt extends EventEmitter
                 # should we close mux?
             bstream = mx.createStream 'beacon', { allowHalfOpen:true }
             bstream.on 'data', (beacon) =>
-                @log "received beacon from client: " + beacon
+                @log "received beacon from client: #{cname}"
                 connections[cname].validity = @config.beaconValidity # reset
                 bstream.write "beacon:reply"
                 #bstream.end()
@@ -115,6 +115,7 @@ class StormBolt extends EventEmitter
                 (repeat) =>
                     for key,entry of @connections
                         do (key,entry) =>
+                            @log "DEBUG: #{key} has "+@inspect entry
                             return unless entry? and entry.mx? and entry.stream?
                             entry.validity -= @repeatInterval
                             unless entry.validity > 1
@@ -360,6 +361,12 @@ class StormBolt extends EventEmitter
                             (err) => # finally
                                 err ?= "beacon retry timeout, server no longer responding"
                                 @log "final call on sending beacons, exiting with: " + (err ? "no errors")
+                                try
+                                    _stream.end()
+                                    mx.destroy()
+                                    stream.end()
+                                catch err
+                                    @log "error during client connection shutdown due to beacon timeout: "+err
                         )
 
                     when 'relay'
@@ -446,11 +453,11 @@ class StormBolt extends EventEmitter
         )
 
         stream.on "error", (err) =>
-            @log 'client error: ' + err
+            @log 'client error during connection to #{host}:#{port} with: ' + err
             @emit 'client.disconnect', stream
 
         stream.on "close", =>
-            @log 'client closed: '
+            @log "client closed connection to: #{host}:#{port}"
             @emit 'client.disconnect', stream
         return stream
 
