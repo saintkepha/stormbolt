@@ -128,12 +128,12 @@ class StormBolt extends StormAgent
                 (repeat) =>
                     for key,entry of @connections
                         do (key,entry) =>
-                            return unless entry? and entry.mx? and entry.stream?
+                            return unless entry? and entry.mux? and entry.stream?
                             @log "DEBUG: #{key} has validity=#{entry.validity}"
                             @connections[key].validity -= @repeatInterval
                             unless entry.validity > 1
                                 try
-                                    entry.mx.close()
+                                    entry.mux.close()
                                     entry.stream.destroy()
                                 catch err
                                     @log "unable to properly terminate expired client connection: "+err
@@ -183,6 +183,7 @@ class StormBolt extends StormAgent
         if key?
             return unless key in @connections
             entry = @connections[key]
+            return unless entry?
             res =
                 cname: key
                 ports: entry.allowedPorts
@@ -191,12 +192,13 @@ class StormBolt extends StormAgent
             return res
 
         # iterate through connections and return resulting set
-        {
+        for key,entry of @connections
+            continue unless entry?
             cname: key
             ports: entry.allowedPorts
             address: entry.stream.remoteAddress
             validity: entry.validity
-        } for key,entry of @connections
+        #} for key,entry of @connections
 
     relay: (port) ->
         unless port? and port > 0
@@ -211,6 +213,7 @@ class StormBolt extends StormAgent
             if request.url == '/cname'
                 res = []
                 for key, entry of @connections
+                    return unless entry? and entry.mux? and entry.stream?
                     res.push
                         cname: key
                         forwardingports: entry.allowedPorts
