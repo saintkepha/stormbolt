@@ -39,7 +39,6 @@
 		"key": "/var/stormstack/agent.key",
 		"ca": "/var/stormstack/ca.cert",
 		"logfile": "/var/log/stormbolt.log",
-		"datadir": "/var/stormstack",
 		"storm": {
 			"functions": [
 				"agent.connect",
