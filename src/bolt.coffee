@@ -109,7 +109,7 @@ class StormBolt extends StormAgent
                 unless err
                     @on "error", (err) =>
                         @log "run - bolt fizzled... should do something smart here"
-                    @run storm
+                    @run storm.bolt
             return
 
         # check for bolt server config
