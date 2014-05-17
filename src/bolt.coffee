@@ -7,7 +7,6 @@ StormAgent = require 'stormagent'
 class StormBolt extends StormAgent
 
     validate = require('json-schema').validate
-    util = require('util')
     tls = require("tls")
     fs = require("fs")
     http = require("http")
@@ -68,12 +67,18 @@ class StormBolt extends StormAgent
             mx.close()
             connections[cname] = null
 
+    status: ->
+        state = super
+        state.uplink = @uplink ? null
+        state.clients = @clients()
+        state
+
     run: (config) ->
 
         if config?
-            @log 'run called with:\n'+ @inspect config
+            @log 'run called with:', config
             res = validate config, schema
-            @log 'run - validation of runtime config: '+ @inspect res
+            @log 'run - validation of runtime config:', res
             @config = extend(@config, config) if res.valid
 
         # start the agent web api instance...
@@ -173,11 +178,6 @@ class StormBolt extends StormAgent
             )
         # check for running the relay
         @relay(@config.relayPort) if @config.allowRelay
-
-    log: (message) ->
-        util.log "#{@constructor.name} - #{message}"
-
-    inspect: util.inspect
 
     clients: (key) ->
         if key?
@@ -340,6 +340,10 @@ class StormBolt extends StormAgent
         stream = tls.connect(port, host, options, =>
             if stream.authorized
                 @log "Successfully connected to bolt server"
+                @uplink =
+                    host: host
+                    port: port
+                    options: options
 #                @emit 'client.connection', stream
             else
                 @log "Failed to authorize TLS connection. Could not connect to bolt server (ignored for now)"

@@ -35,9 +35,9 @@
 		"beaconInterval": 10,
 		"beaconRetry": 3,
 		"beaconValidity": 45,
-		"cert": "/var/stormstack/certs/snap.cert",
-		"key": "/var/stormstack/certs/snap.key",
-		"ca": "/var/stormstack/certs/ca.cert",
+		"cert": "/var/stormstack/agent.cert",
+		"key": "/var/stormstack/agent.key",
+		"ca": "/var/stormstack/ca.cert",
 		"logfile": "/var/log/stormbolt.log",
 		"datadir": "/var/stormstack",
 		"storm": {
@@ -45,7 +45,7 @@
 				"agent.connect",
 				"agent.listen",
 				"agent.relay",
-				"agent.list"
+				"agent.clients"
 			],
 			"plugins": [
 				"lib/plugin"
