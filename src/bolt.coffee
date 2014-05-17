@@ -1,9 +1,10 @@
-EventEmitter = require('events').EventEmitter
 
 #Workaround - fix it later, Avoids DEPTH_ZERO_SELF_SIGNED_CERT error for self-signed certs
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 
-class StormBolt extends EventEmitter
+StormAgent = require 'stormagent'
+
+class StormBolt extends StormAgent
 
     validate = require('json-schema').validate
     util = require('util')
@@ -32,19 +33,54 @@ class StormBolt extends EventEmitter
             beaconInterval: { type: "integer" }
             beaconRetry:    { type: "integer" }
 
-
     constructor: (config) ->
-        @log 'constructor called with:\n'+ @inspect config if config?
-        res = validate config, schema
-        @log 'validation of input config: '+ @inspect res
+        super config
 
-        # need to setup some basic defaults...
-        @config = require('../package').config
-        @config = extend(@config, config) if config? and res.valid
+        # key routine to import itself into agent base
+        @import module
 
-        @log "constructor initialized with:\n" + @inspect @config
+        @repeatInterval = 5 # in seconds
+        @connections = connections = {}
+
+        # setup event handlers for server events
+        @on 'server.connect', (cname, stream, mx) =>
+            @log "server connect event triggered for cname - #{cname}"
+            capability = mx.createReadStream 'capability'
+            capability.on 'data', (capa) =>
+                @log "received capability info from client:", capa
+                # check for forwardingPorts?
+                connections[cname] =
+                    stream: stream
+                    mux: mx
+                    allowedPorts: capa.split(',') ? []
+                    validity: @config.beaconValidity
+                @log "Added new client in the connections list, cname - #{cname}"
+                # should we close mux?
+            bstream = mx.createStream 'beacon', { allowHalfOpen:true }
+            bstream.on 'data', (beacon) =>
+                @log "received beacon from client: #{cname}"
+                connections[cname].validity = @config.beaconValidity # reset
+                bstream.write "beacon:reply"
+                #bstream.end()
+
+        @on 'server.disconnect', (cname, stream, mx) =>
+            @log "server disconnect event triggered for cname - #{cname}"
+            mx.close()
+            connections[cname] = null
+
+    run: (config) ->
+
+        if config?
+            @log 'run called with:\n'+ @inspect config
+            res = validate config, schema
+            @log 'run - validation of runtime config: '+ @inspect res
+            @config = extend(@config, config) if res.valid
+
+        # start the agent web api instance...
+        super config
 
         try
+            @log 'run - validating security credentials...'
             unless @config.cert instanceof Buffer
                 @config.cert = fs.readFileSync "#{@config.cert}",'utf8'
 
@@ -63,41 +99,13 @@ class StormBolt extends EventEmitter
                         cacert = []
                 @config.ca = ca
         catch err
-            @log "unable to retrieve security credentials!"
-            throw err
-
-        @repeatInterval = 5 # in seconds
-
-        @connections = connections = {}
-
-        # setup event handlers for server events
-        @on 'server.connect', (cname, stream, mx) =>
-            @log "server connect event triggered for cname - " + cname
-            capability = mx.createReadStream 'capability'
-            capability.on 'data', (capa) =>
-                @log "received capability info from client: " + capa
-                # check for forwardingPorts?
-                connections[cname] =
-                    stream: stream
-                    mux: mx
-                    allowedPorts: capa.split(',') ? []
-                    validity: @config.beaconValidity
-                @log "Added new client in the connections list , cname -  " + cname
-                #@list()
-                # should we close mux?
-            bstream = mx.createStream 'beacon', { allowHalfOpen:true }
-            bstream.on 'data', (beacon) =>
-                @log "received beacon from client: #{cname}"
-                connections[cname].validity = @config.beaconValidity # reset
-                bstream.write "beacon:reply"
-                #bstream.end()
-
-        @on 'server.disconnect', (cname, stream, mx) =>
-            @log "server disconnect event triggered for cname - " + cname
-            mx.close()
-            connections[cname] = null
-
-    run: (callback) ->
+            @log "run - missing proper security credentials, attempting to self-configure..."
+            @activate null, (err, storm) =>
+                unless err
+                    @on "error", (err) =>
+                        @log "run - bolt fizzled... should do something smart here"
+                    @run storm
+            return
 
         # check for bolt server config
         if @config.listenPort? and @config.listenPort > 0
@@ -115,9 +123,9 @@ class StormBolt extends EventEmitter
                 (repeat) =>
                     for key,entry of @connections
                         do (key,entry) =>
-                            @log "DEBUG: #{key} has "+@inspect entry
                             return unless entry? and entry.mx? and entry.stream?
-                            entry.validity -= @repeatInterval
+                            @log "DEBUG: #{key} has validity=#{entry.validity}"
+                            @connections[key].validity -= @repeatInterval
                             unless entry.validity > 1
                                 try
                                     entry.mx.close()
@@ -171,10 +179,24 @@ class StormBolt extends EventEmitter
 
     inspect: util.inspect
 
-    list: ->
-        @log '[active bolt connections]'
-        for key,entry of @connections
-            @log "cname: #{key} allowedPorts: #{entry.allowedPorts} watchdog: #{entry.watchdog}"
+    clients: (key) ->
+        if key?
+            return unless key in @connections
+            entry = @connections[key]
+            res =
+                cname: key
+                ports: entry.allowedPorts
+                address: entry.stream.remoteAddress
+                validity: entry.validity
+            return res
+
+        # iterate through connections and return resulting set
+        {
+            cname: key
+            ports: entry.allowedPorts
+            address: entry.stream.remoteAddress
+            validity: entry.validity
+        } for key,entry of @connections
 
     relay: (port) ->
         unless port? and port > 0
@@ -206,11 +228,11 @@ class StormBolt extends EventEmitter
             [ cname, port ] = target.split(':') if target
 
             if cname
-                @list()
+                @log "active client connections:", @clients
                 entry = @connections[cname]
                 unless entry
                     error = "no such stormflash-bolt-target: "+target
-                    @log error
+                    @log "error:", error
                     response.writeHead(404, {
                         'Content-Length': error.length,
                         'Content-Type': 'application/json',
@@ -268,7 +290,6 @@ class StormBolt extends EventEmitter
                 cname = certObj.subject.CN
 
                 stream.name = cname
-
                 server.emit 'newconnection', cname, stream
 
                 @log 'server connected ' + stream.authorized ? 'authorized' : 'unauthorized'
@@ -279,7 +300,7 @@ class StormBolt extends EventEmitter
                 return
 
         server.on 'newconnection', (cname, stream) =>
-            @log 'connection event triggered ' + @inspect cname
+            @log 'connection event triggered for: '+ cname
 
             stream.pipe(mx = MuxDemux()).pipe(stream)
             @emit 'server.connect', cname, stream, mx
@@ -453,7 +474,7 @@ class StormBolt extends EventEmitter
         )
 
         stream.on "error", (err) =>
-            @log 'client error during connection to #{host}:#{port} with: ' + err
+            @log "client error during connection to #{host}:#{port} with: " + err
             @emit 'client.disconnect', stream
 
         stream.on "close", =>
