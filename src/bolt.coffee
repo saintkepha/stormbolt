@@ -193,12 +193,11 @@ class StormBolt extends StormAgent
 
         # iterate through connections and return resulting set
         for key,entry of @connections
-            continue unless entry?
-            cname: key
-            ports: entry.allowedPorts
-            address: entry.stream.remoteAddress
-            validity: entry.validity
-        #} for key,entry of @connections
+            if entry?
+                cname: key
+                ports: entry.allowedPorts
+                address: entry.stream.remoteAddress
+                validity: entry.validity
 
     relay: (port) ->
         unless port? and port > 0
@@ -213,11 +212,12 @@ class StormBolt extends StormAgent
             if request.url == '/cname'
                 res = []
                 for key, entry of @connections
-                    return unless entry? and entry.mux? and entry.stream?
-                    res.push
-                        cname: key
-                        forwardingports: entry.allowedPorts
-                        caddress: entry.stream.remoteAddress
+                    if entry? 
+                        res.push
+                            cname: key
+                            ports: entry.allowedPorts
+                            address: entry.stream.remoteAddress
+                            validity: entry.validity
 
                 body = JSON.stringify res
                 @log "[proxy] returning connections data: " + body
