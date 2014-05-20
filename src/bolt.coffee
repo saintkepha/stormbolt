@@ -60,7 +60,6 @@ class BoltStream extends StormData
             request.on 'error', (err) =>
                 @log "error processing request via boltstream...", err
                 relay.destroy()
-                callback err
 
             request.pipe relay
             firstreply = false
