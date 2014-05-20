@@ -362,7 +362,7 @@ class StormBolt extends StormAgent
                                 @log "sending beacon..."
                                 _stream.write "Beacon"
                                 bsent++
-                                setTimeout(repeat, @config.beaconInterval * 1000)
+                                @beaconTimer = setTimeout(repeat, @config.beaconInterval * 1000)
                             (err) => # finally
                                 err ?= "beacon retry timeout, server no longer responding"
                                 @log "final call on sending beacons, exiting with: " + (err ? "no errors")
@@ -462,6 +462,7 @@ class StormBolt extends StormAgent
             @emit 'client.disconnect', stream
 
         stream.on "close", =>
+            clearTimeout(@beaconTimer)
             @log "client closed connection to: #{host}:#{port}"
             @emit 'client.disconnect', stream
         return stream
