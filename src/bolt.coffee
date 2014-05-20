@@ -35,7 +35,8 @@ class BoltStream extends StormData
 
         @stream.on 'close', =>
             @log "bolt stream closed for #{@id} to #{@stream.remoteAddress}"
-            @emit 'closed'
+            @destroy()
+            @emit 'close'
 
         @stream.on 'error', (err) =>
             @log "issue with underlying bolt stream...", err
@@ -46,41 +47,41 @@ class BoltStream extends StormData
             cname:  @id
             remote: @stream.remoteAddress
 
-    relay: (request, callback) ->
+    relay: (request, response) ->
         #callback new Error "unable to forward request to #{@id} for unsupported port" unless request.target in @capability
-
         @log "relay - forwarding request to #{@id} at #{@stream.remoteAddress}"
         try
             relay = @mux.createStream("relay:#{request.target}", {allowHalfOpen:true})
             relay.write JSON.stringify
-                method:  request.method,
-                url:     request.url,
-                headers: request.headers
+                method: request.method
+                url:    request.url
+                port:   request.port
 
             request.on 'error', (err) =>
                 @log "error processing request via boltstream...", err
                 relay.destroy()
 
-            request.pipe relay
-            firstreply = false
-            data = ''
-            relay.on 'data', (chunk) =>
-                unless firstreply
-                    try
-                        firstreply = JSON.parse chunk
-                    catch err
-                        @log "invalid first relay response!", err
-                        relay.destroy()
-                    return
-                data += chunk
-            relay.on 'end', ->
-                callback firstreply, data
             relay.on 'error', (err) ->
                 @log "error during relay multiplexing boltstream...", err
-                callback err
+
+            request.pipe(relay)
+
+            header = null
+            body = ''
+            relay.on 'data', (chunk) =>
+                try
+                    unless header
+                        header = JSON.parse chunk
+                        if response?
+                            response.writeHead header.statusCode, header.headers
+                            relay.pipe(response)
+                catch err
+                    @log "invalid relay response received from #{@id}"
+                    relay.end()
+
+            return relay
         catch err
             @log "error duing relaying request to boltstream", err
-            callback err
 
     destroy: ->
         try
@@ -238,16 +239,22 @@ class StormBolt extends StormAgent
             async.forever(
                 (next) =>
                     next new Error "retry max exceeded, unable to establish bolt server connection" if retries > 30
-                    unless connected
-                        uplink = @config.uplinks[i++]
-                        [ host, port ] = uplink.split(':')
-                        @connect host,port,
-                            key: @config.key
-                            cert: @config.cert
-                            ca: @config.ca
-                            requestCert: true
-                        i = 0 unless i < @config.uplinks.length
-                    setTimeout(next, 5000)
+                    async.until(
+                        () ->
+                            connected
+                        (repeat) =>
+                            uplink = @config.uplinks[i++]
+                            [ host, port ] = uplink.split(':')
+                            @connect host,port,
+                                key: @config.key
+                                cert: @config.cert
+                                ca: @config.ca
+                                requestCert: true
+                            i = 0 unless i < @config.uplinks.length
+                            setTimeout(repeat, 5000)
+                        (err) =>
+                            setTimeout(next, 5000)
+                    )
                 (err) =>
                     @emit 'error', err if err?
             )
@@ -259,7 +266,7 @@ class StormBolt extends StormAgent
             @log "need to pass in valid port for performing relay"
             return
 
-        @log 'starting the relay on port ' + port
+        @log 'starting the proxy relay on port ' + port
         # after initial data, invoke HTTP server listener on port
         acceptor = http.createServer().listen(port)
         acceptor.on "request", (request,response) =>
@@ -279,7 +286,7 @@ class StormBolt extends StormAgent
 
             @log "[proxy] forwarding request to " + cname + " at " + entry.stream.remoteAddress
             request.target = port
-            entry.relay request, (reply, body) =>
+            entry.relay request, response, (reply, body) =>
                 unless reply instanceof Error
                     try
                         reply = JSON.parse reply
@@ -322,7 +329,7 @@ class StormBolt extends StormAgent
         return server
 
     #Method to start bolt client
-    connect: (host, port, options) ->
+    connect: (host, port, options, callback) ->
         tls.SLAB_BUFFER_SIZE = 100 * 1024
         # try to connect to the server
         @log "making connection to bolt server at: "+host+':'+port
@@ -332,7 +339,6 @@ class StormBolt extends StormAgent
             @uplink =
                 host: host
                 port: port
-                options: options
             if stream.authorized
                 @log "Successfully connected to bolt server"
 #                @emit 'client.connection', stream
@@ -340,6 +346,9 @@ class StormBolt extends StormAgent
                 @log "Failed to authorize TLS connection. Could not connect to bolt server (ignored for now)"
 
             @emit 'client.connection', stream
+
+            callback stream if callback?
+
             stream.setKeepAlive(true, 60 * 1000) #Send keep-alive every 60 seconds
             stream.setEncoding 'utf8'
             stream.pipe(mx=MuxDemux()).pipe(stream)
@@ -477,6 +486,7 @@ class StormBolt extends StormAgent
             clearTimeout(@beaconTimer)
             @log "client closed connection to: #{host}:#{port}"
             @emit 'client.disconnect', stream
-        return stream
+
+        stream
 
 module.exports = StormBolt
