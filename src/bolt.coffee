@@ -460,6 +460,7 @@ class StormBolt extends StormAgent
         )
 
         stream.on "error", (err) =>
+            clearTimeout(@beaconTimer)
             @log "client error during connection to #{host}:#{port} with: " + err
             @emit 'client.disconnect', stream
 
