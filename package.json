@@ -43,6 +43,7 @@
 			"functions": [
 				"agent.connect",
 				"agent.listen",
+				"agent.proxy",
 				"agent.relay",
 				"agent.clients"
 			],

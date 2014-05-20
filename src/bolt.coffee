@@ -4,6 +4,72 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 
 StormAgent = require 'stormagent'
 
+StormData = StormAgent.StormData
+
+# XXX - for now, only representing the server-side... will refactor for client-side later
+class BoltStream extends StormData
+
+    constructor: (@id, @stream) ->
+        @stream.pipe(@mux = MuxDemux()).pipe(@stream)
+
+        @cstream = @mux.createReadStream 'capability'
+        @cstream.on 'data', (capa) =>
+            @log "received capability info from client:", capa
+            @capability = capa.split(',') ? []
+            @emit 'capability', capa
+
+        @bstream = @mux.createStream 'beacon', { allowHalfOpen:true }
+        @bstream.on 'data', (beacon) =>
+            @log "received beacon from client: #{cname}"
+            @bstream.write "beacon:reply"
+
+            @emit 'beacon', beacon
+            @validity = @config.beaconValidity # reset
+
+        @mux.on 'error', (err) =>
+            @log "issue with bolt mux channel...", err
+            @stream.destroy()
+            @emit 'error', err
+
+        @stream.on 'close', =>
+            @log "bolt stream closed for #{@id} to #{@stream.remoteAddress}"
+            @emit 'closed'
+
+        @stream.on 'error', (err) =>
+            @log "issue with underlying bolt stream...", err
+            @mux.destroy()
+            @emit 'error', err
+
+        super @id,
+            cname:  @id
+            remote: @stream.remoteAddress
+
+    destroy: ->
+        try
+            @mux.close()
+            @stream.destroy()
+        catch err
+            @log "unable to properly terminate bolt stream: #{bolt.id}", err
+
+StormRegistry = StormAgent.StormRegistry
+
+class BoltRegistry extends StormRegistry
+
+    constructor: (filename) ->
+        @on 'removed', (bolt) ->
+            bolt.destroy() if bolt?
+
+        super filename
+
+    get: (key) ->
+        entry = super key
+        cname: key
+        ports: entry.capability
+        address: entry.data.remote
+        validity: entry.validity
+
+#-----------------------------------------------------------------
+
 class StormBolt extends StormAgent
 
     validate = require('json-schema').validate
@@ -39,38 +105,12 @@ class StormBolt extends StormAgent
         @import module
 
         @repeatInterval = 5 # in seconds
-        @connections = connections = {}
-
-        # setup event handlers for server events
-        @on 'server.connect', (cname, stream, mx) =>
-            @log "server connect event triggered for cname - #{cname}"
-            capability = mx.createReadStream 'capability'
-            capability.on 'data', (capa) =>
-                @log "received capability info from client:", capa
-                # check for forwardingPorts?
-                connections[cname] =
-                    stream: stream
-                    mux: mx
-                    allowedPorts: capa.split(',') ? []
-                    validity: @config.beaconValidity
-                @log "Added new client in the connections list, cname - #{cname}"
-                # should we close mux?
-            bstream = mx.createStream 'beacon', { allowHalfOpen:true }
-            bstream.on 'data', (beacon) =>
-                @log "received beacon from client: #{cname}"
-                connections[cname].validity = @config.beaconValidity # reset
-                bstream.write "beacon:reply"
-                #bstream.end()
-
-        @on 'server.disconnect', (cname, stream, mx) =>
-            @log "server disconnect event triggered for cname - #{cname}"
-            mx.close()
-            connections[cname] = null
+        @clients = new BoltRegistry
 
     status: ->
         state = super
         state.uplink = @uplink ? null
-        state.clients = @clients()
+        state.clients = @clients.list()
         state
 
     run: (config) ->
@@ -120,33 +160,28 @@ class StormBolt extends StormAgent
                 ca: @config.ca
                 requestCert: true
                 rejectUnauthorized: true
+               , (bolt) =>
+                bolt.validity ?= @config.beaconValidity if @config.beaconValidity
+                @clients.add bolt.id, bolt
+                bolt.on 'beacon', (beacon) =>
+                    ### not sure if we need this logic...
+                    entry = @clients.get bolt.id
+                    entry.validity = @config.beaconValidity
+                    @clients.update bolt.id, entry
+                    ###
+                bolt.on 'close', (err) =>
+                    @clients.remove bolt.id
+                bolt.on 'error', (err) =>
+                    @clients.remove bolt.id
 
-            running = true
-            async.whilst(
-                () => # test condition
-                    running
-                (repeat) =>
-                    for key,entry of @connections
-                        do (key,entry) =>
-                            return unless entry? and entry.mux? and entry.stream?
-                            @log "DEBUG: #{key} has validity=#{entry.validity}"
-                            @connections[key].validity -= @repeatInterval
-                            unless entry.validity > 1
-                                try
-                                    entry.mux.close()
-                                    entry.stream.destroy()
-                                catch err
-                                    @log "unable to properly terminate expired client connection: "+err
-                                delete @connections[key]
-                                @log "removed expired client connection from #{key}"
-                    setTimeout(repeat, @repeatInterval * 1000)
-                (err) =>
-                    @log "bolt server no longer running, validity checker stopping..."
-            )
             server.on 'error', (err) =>
                 @log "fatal issue with bolt server: "+err
-                running = false
+                @clients.running = false
                 @emit 'server.error', err
+
+            # start client connection expiry checker
+            @clients.expires @config.repeatdelay
+
 
         # check for client uplink to bolt server
         if @config.uplinks? and @config.uplinks.length > 0
@@ -164,7 +199,7 @@ class StormBolt extends StormAgent
                 (next) =>
                     next new Error "retry max exceeded, unable to establish bolt server connection" if retries > 30
                     unless connected
-                        uplink = @config.uplinks[i++]
+                        @uplink = @config.uplinks[i++]
                         [ host, port ] = uplink.split(':')
                         @connect host,port,
                             key: @config.key
@@ -176,31 +211,26 @@ class StormBolt extends StormAgent
                 (err) =>
                     @emit 'error', err if err?
             )
-        # check for running the relay
-        @relay(@config.relayPort) if @config.allowRelay
+        # check for running the relay proxy
+        @proxy(@config.relayPort) if @config.allowRelay
 
-    clients: (key) ->
-        if key?
-            return unless key in @connections
-            entry = @connections[key]
-            return unless entry?
-            res =
-                cname: key
-                ports: entry.allowedPorts
-                address: entry.stream.remoteAddress
-                validity: entry.validity
-            return res
+    relay: (request, bolt, callback) ->
+        return unless bolt instanceof BoltStream
+        @log "relay - forwarding request to #{bolt.id} at #{bolt.stream.remoteAddress}"
+        try
+            relay = bolt.mux.createStream("relay:#{request.target}", {allowHalfOpen:true})
+            relay.write JSON.stringify
+                method:  request.method,
+                url:     request.url,
+                headers: request.headers
 
-        # iterate through connections and return resulting set
-        for key,entry of @connections
-            continue unless entry?
-            cname: key
-            ports: entry.allowedPorts
-            address: entry.stream.remoteAddress
-            validity: entry.validity
-        #} for key,entry of @connections
+            request.setEncoding 'utf8'
+            request.pipe relay
+            relay.on 'data', callback
+            relay.on 'error', (err) ->
+                @log "error during relay multiplexing boltstream...", err
 
-    relay: (port) ->
+    proxy: (port) ->
         unless port? and port > 0
             @log "need to pass in valid port for performing relay"
             return
@@ -209,80 +239,36 @@ class StormBolt extends StormAgent
         # after initial data, invoke HTTP server listener on port
         acceptor = http.createServer().listen(port)
         acceptor.on "request", (request,response) =>
-            #@log "[proxy] request from client: " + request.url
-            if request.url == '/cname'
-                res = []
-                for key, entry of @connections
-                    return unless entry? and entry.mux? and entry.stream?
-                    res.push
-                        cname: key
-                        forwardingports: entry.allowedPorts
-                        caddress: entry.stream.remoteAddress
 
-                body = JSON.stringify res
-                @log "[proxy] returning connections data: " + body
-                response.writeHead(200, {
-                    'Content-Length': body.length,
-                    'Content-Type': 'application/json' })
-                response.end(body,"utf8")
-                return
-
-            target = request.headers['stormflash-bolt-target']
+            target = request.headers['stormbolt-target']
             [ cname, port ] = target.split(':') if target
 
-            if cname
-                @log "active client connections:", @clients
-                entry = @connections[cname]
-                unless entry
-                    error = "no such stormflash-bolt-target: "+target
-                    @log "error:", error
-                    response.writeHead(404, {
-                        'Content-Length': error.length,
-                        'Content-Type': 'application/json',
-                        'Connection': 'close' })
-                    response.end(error,"utf8")
-                    return
+            entry = @clients.get cname
+            unless entry
+                error = "no such stormfbolt-target [#{target}] currently connected!"
+                @log "error:", error
+                response.writeHead(404, {
+                    'Content-Length': error.length,
+                    'Content-Type': 'application/json',
+                    'Connection': 'close' })
+                response.end(error,"utf8")
+                return
 
-                @log "[proxy] forwarding request to " + cname + " at " + entry.stream.remoteAddress
-
-                if entry.mux
-                    relay = entry.mux.createStream('relay:'+ port, {allowHalfOpen:true})
-
-                    relay.write JSON.stringify
-                        method:  request.method,
-                        url:     request.url,
-                        headers: request.headers
-
-                    # relay.write request.method + ' ' + request.url + " HTTP/1.1\r\n"
-                    # relay.write 'stormflash-bolt-target: '+request.headers['stormflash-bolt-target']+"\r\n"
-                    # relay.write "\r\n"
-
-                    request.setEncoding 'utf8'
-                    request.pipe(relay)
-                    relayResponse = null
-                    relay.on "data", (chunk) =>
-                        unless relayResponse
-                            try
-                                @log "relay response received: "+ chunk
-                                relayResponse = JSON.parse chunk
-                                response.writeHead(relayResponse.statusCode, relayResponse.headers)
-                                relay.pipe(response)
-                            catch err
-                                @log "invalid relay response!"
-                                relay.end()
-                                return
-
-                    relay.on "end", =>
-                        @log "no more data in relay"
-
-                    request.on "data", (chunk) =>
-                        @log "read some data: "+chunk
-
-                    request.on "end", =>
-                        @log "no more data in the request..."
+            @log "[proxy] forwarding request to " + cname + " at " + entry.stream.remoteAddress
+            relayreply = null
+            request.target = port
+            relay = @relay request, entry, (chunk) =>
+                unless relayreply
+                    try
+                        relayreply = JSON.parse chunk
+                        response.writeHead(relayResponse.statusCode, relayResponse.headers)
+                        relay.pipe(response)
+                    catch err
+                        @log "invalid relay response!"
+                        relay.end()
 
     # Method to start bolt server
-    listen: (port, options) ->
+    listen: (port, options, callback) ->
         @log "server port:" + port
         #@log "options: " + @inspect options
         server = tls.createServer options, (stream) =>
@@ -292,32 +278,12 @@ class StormBolt extends StormAgent
                 certObj = stream.getPeerCertificate()
                 cname = certObj.subject.CN
 
-                stream.name = cname
-                server.emit 'newconnection', cname, stream
-
-                @log 'server connected ' + stream.authorized ? 'authorized' : 'unauthorized'
+                @log 'server connected from #{cname}: ' + stream.authorized ? 'authorized' : 'unauthorized'
+                callback new BoltStream cname, stream if callback?
 
             catch error
                 @log 'unable to retrieve peer certificate and authorize connection!'
                 stream.end()
-                return
-
-        server.on 'newconnection', (cname, stream) =>
-            @log 'connection event triggered for: '+ cname
-
-            stream.pipe(mx = MuxDemux()).pipe(stream)
-            @emit 'server.connect', cname, stream, mx
-
-            stream.on "close", =>
-                @log "Bolt client connection is closed for ID: " + stream.name
-                @emit 'server.disconnect', cname, stream, mx
-
-            stream.on 'error', ->
-                mx.destroy()
-
-            #TODO - What happens when Mux goes into error, should we call removeConnection here?
-            mx.on 'error', ->
-                stream.destroy()
 
         server.on 'error', (err) =>
             @log 'server connection error :' + err.message
