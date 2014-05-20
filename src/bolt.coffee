@@ -63,12 +63,19 @@ class BoltStream extends StormData
                 callback err
 
             request.pipe relay
+            firstreply = false
             data = ''
-            relay.on 'data', (chunk) ->
+            relay.on 'data', (chunk) =>
+                unless firstreply
+                    try
+                        firstreply = JSON.parse chunk
+                    catch err
+                        @log "invalid first relay response!", err
+                        relay.destroy()
+                    return
                 data += chunk
-                callback chunk
             relay.on 'end', ->
-                callback data, true
+                callback firstreply, data
             relay.on 'error', (err) ->
                 @log "error during relay multiplexing boltstream...", err
                 callback err
@@ -272,12 +279,11 @@ class StormBolt extends StormAgent
                 return
 
             @log "[proxy] forwarding request to " + cname + " at " + entry.stream.remoteAddress
-            firstreply = false
             request.target = port
-            entry.relay request, (res) =>
-                unless res instanceof Error and firstreply
+            entry.relay request, (reply, body) =>
+                unless reply instanceof Error
                     try
-                        reply = JSON.parse res
+                        reply = JSON.parse reply
                         response.writeHead(reply.statusCode, reply.headers)
                         relay.pipe(response)
                     catch err
