@@ -1,7 +1,7 @@
 {
 	"name": "stormbolt",
 	"description": "stormbolt provides secure messaging overlay networking",
-	"version": "0.2.3",
+	"version": "0.2.5",
 	"author": "Peter K. Lee",
 	"description": "Stormbolt is a web framework for cloud based automation connect bolt client.",
 	"repository": {
@@ -26,11 +26,11 @@
 	},
 	"main": "./lib/bolt",
 	"config": {
-		"uplinks": [ ],
+		"uplinks": [ "127.0.0.1:8017" ],
 		"uplinkStrategy": "round-robin",
 		"allowRelay": true,
 		"relayPort":  8017,
-		"allowedPorts": [ ],
+		"allowedPorts": [ 5000,8000 ],
 		"listenPort": 443,
 		"beaconInterval": 10,
 		"beaconRetry": 3,
@@ -43,8 +43,9 @@
 			"functions": [
 				"agent.connect",
 				"agent.listen",
-				"agent.relay",
-				"agent.clients"
+				"agent.proxy",
+				"agent.clients",
+				"boltstream.relay"
 			],
 			"plugins": [
 				"lib/plugin"
@@ -52,8 +53,8 @@
 		}
 	},
 	"scripts": {
-		"prepublish": "find src -name '*.coffee' | xargs coffee -o lib -c",
-		"start": "node lib/app.js"
+		"prepublish": "mkdir -p lib; coffee -o lib -c src",
+		"start": "node lib/app"
 	},
 	"contributors": [
 		"Geetha Rani",
