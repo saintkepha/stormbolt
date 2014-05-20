@@ -26,7 +26,7 @@ class BoltStream extends StormData
             @bstream.write "beacon:reply"
 
             @emit 'beacon', beacon
-            @validity = @config.beaconValidity # reset
+            #@validity = @config.beaconValidity # reset
 
         @mux.on 'error', (err) =>
             @log "issue with bolt mux channel...", err
@@ -190,6 +190,7 @@ class StormBolt extends StormAgent
                 bolt.validity ?= @config.beaconValidity if @config.beaconValidity
                 @clients.add bolt.id, bolt
                 bolt.on 'beacon', (beacon) =>
+                    bolt.validity = @config.beaconValidity # reset
                     ### not sure if we need this logic...
                     entry = @clients.get bolt.id
                     entry.validity = @config.beaconValidity
