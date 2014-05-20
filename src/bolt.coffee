@@ -55,7 +55,6 @@ class BoltStream extends StormData
                 url:     request.url,
                 headers: request.headers
 
-            request.setEncoding 'utf8'
             request.pipe relay
             data = ''
             relay.on 'data', (chunk) ->
