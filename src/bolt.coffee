@@ -66,19 +66,18 @@ class BoltStream extends StormData
 
             request.pipe(relay)
 
-            header = null
-            body = ''
-            relay.on 'data', (chunk) =>
-                try
-                    unless header
-                        header = JSON.parse chunk
-                        if response?
+            if response?
+                header = null
+                body = ''
+                relay.on 'data', (chunk) =>
+                    try
+                        unless header
+                            header = JSON.parse chunk
                             response.writeHead header.statusCode, header.headers
                             relay.pipe(response)
-                catch err
-                    @log "invalid relay response received from #{@id}"
-                    relay.end()
-
+                    catch err
+                        @log "invalid relay response received from #{@id}"
+                        relay.end()
             return relay
         catch err
             @log "error duing relaying request to boltstream", err
