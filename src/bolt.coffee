@@ -223,7 +223,7 @@ class StormBolt extends StormAgent
                 (next) =>
                     next new Error "retry max exceeded, unable to establish bolt server connection" if retries > 30
                     unless connected
-                        @uplink = @config.uplinks[i++]
+                        uplink = @config.uplinks[i++]
                         [ host, port ] = uplink.split(':')
                         @connect host,port,
                             key: @config.key
@@ -314,12 +314,12 @@ class StormBolt extends StormAgent
         #@log @inspect options
         calledReconnectOnce = false
         stream = tls.connect(port, host, options, =>
+            @uplink =
+                host: host
+                port: port
+                options: options
             if stream.authorized
                 @log "Successfully connected to bolt server"
-                @uplink =
-                    host: host
-                    port: port
-                    options: options
 #                @emit 'client.connection', stream
             else
                 @log "Failed to authorize TLS connection. Could not connect to bolt server (ignored for now)"
