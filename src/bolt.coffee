@@ -285,11 +285,11 @@ class StormBolt extends StormAgent
                 certObj = stream.getPeerCertificate()
                 cname = certObj.subject.CN
 
-                @log 'server connected from #{cname}: ' + stream.authorized ? 'authorized' : 'unauthorized'
+                @log "server connected from #{cname}: " + stream.authorized ? 'unauthorized'
                 callback new BoltStream cname, stream if callback?
 
             catch error
-                @log 'unable to retrieve peer certificate and authorize connection!'
+                @log 'unable to retrieve peer certificate and authorize connection!', error
                 stream.end()
 
         server.on 'error', (err) =>
