@@ -9,6 +9,8 @@ StormData = StormAgent.StormData
 # XXX - for now, only representing the server-side... will refactor for client-side later
 class BoltStream extends StormData
 
+    MuxDemux = require('mux-demux')
+
     constructor: (@id, @stream) ->
         @stream.pipe(@mux = MuxDemux()).pipe(@stream)
 
