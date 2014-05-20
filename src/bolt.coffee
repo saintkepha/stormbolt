@@ -44,6 +44,30 @@ class BoltStream extends StormData
             cname:  @id
             remote: @stream.remoteAddress
 
+    relay: (request, callback) ->
+        @log "relay - forwarding request to #{@id} at #{@stream.remoteAddress}"
+        try
+            relay = @mux.createStream("relay:#{request.target}", {allowHalfOpen:true})
+            relay.write JSON.stringify
+                method:  request.method,
+                url:     request.url,
+                headers: request.headers
+
+            request.setEncoding 'utf8'
+            request.pipe relay
+            data = ''
+            relay.on 'data', (chunk) ->
+                data += chunk
+                callback chunk
+            relay.on 'end', ->
+                callback data, true
+            relay.on 'error', (err) ->
+                @log "error during relay multiplexing boltstream...", err
+                callback err
+        catch err
+            @log "error duing relaying request to boltstream", err
+            callback err
+
     destroy: ->
         try
             @mux.close()
@@ -214,22 +238,6 @@ class StormBolt extends StormAgent
         # check for running the relay proxy
         @proxy(@config.relayPort) if @config.allowRelay
 
-    relay: (request, bolt, callback) ->
-        return unless bolt instanceof BoltStream
-        @log "relay - forwarding request to #{bolt.id} at #{bolt.stream.remoteAddress}"
-        try
-            relay = bolt.mux.createStream("relay:#{request.target}", {allowHalfOpen:true})
-            relay.write JSON.stringify
-                method:  request.method,
-                url:     request.url,
-                headers: request.headers
-
-            request.setEncoding 'utf8'
-            request.pipe relay
-            relay.on 'data', callback
-            relay.on 'error', (err) ->
-                @log "error during relay multiplexing boltstream...", err
-
     proxy: (port) ->
         unless port? and port > 0
             @log "need to pass in valid port for performing relay"
@@ -254,13 +262,13 @@ class StormBolt extends StormAgent
                 return
 
             @log "[proxy] forwarding request to " + cname + " at " + entry.stream.remoteAddress
-            relayreply = null
+            firstreply = false
             request.target = port
-            relay = @relay request, entry, (chunk) =>
-                unless relayreply
+            entry.relay request, (res) =>
+                unless res instanceof Error and firstreply
                     try
-                        relayreply = JSON.parse chunk
-                        response.writeHead(relayResponse.statusCode, relayResponse.headers)
+                        reply = JSON.parse res
+                        response.writeHead(reply.statusCode, reply.headers)
                         relay.pipe(response)
                     catch err
                         @log "invalid relay response!"

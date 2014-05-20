@@ -44,8 +44,8 @@
 				"agent.connect",
 				"agent.listen",
 				"agent.proxy",
-				"agent.relay",
-				"agent.clients"
+				"agent.clients",
+				"boltstream.relay"
 			],
 			"plugins": [
 				"lib/plugin"
