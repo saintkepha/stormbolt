@@ -22,7 +22,7 @@ class BoltStream extends StormData
 
         @bstream = @mux.createStream 'beacon', { allowHalfOpen:true }
         @bstream.on 'data', (beacon) =>
-            @log "received beacon from client: #{cname}"
+            @log "received beacon from client: #{@id}"
             @bstream.write "beacon:reply"
 
             @emit 'beacon', beacon
