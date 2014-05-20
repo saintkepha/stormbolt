@@ -55,7 +55,9 @@ class BoltStream extends StormData
                 url:     request.url,
                 headers: request.headers
 
-            request.setEncoding 'utf8'
+            request.on 'error', (err) ->
+                @log "error processing request via boltstream...", err
+                callback err
             request.pipe relay
             data = ''
             relay.on 'data', (chunk) ->
