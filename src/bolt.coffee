@@ -239,7 +239,6 @@ class StormBolt extends StormAgent
         # after initial data, invoke HTTP server listener on port
         acceptor = http.createServer().listen(port)
         acceptor.on "request", (request,response) =>
-
             target = request.headers['stormbolt-target']
             [ cname, port ] = target.split(':') if target
 
