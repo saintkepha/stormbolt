@@ -89,6 +89,7 @@ class BoltRegistry extends StormRegistry
 
     get: (key) ->
         entry = super key
+        return unless entry?
         cname: key
         ports: entry.capability
         address: entry.data.remote
