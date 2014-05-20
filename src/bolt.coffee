@@ -47,6 +47,8 @@ class BoltStream extends StormData
             remote: @stream.remoteAddress
 
     relay: (request, callback) ->
+        #callback new Error "unable to forward request to #{@id} for unsupported port" unless request.target in @capability
+
         @log "relay - forwarding request to #{@id} at #{@stream.remoteAddress}"
         try
             relay = @mux.createStream("relay:#{request.target}", {allowHalfOpen:true})
@@ -57,7 +59,7 @@ class BoltStream extends StormData
 
             request.on 'error', (err) =>
                 @log "error processing request via boltstream...", err
-                relay.end()
+                relay.destroy()
                 callback err
 
             request.pipe relay
