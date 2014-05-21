@@ -48,17 +48,19 @@ class BoltStream extends StormData
             remote: @stream.remoteAddress
 
     relay: (request, response) ->
-        #callback new Error "unable to forward request to #{@id} for unsupported port" unless request.target in @capability
+        callback new Error "unable to forward request to #{@id} for unsupported port" unless request.target in @capability
         @log "relay - forwarding request to #{@id} at #{@stream.remoteAddress}"
         try
             relay = @mux.createStream("relay:#{request.target}", {allowHalfOpen:true})
+
+            # always start by writing the preamble message to the other end
             relay.write JSON.stringify
                 method: request.method
                 url:    request.url
                 port:   request.port
 
             request.on 'error', (err) =>
-                @log "error processing request via boltstream...", err
+                @log "error relaying request via boltstream...", err
                 relay.destroy()
 
             relay.on 'error', (err) ->
@@ -66,18 +68,27 @@ class BoltStream extends StormData
 
             request.pipe(relay)
 
-            if response?
-                header = null
-                body = ''
-                relay.on 'data', (chunk) =>
-                    try
-                        unless header
-                            header = JSON.parse chunk
-                            response.writeHead header.statusCode, header.headers
+            # always get the reply preamble message from the other end
+            reply =
+                header: null
+                body: ''
+
+            relay.on 'data', (chunk) =>
+                try
+                    unless header
+                        reply.header = JSON.parse chunk
+                        if response? and response.writeHead?
+                            response.writeHead reply.header.statusCode, reply.header.headers
                             relay.pipe(response)
-                    catch err
-                        @log "invalid relay response received from #{@id}"
-                        relay.end()
+                    else
+                        unless response?
+                            reply.body+=chunk
+                catch err
+                    @log "invalid relay response received from #{@id}"
+                    relay.end()
+            relay.on 'end', =>
+                relay.emit 'reply', reply
+
             return relay
         catch err
             @log "error duing relaying request to boltstream", err
@@ -184,7 +195,14 @@ class StormBolt extends StormAgent
                 @config.ca = ca
         catch err
             @log "run - missing proper security credentials, attempting to self-configure..."
-            @activate null, (err, storm) =>
+            storm = null
+            ### uncomment during dev/testing
+            storm =
+                tracker: "https://stormtracker.dev.intercloud.net"
+                skey: "some-serial-number"
+                token:"some-valid-token"
+            ###
+            @activate storm, (err, storm) =>
                 unless err
                     @on "error", (err) =>
                         @log "run - bolt fizzled... should do something smart here"
@@ -204,11 +222,6 @@ class StormBolt extends StormAgent
                 @clients.add bolt.id, bolt
                 bolt.on 'beacon', (beacon) =>
                     bolt.validity = @config.beaconValidity # reset
-                    ### not sure if we need this logic...
-                    entry = @clients.get bolt.id
-                    entry.validity = @config.beaconValidity
-                    @clients.update bolt.id, entry
-                    ###
                 bolt.on 'close', (err) =>
                     @clients.remove bolt.id
                 bolt.on 'error', (err) =>
@@ -272,7 +285,7 @@ class StormBolt extends StormAgent
             target = request.headers['stormbolt-target']
             [ cname, port ] = target.split(':') if target
 
-            entry = @clients.get cname
+            entry = @clients.entries[cname]
             unless entry
                 error = "no such stormfbolt-target [#{target}] currently connected!"
                 @log "error:", error
@@ -285,15 +298,7 @@ class StormBolt extends StormAgent
 
             @log "[proxy] forwarding request to " + cname + " at " + entry.stream.remoteAddress
             request.target = port
-            entry.relay request, response, (reply, body) =>
-                unless reply instanceof Error
-                    try
-                        reply = JSON.parse reply
-                        response.writeHead(reply.statusCode, reply.headers)
-                        relay.pipe(response)
-                    catch err
-                        @log "invalid relay response!"
-                        relay.end()
+            entry.relay request, response
 
     # Method to start bolt server
     listen: (port, options, callback) ->
