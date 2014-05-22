@@ -231,12 +231,14 @@ class StormBolt extends StormAgent
                 skey: "some-serial-number"
                 token:"some-valid-token"
             ###
-            @activate storm, (err, storm) =>
-                unless err
-                    @on "error", (err) =>
-                        @log "run - bolt fizzled... should do something smart here"
-                    @run storm.bolt
+            @activate storm, (storm) =>
+                # try running again...
+                @run storm.bolt if storm?
             return
+
+        # register one-time event handler for the overall agent... NOT SURE IF NEEDED!
+        @once "error", (err) =>
+            @log "run - bolt fizzled... should do something smart here"
 
         # check for bolt server config
         if @config.listenPort? and @config.listenPort > 0
