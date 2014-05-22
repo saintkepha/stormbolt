@@ -1,4 +1,3 @@
-
 #Workaround - fix it later, Avoids DEPTH_ZERO_SELF_SIGNED_CERT error for self-signed certs
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 
@@ -12,26 +11,20 @@ class BoltStream extends StormData
     MuxDemux = require('mux-demux')
 
     constructor: (@id, @stream) ->
+        @ready = false
+        @capability = []
+        @monitoring = false
+
         @stream.pipe(@mux = MuxDemux()).pipe(@stream)
 
-        @cstream = @mux.createReadStream 'capability'
-        @cstream.on 'data', (capa) =>
-            @log "received capability info from client:", capa
+        cstream = @mux.createReadStream 'capability'
+        cstream.on 'data', (capa) =>
+            @log "received capability info from peer:", capa
             @capability = capa.split(',') ? []
             @emit 'capability', capa
-
-        @bstream = @mux.createStream 'beacon', { allowHalfOpen:true }
-        @bstream.on 'data', (beacon) =>
-            @log "received beacon from client: #{@id}"
-            @bstream.write "beacon:reply"
-
-            @emit 'beacon', beacon
-            #@validity = @config.beaconValidity # reset
-
-        @mux.on 'error', (err) =>
-            @log "issue with bolt mux channel...", err
-            @stream.destroy()
-            @emit 'error', err
+            unless @ready
+                ready = true
+                @emit 'ready'
 
         @stream.on 'close', =>
             @log "bolt stream closed for #{@id} to #{@stream.remoteAddress}"
@@ -43,9 +36,43 @@ class BoltStream extends StormData
             @mux.destroy()
             @emit 'error', err
 
+        @mux.on 'error', (err) =>
+            @log "issue with bolt mux channel...", err
+            @stream.destroy()
+            @emit 'error', err
+
         super @id,
             cname:  @id
             remote: @stream.remoteAddress
+
+    monitor: (interval, period) ->
+        return if @monitoring
+        @monitoring = true
+        validity = period
+
+        # setup the beacon channel with the peer and start collecting beacons
+        bstream = @mux.createStream 'beacon', { allowHalfOpen:true }
+        bstream.on 'data', (beacon) =>
+            @log "monitor - received beacon from client: #{@id}"
+            bstream.write "beacon:reply"
+            @emit 'beacon', beacon
+            validity = period # reset
+
+        # start the validity count-down...
+        async.whilst(
+            () => # test condition
+                validity > 0
+            (repeat) =>
+                validity -= interval / 1000
+                @log "monitor - #{@id} has validity=#{validity}"
+                setTimeout repeat, interval
+            (err) =>
+                @log "monitor - #{@id} has expired and being destroyed..."
+                bstream.close()
+                @destroy()
+                @emit 'expired'
+                @monitoring = false
+        )
 
     relay: (request, response) ->
         @log "relay - forwarding request to #{@id} at #{@stream.remoteAddress}"
@@ -97,6 +124,7 @@ class BoltStream extends StormData
     destroy: ->
         try
             @mux.close()
+            @stream.close()
             @stream.destroy()
         catch err
             @log "unable to properly terminate bolt stream: #{bolt.id}", err
@@ -219,14 +247,16 @@ class StormBolt extends StormAgent
                 requestCert: true
                 rejectUnauthorized: true
                , (bolt) =>
-                bolt.validity ?= @config.beaconValidity if @config.beaconValidity
-                @clients.add bolt.id, bolt
-                bolt.on 'beacon', (beacon) =>
-                    bolt.validity = @config.beaconValidity # reset
-                bolt.on 'close', (err) =>
-                    @clients.remove bolt.id
-                bolt.on 'error', (err) =>
-                    @clients.remove bolt.id
+                bolt.once 'ready', =>
+                    # starts the bolt self-monitoring and initiates beacons request
+                    bolt.monitor @config.repeatdelay, @config.beaconValidity
+                    # after initialization complete, THEN we add to our clients!
+                    @clients.add bolt.id, bolt
+                    # we register for bolt close/error event only after it's ready and added...
+                    bolt.once 'close', (err) =>
+                        @clients.remove bolt.id
+                    bolt.once 'error', (err) =>
+                        @clients.remove bolt.id
 
             server.on 'error', (err) =>
                 @log "fatal issue with bolt server: "+err
@@ -234,7 +264,9 @@ class StormBolt extends StormAgent
                 @emit 'server.error', err
 
             # start client connection expiry checker
-            @clients.expires @config.repeatdelay
+            #
+            # XXX - this is no longer needed since each BoltStream self monitors!
+            #@clients.expires @config.repeatdelay
 
 
         # check for client uplink to bolt server
