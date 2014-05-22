@@ -313,6 +313,7 @@ class StormBolt extends StormAgent
                         (repeat) =>
                             uplink = @config.uplinks[i++]
                             [ host, port ] = uplink.split(':')
+                            port ?= 443 # default port to try
                             @connect host,port,
                                 key: @config.key
                                 cert: @config.cert
