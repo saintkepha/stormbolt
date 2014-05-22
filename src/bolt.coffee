@@ -244,8 +244,7 @@ class StormBolt extends StormAgent
                 token:"some-valid-token"
             ###
             @activate storm, (storm) =>
-                # try running again...
-                @run storm.bolt if storm?
+                @run storm.bolt
             return
 
         # register one-time event handler for the overall agent... NOT SURE IF NEEDED!
