@@ -15,10 +15,11 @@
             @send 404
 
     # proxy operation for stormflash requests
-    @all '/proxy/:id/*': ->
+    @all '/proxy/:id@:port/*': ->
         bolt = agent.clients.entries[@params.id]
-        if bolt? and bolt.relay?
-            @req.target = 8000
+        port = (Number) @params.port
+        if bolt? and bolt.relay? and port in bolt.capability
+            @req.target = port
             @req.url = @params[0]
             # pipes @req stream via bolt back up to @res stream
             bolt.relay @req, @res

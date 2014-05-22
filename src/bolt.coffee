@@ -48,11 +48,12 @@ class BoltStream extends StormData
             remote: @stream.remoteAddress
 
     relay: (request, response) ->
-        callback new Error "unable to forward request to #{@id} for unsupported port" unless request.target in @capability
         @log "relay - forwarding request to #{@id} at #{@stream.remoteAddress}"
         try
-            relay = @mux.createStream("relay:#{request.target}", {allowHalfOpen:true})
+            unless request.target in @capability
+                throw new Error "unable to forward request to #{@id} for unsupported port: #{request.target}"
 
+            relay = @mux.createStream("relay:#{request.target}", {allowHalfOpen:true})
             # always start by writing the preamble message to the other end
             relay.write JSON.stringify
                 method: request.method
@@ -75,7 +76,7 @@ class BoltStream extends StormData
 
             relay.on 'data', (chunk) =>
                 try
-                    unless header
+                    unless reply.header
                         reply.header = JSON.parse chunk
                         if response? and response.writeHead?
                             response.writeHead reply.header.statusCode, reply.header.headers
@@ -84,7 +85,7 @@ class BoltStream extends StormData
                         unless response?
                             reply.body+=chunk
                 catch err
-                    @log "invalid relay response received from #{@id}"
+                    @log "invalid relay response received from #{@id}:", err
                     relay.end()
             relay.on 'end', =>
                 relay.emit 'reply', reply
@@ -286,8 +287,8 @@ class StormBolt extends StormAgent
             [ cname, port ] = target.split(':') if target
 
             entry = @clients.entries[cname]
-            unless entry
-                error = "no such stormfbolt-target [#{target}] currently connected!"
+            unless entry and port in entry.capability
+                error = "stormfbolt-target [#{target}] cannot be reached!"
                 @log "error:", error
                 response.writeHead(404, {
                     'Content-Length': error.length,
@@ -296,7 +297,7 @@ class StormBolt extends StormAgent
                 response.end(error,"utf8")
                 return
 
-            @log "[proxy] forwarding request to " + cname + " at " + entry.stream.remoteAddress
+            @log "[proxy] forwarding request to #{cname} #{entry.stream.remoteAddress}"
             request.target = port
             entry.relay request, response
 
