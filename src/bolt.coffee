@@ -375,8 +375,12 @@ class StormBolt extends StormAgent
                 @log 'unable to retrieve peer certificate and authorize connection!', error
                 stream.end()
 
+        server.on 'clientError', (exception, securePair) =>
+            @log 'TLS handshake error:', exception
+            @log 'TLS error with securePair:', securePair
+
         server.on 'error', (err) =>
-            @log 'server connection error :' + err.message
+            @log 'TLS server connection error :' + err.message
             try
                 message = String(err.message)
                 if (message.indexOf ('ECONNRESET')) >= 0
