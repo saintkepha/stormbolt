@@ -75,12 +75,24 @@ class BoltStream extends StormData
         )
 
     relay: (request, response) ->
-        @log "relay - forwarding request to #{@id} at #{@stream.remoteAddress}"
+        unless @ready
+            throw new Error "cannot relay to unready boltstream..."
         try
+            @log "relay - forwarding request to #{@id} at #{@stream.remoteAddress} for #{request.url}"
             unless request.target in @capability
                 throw new Error "unable to forward request to #{@id} for unsupported port: #{request.target}"
 
             relay = @mux.createStream("relay:#{request.target}", {allowHalfOpen:true})
+
+            unless request.url
+                @log "no request.url is set!"
+                request.url = '/'
+
+            if typeof request.url is 'string'
+                url = require('url').parse request.url
+                url.pathname = '/'+url.pathname unless /^\//.test url.pathname
+                url.path = '/'+url.path unless /^\//.test url.pathname
+                request.url = require('url').format url
             # always start by writing the preamble message to the other end
             relay.write JSON.stringify
                 method: request.method
@@ -255,9 +267,11 @@ class StormBolt extends StormAgent
                     # after initialization complete, THEN we add to our clients!
                     @clients.add bolt.id, bolt
                     # we register for bolt close/error event only after it's ready and added...
-                    bolt.once 'close', (err) =>
+                    bolt.on 'close', (err) =>
+                        @log "bolt.close on #{bolt.id}:",err
                         @clients.remove bolt.id
-                    bolt.once 'error', (err) =>
+                    bolt.on 'error', (err) =>
+                        @log "bolt.error on #{bolt.id}:",err
                         @clients.remove bolt.id
 
             server.on 'error', (err) =>
@@ -394,6 +408,12 @@ class StormBolt extends StormAgent
 
             forwardingPorts = @config.allowedPorts
 
+            mx.on "error", (err) =>
+                @log "MUX ERROR:", err
+                mx.destroy()
+                stream.destroy()
+                @emit 'client.disconnect', stream
+
             mx.on "connection", (_stream) =>
                 [ action, target ] = _stream.meta.split(':')
                 @log "Client: action #{action}  target #{target}"
@@ -456,13 +476,16 @@ class StormBolt extends StormAgent
                                 incoming += chunk
 
                         _stream.on 'end',  =>
-                            @log "relaying following request to local:#{target} - "
+                            @log "relaying following request to localhost:#{target} - ", request
 
-                            roptions = url.parse request.url
+                            if typeof request.url is 'object'
+                                roptions = url.format request.url
+                            else
+                                roptions = url.parse request.url
                             roptions.method = request.method
                             roptions.headers = request.headers
                             roptions.agent = false
-                            roptions.port = target
+                            roptions.port ?= target
 
                             @log JSON.stringify roptions
 
