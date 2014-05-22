@@ -240,7 +240,7 @@ class StormBolt extends StormAgent
                 skey: "some-serial-number"
                 token:"some-valid-token"
             ###
-            selfconfig = ->
+            selfconfig = =>
                 @activate storm, (storm) =>
                     @run storm.bolt
 
