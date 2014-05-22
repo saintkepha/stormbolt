@@ -212,9 +212,6 @@ class StormBolt extends StormAgent
             @log 'run - validation of runtime config:', res
             @config = extend(@config, config) if res.valid
 
-        # start the agent web api instance...
-        super config
-
         try
             @log 'run - validating security credentials...'
             unless @config.cert instanceof Buffer
@@ -243,9 +240,20 @@ class StormBolt extends StormAgent
                 skey: "some-serial-number"
                 token:"some-valid-token"
             ###
-            @activate storm, (storm) =>
-                @run storm.bolt
+            selfconfig = ->
+                @activate storm, (storm) =>
+                    @run storm.bolt
+
+            if @state.activated
+                @state.activated = false
+                @log "previous activation attempt failed... retrying in 60 seconds"
+                setTimeout selfconfig, 60000
+            else
+                selfconfig()
             return
+
+        # start the agent web api instance...
+        super config
 
         # register one-time event handler for the overall agent... NOT SURE IF NEEDED!
         @once "error", (err) =>
