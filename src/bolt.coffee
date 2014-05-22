@@ -20,15 +20,15 @@ class BoltStream extends StormData
 
         cstream = @mux.createReadStream 'capability'
         cstream.on 'data', (capa) =>
-            @log "received capability info from peer:", capa
-            @capability = capa.split(',') ? []
+            @log "received capability info from peer: #{capa}"
+            @capability = capa.split(',').map (entry) -> (Number) entry
             @emit 'capability', capa
             unless @ready
-                ready = true
+                @ready = true
                 @emit 'ready'
 
         @stream.on 'close', =>
-            @log "bolt stream closed for #{@id} to #{@stream.remoteAddress}"
+            @log "bolt stream closed for #{@id}"
             @destroy()
             @emit 'close'
 
@@ -62,14 +62,13 @@ class BoltStream extends StormData
         # start the validity count-down...
         async.whilst(
             () => # test condition
-                validity > 0
+                validity > 0 and @monitoring and @ready
             (repeat) =>
                 validity -= interval / 1000
                 @log "monitor - #{@id} has validity=#{validity}"
                 setTimeout repeat, interval
             (err) =>
                 @log "monitor - #{@id} has expired and being destroyed..."
-                bstream.close()
                 @destroy()
                 @emit 'expired'
                 @monitoring = false
@@ -124,11 +123,11 @@ class BoltStream extends StormData
 
     destroy: ->
         try
-            @mux.close()
-            @stream.close()
+            @ready = @monitoring = false
+            @mux.destroy()
             @stream.destroy()
         catch err
-            @log "unable to properly terminate bolt stream: #{bolt.id}", err
+            @log "unable to properly terminate bolt stream: #{@id}", err
 
 StormRegistry = StormAgent.StormRegistry
 
