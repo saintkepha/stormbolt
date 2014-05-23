@@ -1,6 +1,3 @@
-#Workaround - fix it later, Avoids DEPTH_ZERO_SELF_SIGNED_CERT error for self-signed certs
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
-
 StormAgent = require 'stormagent'
 
 StormData = StormAgent.StormData
@@ -197,6 +194,10 @@ class StormBolt extends StormAgent
 
         @repeatInterval = 5 # in seconds
         @clients = new BoltRegistry
+
+        if @config.insecure
+            #Workaround - fix it later, Avoids DEPTH_ZERO_SELF_SIGNED_CERT error for self-signed certs
+            process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 
     status: ->
         state = super

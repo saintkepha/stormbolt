@@ -5,8 +5,10 @@
     agent = @settings.agent
 
     @head '/clients': ->
-        @res.header 'Content-MD5', agent.clients.checksum()
-        @res.send ''
+        checksum = agent.clients.checksum()
+        agent.log "checksum: #{checksum}"
+        @res.set 'Content-MD5', checksum
+        @send ''
 
     @get '/clients': ->
         @send agent.clients.list()

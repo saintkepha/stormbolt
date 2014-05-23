@@ -26,6 +26,7 @@
 	},
 	"main": "./lib/bolt",
 	"config": {
+		"insecure": false,
 		"uplinks": [ "127.0.0.1:443" ],
 		"uplinkStrategy": "round-robin",
 		"allowRelay": false,
