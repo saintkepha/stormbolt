@@ -31,12 +31,12 @@ class BoltStream extends StormData
 
         @stream.on 'error', (err) =>
             @log "issue with underlying bolt stream...", err
-            @mux.destroy()
+            @destroy()
             @emit 'error', err
 
         @mux.on 'error', (err) =>
             @log "issue with bolt mux channel...", err
-            @stream.destroy()
+            @destroy()
             @emit 'error', err
 
         super @id,
@@ -206,12 +206,8 @@ class StormBolt extends StormAgent
         state
 
     run: (config) ->
-
-        if config?
-            @log 'run called with:', config
-            res = validate config, schema
-            @log 'run - validation of runtime config:', res
-            @config = extend(@config, config) if res.valid
+        # start the agent web api instance...
+        super config, schema
 
         try
             @log 'run - validating security credentials...'
@@ -252,9 +248,6 @@ class StormBolt extends StormAgent
             else
                 selfconfig()
             return
-
-        # start the agent web api instance...
-        super config
 
         # register one-time event handler for the overall agent... NOT SURE IF NEEDED!
         @once "error", (err) =>
@@ -376,9 +369,8 @@ class StormBolt extends StormAgent
                 @log 'unable to retrieve peer certificate and authorize connection!', error
                 stream.end()
 
-        server.on 'clientError', (exception, securePair) =>
+        server.on 'clientError', (exception) =>
             @log 'TLS handshake error:', exception
-            @log 'TLS error with securePair:', securePair
 
         server.on 'error', (err) =>
             @log 'TLS server connection error :' + err.message
@@ -565,3 +557,35 @@ class StormBolt extends StormAgent
         stream
 
 module.exports = StormBolt
+
+#-------------------------------------------------------------------------------------------
+
+if require.main is module
+
+    ###
+    argv = require('minimist')(process.argv.slice(2))
+    if argv.h?
+        console.log """
+            -h view this help
+            -p port number
+            -l logfile
+            -d datadir
+        """
+        return
+
+    config = {}
+    config.port    = argv.p ? 5000
+    config.logfile = argv.l ? "/var/log/stormbolt.log"
+    config.datadir = argv.d ? "/var/stormstack"
+    ###
+
+    config = null
+    storm = null # override during dev
+    agent = new StormBolt config
+    agent.run storm
+
+    # Garbage collect every 2 sec
+    # Run node with --expose-gc
+    setInterval (
+        () -> gc()
+    ), 2000 if gc?

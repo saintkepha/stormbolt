@@ -1,7 +1,7 @@
 {
 	"name": "stormbolt",
 	"description": "stormbolt provides secure messaging overlay networking",
-	"version": "0.2.8",
+	"version": "0.2.9",
 	"author": "Peter K. Lee",
 	"description": "Stormbolt is a web framework for cloud based automation connect bolt client.",
 	"repository": {
@@ -24,7 +24,7 @@
 	"engines": {
 		"node": ">=0.6.x"
 	},
-	"main": "./lib/bolt",
+	"main": "./lib/stormbolt",
 	"config": {
 		"insecure": false,
 		"uplinks": [ "127.0.0.1:443" ],
@@ -55,7 +55,7 @@
 	},
 	"scripts": {
 		"prepublish": "mkdir -p lib; coffee -o lib -c src",
-		"start": "node lib/app"
+		"start": "node lib/stormbolt"
 	},
 	"contributors": [
 		"Geetha Rani",
