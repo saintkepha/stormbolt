@@ -358,7 +358,6 @@ class StormBolt extends StormAgent
         server = tls.createServer options, (stream) =>
             try
                 @log "TLS connection established with VCG client from: " + stream.remoteAddress
-                @log 'Debugging null certs issue : server authorizationError: ' + stream.authorizationError
                 certObj = stream.getPeerCertificate()
                 cname = certObj.subject.CN
 
