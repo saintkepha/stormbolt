@@ -153,7 +153,7 @@ class BoltRegistry extends StormRegistry
         return unless entry?
         cname: key
         ports: entry.capability
-        address: entry.data.remote
+        address: entry.data.remote if entry.data?
         validity: entry.validity
 
 #-----------------------------------------------------------------
