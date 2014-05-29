@@ -187,6 +187,7 @@ class StormBolt extends StormAgent
             relayPort:      { type: "integer" }
             allowedPorts:   { type: "array" }
             listenPort:     { type: "integer" }
+            beaconValidity: { type: "integer" }
             beaconInterval: { type: "integer" }
             beaconRetry:    { type: "integer" }
 
