@@ -28,6 +28,6 @@
             @req.target = port
             @req.url = @params[0]
             # pipes @req stream via bolt back up to @res stream
-            bolt.relay @req, @res
+            bolt.relay @req, @body, @res
         else
             @send 404

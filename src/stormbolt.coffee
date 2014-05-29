@@ -71,7 +71,7 @@ class BoltStream extends StormData
                 @monitoring = false
         )
 
-    relay: (request, response) ->
+    relay: (request,body,response) ->
         unless @ready
             throw new Error "cannot relay to unready boltstream..."
         try
@@ -104,6 +104,10 @@ class BoltStream extends StormData
                 @log "error during relay multiplexing boltstream...", err
 
             request.pipe(relay)
+           
+            #For POST method, we should write the body also.
+            relay.write JSON.stringify body if body?
+
 
             # always get the reply preamble message from the other end
             reply =
