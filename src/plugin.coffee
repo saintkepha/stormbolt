@@ -27,7 +27,8 @@
         if bolt? and bolt.relay? and port in bolt.capability
             @req.target = port
             @req.url = @params[0]
+            @req.data = @body
             # pipes @req stream via bolt back up to @res stream
-            bolt.relay @req, @body, @res
+            bolt.relay @req, @res
         else
             @send 404

@@ -71,7 +71,7 @@ class BoltStream extends StormData
                 @monitoring = false
         )
 
-    relay: (request,body,response) ->
+    relay: (request,response) ->
         unless @ready
             throw new Error "cannot relay to unready boltstream..."
         try
@@ -95,6 +95,7 @@ class BoltStream extends StormData
                 method: request.method
                 url:    request.url
                 port:   request.port
+                data:   request.data
 
             request.on 'error', (err) =>
                 @log "error relaying request via boltstream...", err
@@ -103,11 +104,8 @@ class BoltStream extends StormData
             relay.on 'error', (err) ->
                 @log "error during relay multiplexing boltstream...", err
 
-            request.pipe(relay)
-           
-            #For POST method, we should write the body also.
-            relay.write JSON.stringify body if body?
-
+            #request.pipe(relay)
+            relay.end()
 
             # always get the reply preamble message from the other end
             reply =
@@ -492,7 +490,9 @@ class StormBolt extends StormAgent
                             else
                                 roptions = url.parse request.url
                             roptions.method = request.method
-                            roptions.headers = request.headers
+                            # hard coded the header option..
+                            roptions.headers =
+                                'Content-Type':'application/json'
                             roptions.agent = false
                             roptions.port ?= target
 
@@ -511,7 +511,7 @@ class StormBolt extends StormAgent
                                     catch err
                                         @log "unable to write response back to requestor upstream bolt! error: " + err
 
-                            relay.write incoming if incoming
+                            relay.write JSON.stringify request.data if request.data?
                             relay.end()
 
                             relay.on 'end', =>
