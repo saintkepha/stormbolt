@@ -592,4 +592,4 @@ if require.main is module
     # Run node with --expose-gc
     setInterval (
         () -> gc()
-    ), 2000 if gc?
+    ), 60000 if gc?
