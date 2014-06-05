@@ -13,6 +13,16 @@ class BoltStream extends StormData
         @capability = []
         @monitoring = false
 
+        @stream.on 'error', (err) =>
+            @log "issue with underlying bolt stream...", err
+            @destroy()
+            @emit 'error', err
+
+        @stream.on 'close', =>
+            @log "bolt stream closed for #{@id}"
+            @destroy()
+            @emit 'close'
+
         @stream.pipe(@mux = MuxDemux()).pipe(@stream)
 
         cstream = @mux.createReadStream 'capability'
@@ -23,16 +33,6 @@ class BoltStream extends StormData
             unless @ready
                 @ready = true
                 @emit 'ready'
-
-        @stream.on 'close', =>
-            @log "bolt stream closed for #{@id}"
-            @destroy()
-            @emit 'close'
-
-        @stream.on 'error', (err) =>
-            @log "issue with underlying bolt stream...", err
-            @destroy()
-            @emit 'error', err
 
         @mux.on 'error', (err) =>
             @log "issue with bolt mux channel...", err
@@ -197,6 +197,7 @@ class StormBolt extends StormAgent
 
         @repeatInterval = 5 # in seconds
         @clients = new BoltRegistry
+        @state.haveCredentials = false
 
         if @config.insecure
             #Workaround - fix it later, Avoids DEPTH_ZERO_SELF_SIGNED_CERT error for self-signed certs
@@ -209,123 +210,137 @@ class StormBolt extends StormAgent
         state
 
     run: (config) ->
-        # start the agent web api instance...
+        # first try using the passed in config, get it validated and start the underlying agent
         super config, schema
 
-        try
-            @log 'run - validating security credentials...'
-            unless @config.cert instanceof Buffer
-                @config.cert = fs.readFileSync "#{@config.cert}",'utf8'
+        async.until(
+            () => # test condition
+                @state.haveCredentials
 
-            unless @config.key instanceof Buffer
-                @config.key =  fs.readFileSync "#{@config.key}",'utf8'
+            (repeat) => # repeat function
+                try
+                    @log 'run - validating security credentials...'
+                    unless @config.cert instanceof Buffer
+                        @config.cert = fs.readFileSync "#{@config.cert}",'utf8'
 
-            unless @config.ca instanceof Buffer
-                ca = []
-                chain = fs.readFileSync "#{@config.ca}", 'utf8'
-                chain = chain.split "\n"
-                cacert = []
-                for line in chain when line.length isnt 0
-                    cacert.push line
-                    if line.match /-END CERTIFICATE-/
-                        ca.push cacert.join "\n"
+                    unless @config.key instanceof Buffer
+                        @config.key =  fs.readFileSync "#{@config.key}",'utf8'
+
+                    unless @config.ca instanceof Buffer
+                        ca = []
+                        chain = fs.readFileSync "#{@config.ca}", 'utf8'
+                        chain = chain.split "\n"
                         cacert = []
-                @config.ca = ca
-        catch err
-            @log "run - missing proper security credentials, attempting to self-configure..."
-            storm = null
-            ### uncomment during dev/testing
-            storm =
-                tracker: "https://stormtracker.dev.intercloud.net"
-                skey: "some-serial-number"
-                token:"some-valid-token"
-            ###
-            selfconfig = =>
-                @activate storm, (storm) =>
-                    @run storm.bolt
+                        for line in chain when line.length isnt 0
+                            cacert.push line
+                            if line.match /-END CERTIFICATE-/
+                                ca.push cacert.join "\n"
+                                cacert = []
+                        @config.ca = ca
 
-            if @state.activated
-                @state.activated = false
-                @log "previous activation attempt failed... retrying in 60 seconds"
-                setTimeout selfconfig, 60000
-            else
-                selfconfig()
-            return
+                    # if we get here, we've got something
+                    @state.haveCredentials = true
+                    repeat()
+                catch err
+                    @log "run - missing proper security credentials, attempting to self-configure..."
+                    storm = null
+                    ### uncomment during dev/testing
+                    storm =
+                        tracker: "https://stormtracker.dev.intercloud.net"
+                        skey: "some-serial-number"
+                        token:"some-valid-token"
+                    ###
+                    @activate storm, (storm) =>
+                        # first, validate whether the storm config is proper
+                        if @validate storm.bolt, schema
+                            @config = extend @config, storm.bolt
+                            repeat()
+                        else
+                            @log "invalid 'storm.bolt' configuration retrieved during activation! (retry in 30 seconds)"
+                            @state.activated = false
+                            setTimeout repeat, 30000
+            (err) =>
+                if err? and err instanceof Error
+                    @log "FATAL ERROR during stormbolt.run!"
+                    return throw err
+
+                # here we start the main run logic for stormbolt
+                # check for bolt server config
+                if @config.listenPort? and @config.listenPort > 0
+                    server = @listen @config.listenPort,
+                        key: @config.key
+                        cert: @config.cert
+                        ca: @config.ca
+                        requestCert: true
+                        rejectUnauthorized: true
+                       , (bolt) =>
+                        bolt.once 'ready', =>
+                            # starts the bolt self-monitoring and initiates beacons request
+                            bolt.monitor @config.repeatdelay, @config.beaconValidity
+                            # after initialization complete, THEN we add to our clients!
+                            @clients.add bolt.id, bolt
+                            # we register for bolt close/error event only after it's ready and added...
+                            bolt.on 'close', (err) =>
+                                @log "bolt.close on #{bolt.id}:",err
+                                @clients.remove bolt.id
+                            bolt.on 'error', (err) =>
+                                @log "bolt.error on #{bolt.id}:",err
+                                @clients.remove bolt.id
+
+                    server.on 'error', (err) =>
+                        @log "fatal issue with bolt server: "+err
+                        @clients.running = false
+                        @emit 'server.error', err
+
+                    # start client connection expiry checker
+                    #
+                    # XXX - this is no longer needed since each BoltStream self monitors!
+                    #@clients.expires @config.repeatdelay
+
+
+                # check for client uplink to bolt server
+                if @config.uplinks? and @config.uplinks.length > 0
+
+                    [ i, retries ] = [ 0, 0 ]
+
+                    @connected = false
+                    @on 'client.connection', (stream) =>
+                        @connected = true
+                        retries = 0
+                    @on 'client.disconnect', (stream) =>
+                        @connected = false
+
+                    async.forever(
+                        (next) =>
+                            next new Error "retry max exceeded, unable to establish bolt server connection" if retries > 30
+                            async.until(
+                                () =>
+                                    @connected
+                                (repeat) =>
+                                    uplink = @config.uplinks[i++]
+                                    [ host, port ] = uplink.split(':')
+                                    port ?= 443 # default port to try
+                                    @connect host,port,
+                                        key: @config.key
+                                        cert: @config.cert
+                                        ca: @config.ca
+                                        requestCert: true
+                                    i = 0 unless i < @config.uplinks.length
+                                    setTimeout(repeat, 5000)
+                                (err) =>
+                                    setTimeout(next, 5000)
+                            )
+                        (err) =>
+                            @emit 'error', err if err?
+                    )
+                # check for running the relay proxy
+                @proxy(@config.relayPort) if @config.allowRelay
+        )
 
         # register one-time event handler for the overall agent... NOT SURE IF NEEDED!
         @once "error", (err) =>
             @log "run - bolt fizzled... should do something smart here"
 
-        # check for bolt server config
-        if @config.listenPort? and @config.listenPort > 0
-            server = @listen @config.listenPort,
-                key: @config.key
-                cert: @config.cert
-                ca: @config.ca
-                requestCert: true
-                rejectUnauthorized: true
-               , (bolt) =>
-                bolt.once 'ready', =>
-                    # starts the bolt self-monitoring and initiates beacons request
-                    bolt.monitor @config.repeatdelay, @config.beaconValidity
-                    # after initialization complete, THEN we add to our clients!
-                    @clients.add bolt.id, bolt
-                    # we register for bolt close/error event only after it's ready and added...
-                    bolt.on 'close', (err) =>
-                        @log "bolt.close on #{bolt.id}:",err
-                        @clients.remove bolt.id
-                    bolt.on 'error', (err) =>
-                        @log "bolt.error on #{bolt.id}:",err
-                        @clients.remove bolt.id
-
-            server.on 'error', (err) =>
-                @log "fatal issue with bolt server: "+err
-                @clients.running = false
-                @emit 'server.error', err
-
-            # start client connection expiry checker
-            #
-            # XXX - this is no longer needed since each BoltStream self monitors!
-            #@clients.expires @config.repeatdelay
-
-
-        # check for client uplink to bolt server
-        if @config.uplinks? and @config.uplinks.length > 0
-
-            [ i, retries ] = [ 0, 0 ]
-
-            connected = false
-            @on 'client.connection', (stream) =>
-                connected = true
-                retries = 0
-            @on 'client.disconnect', (stream) =>
-                connected = false
-
-            async.forever(
-                (next) =>
-                    next new Error "retry max exceeded, unable to establish bolt server connection" if retries > 30
-                    async.until(
-                        () ->
-                            connected
-                        (repeat) =>
-                            uplink = @config.uplinks[i++]
-                            [ host, port ] = uplink.split(':')
-                            port ?= 443 # default port to try
-                            @connect host,port,
-                                key: @config.key
-                                cert: @config.cert
-                                ca: @config.ca
-                                requestCert: true
-                            i = 0 unless i < @config.uplinks.length
-                            setTimeout(repeat, 5000)
-                        (err) =>
-                            setTimeout(next, 5000)
-                    )
-                (err) =>
-                    @emit 'error', err if err?
-            )
-        # check for running the relay proxy
-        @proxy(@config.relayPort) if @config.allowRelay
 
     proxy: (port) ->
         unless port? and port > 0
@@ -359,6 +374,10 @@ class StormBolt extends StormAgent
         @log "server port:" + port
         #@log "options: " + @inspect options
         server = tls.createServer options, (stream) =>
+            stream.on 'error', (err) =>
+                @log "unhandled exception with TLS...", err
+                stream.end()
+
             try
                 @log "TLS connection established with VCG client from: " + stream.remoteAddress
                 certObj = stream.getPeerCertificate()
