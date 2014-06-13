@@ -29,6 +29,9 @@
             @req.url = @params[0]
             @req.data = @body
             # pipes @req stream via bolt back up to @res stream
-            bolt.relay @req, @res
+            try
+                bolt.relay @req, @res
+            catch err
+                @send err
         else
             @send 404

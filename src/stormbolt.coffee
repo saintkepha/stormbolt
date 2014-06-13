@@ -74,63 +74,63 @@ class BoltStream extends StormData
     relay: (request,response) ->
         unless @ready
             throw new Error "cannot relay to unready boltstream..."
-        try
-            @log "relay - forwarding request to #{@id} at #{@stream.remoteAddress} for #{request.url}"
-            unless request.target in @capability
-                throw new Error "unable to forward request to #{@id} for unsupported port: #{request.target}"
 
-            relay = @mux.createStream("relay:#{request.target}", {allowHalfOpen:true})
+        @log "relay - forwarding request to #{@id} at #{@stream.remoteAddress} for #{request.url}"
+        unless request.target in @capability
+            throw new Error "unable to forward request to #{@id} for unsupported port: #{request.target}"
 
-            unless request.url
-                @log "no request.url is set!"
-                request.url = '/'
+        relay = @mux.createStream("relay:#{request.target}", {allowHalfOpen:true})
 
-            if typeof request.url is 'string'
-                url = require('url').parse request.url
-                url.pathname = '/'+url.pathname unless /^\//.test url.pathname
-                url.path = '/'+url.path unless /^\//.test url.pathname
-                request.url = require('url').format url
-            # always start by writing the preamble message to the other end
-            relay.write JSON.stringify
-                method: request.method
-                url:    request.url
-                port:   request.port
-                data:   request.data
+        unless request.url
+            @log "no request.url is set!"
+            request.url = '/'
 
-            request.on 'error', (err) =>
-                @log "error relaying request via boltstream...", err
-                relay.destroy()
+        if typeof request.url is 'string'
+            url = require('url').parse request.url
+            url.pathname = '/'+url.pathname unless /^\//.test url.pathname
+            url.path = '/'+url.path unless /^\//.test url.pathname
+            request.url = require('url').format url
+        # always start by writing the preamble message to the other end
+        relay.write JSON.stringify
+            method: request.method
+            url:    request.url
+            port:   request.port
+            data:   request.data
 
-            relay.on 'error', (err) ->
-                @log "error during relay multiplexing boltstream...", err
+        request.on 'error', (err) =>
+            @log "error relaying request via boltstream...", err
+            relay.destroy()
 
-            #request.pipe(relay)
-            relay.end()
+        relay.on 'error', (err) ->
+            @log "error during relay multiplexing boltstream...", err
 
-            # always get the reply preamble message from the other end
-            reply =
-                header: null
-                body: ''
+        #request.pipe(relay)
+        relay.end()
+        realy.emit 'sent', request
 
-            relay.on 'data', (chunk) =>
-                try
-                    unless reply.header
-                        reply.header = JSON.parse chunk
-                        if response? and response.writeHead?
-                            response.writeHead reply.header.statusCode, reply.header.headers
-                            relay.pipe(response)
-                    else
-                        unless response?
-                            reply.body+=chunk
-                catch err
-                    @log "invalid relay response received from #{@id}:", err
-                    relay.end()
-            relay.on 'end', =>
-                relay.emit 'reply', reply
+        # always get the reply preamble message from the other end
+        reply =
+            header: null
+            body: ''
 
-            return relay
-        catch err
-            @log "error duing relaying request to boltstream", err
+        relay.on 'data', (chunk) =>
+            try
+                unless reply.header
+                    reply.header = JSON.parse chunk
+                    # pipe relay into response if response stream is provided
+                    if response? and response.writeHead?
+                        response.writeHead reply.header.statusCode, reply.header.headers
+                        relay.pipe(response)
+                else
+                    unless response?
+                        reply.body+=chunk
+            catch err
+                @log "invalid relay response received from #{@id}:", err
+                relay.end()
+        relay.on 'end', =>
+            relay.emit 'reply', reply
+
+        return relay
 
     destroy: ->
         try
