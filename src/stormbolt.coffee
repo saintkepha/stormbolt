@@ -106,7 +106,6 @@ class BoltStream extends StormData
 
         #request.pipe(relay)
         relay.end()
-        relay.emit 'sent', request
 
         # always get the reply preamble message from the other end
         reply =
