@@ -514,7 +514,7 @@ class StormBolt extends StormAgent
                             roptions.agent = false
                             roptions.port ?= target
 
-                            @log JSON.stringify roptions
+                            #@log JSON.stringify roptions
 
                             timeout = false
                             relay = http.request roptions, (reply) =>
