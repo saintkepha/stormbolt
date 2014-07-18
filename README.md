@@ -1,6 +1,9 @@
-stormbolt
-===============
+Stormbolt
+=========
 
+
+Synopsis
+----------
 A simple and light-weight secure tunneling application (over SSL) for
 performing HTTP transactions between systems.
 
@@ -44,8 +47,6 @@ does not make any difference to the actual *applications* that wants
 to communicate with each other, who is the initiator of the request or
 acting to respond to requests.
 
-communication establishment sequence
-------------------------------------
 
 Bolt server functionality:
 1.tls/ssl server will be listening for stormbolt connections on
@@ -67,8 +68,8 @@ port.
 4.Forwards HTTP requests coming on to the configured webservices
 (stormtower, stormlight etc.) and send response back to bolt server.
 
-*List of StormBolt APIs*
-=========================
+List of APIs
+--------------
 
 <table>
   <tr>
@@ -228,5 +229,31 @@ GET  /proxy/5b861151-5e17-4c24-b0f4-d2f77940fe1b@5000/environment
         ]
       }
     }
+
+
+
+Code Sample
+-----------
+
+
+
+Copyrights and License
+----------------------
+
+LICENSE
+
+MIT
+
+COPYRIGHT AND PERMISSION NOTICE
+
+Copyright (c) 2014-2015, Clearpath Networks, licensing@clearpathnet.com.
+
+All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
