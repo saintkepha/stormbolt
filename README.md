@@ -99,15 +99,14 @@ List of APIs
 </table>
 
 
-Get global md5 checksum
-------------------------
+###Get global md5 checksum
 
     Verb   URI               Description
     HEAD   /clients          get global md5 checksum of all stormbolt client
 
 On success it returns the global md5 checksum string in the Content-MD5 header field. This MD5 checksum string is generated from the response object of all stormbolt clients connected to stormbolt server.
 
-### Response Header
+#### Response Header
 
     HTTP/1.1 200 OK
     X-Powered-By: Zappa 0.4.22
@@ -118,15 +117,14 @@ On success it returns the global md5 checksum string in the Content-MD5 header f
     Connection: keep-alive
 
 
-Get list of connected stormbolt clients
-----------------------------------------
+###Get list of connected stormbolt clients
 
     Verb   URI               Description
     GET    /clients          get list of all stormbolt clients connected to the stormbolt server
 
 On success it returns the list of all stormbolt clients connected to the server. This includes details like uuid, port and ip address of each client.
 
-### Response
+#### Response
 
     [
       {
@@ -146,19 +144,18 @@ On success it returns the list of all stormbolt clients connected to the server.
     ]
 
 
-Get ip and port details of specific stormbolt
-----------------------------------------------
+###Get ip and port details of specific stormbolt
 
     Verb   URI               Description
     GET   /clients/:id       get details of the given stormbolt client
 
 On success it provides information such as uuid, ports and ip address about given stormbolt client.
 
-### Request URL
+#### Request URL
 
 GET  /clients/5b861151-5e17-4c24-b0f4-d2f77940fe1b
 
-### Response
+#### Response
 
     {
       "cname": "5b861151-5e17-4c24-b0f4-d2f77940fe1b",
@@ -169,19 +166,18 @@ GET  /clients/5b861151-5e17-4c24-b0f4-d2f77940fe1b
     }
 
 
-Common endpoint for GET/POST/PUT/DELETE calls on specific stormbolt
---------------------------------------------------------------------
+###Common endpoints for GET/POST/PUT/DELETE calls on specific stormbolt
 
     Verb   URI                  Description
     GET   /proxy/:id@:port/*    forwards the GET API call to given endpoint of specific stormbolt
 
 This provides a common endpoint for all RESTful calls GET/POST/PUT/DELETE to be forwarded to specific stormbolt client. The :id is the uuid of the stormbolt client and :port specifies on which port the request will be forwarded to. Actual endpoint of the target stormbolt client is mentioned at the end. The output is then send back from bolt client.
 
-### Request URL
+#### Request URL
 
 GET  /proxy/5b861151-5e17-4c24-b0f4-d2f77940fe1b@5000/environment
 
-### Response
+#### Response
 
     {
       "tmpdir": "/lib/node_modules/stormflash",
@@ -232,8 +228,69 @@ GET  /proxy/5b861151-5e17-4c24-b0f4-d2f77940fe1b@5000/environment
 
 
 
-Code Sample
------------
+Usage
+-----
+
+
+### Example:
+
+Stormbolt service can be used to run the application in server or client mode. The 'listenPort' parameter is defined in config (say 443) then it runs in server mode. And when the uplinks parameter defines the link to connect a bolt server, then it runs in client mode.
+
+
+    StormBolt = require 'stormbolt'
+    
+    class StormTower extends StormBolt
+        constructor: (config) ->
+            super config
+            @import module
+
+
+### Methods:
+
+
+#### run
+
+Validates the config data and starts underlying agent
+
+    syntax:
+    run (config)
+    config: configuration object obtained by extending the package.json file
+
+
+#### listen
+
+Starts the stormbolt server and opens a port for listening
+
+    syntax:
+    listen (port, options, callback)
+    port: on which port the server starts listening
+    options: object containing other parameters like key, ca certs, authorization options
+    callback: returns the BoltStream created for this instance
+
+
+#### connect
+
+Starts the stormbolt client and tries to connect to corresponding bolt server
+
+    syntax:
+    connect (host, port, options, callback)
+    host: bolt server's link as define in uplinks parameter of config file
+    port: port on which server is listening
+    options: object containing other parameters like key, ca certs, cert request options
+    callback: returns the tls stream established with the server
+
+
+### Events:
+
+
+#### client.connection
+
+Triggered when a new connection established between client and server. The new tls CleartextStream object received as data.
+
+
+#### client.disconnect
+
+Triggered when error appears on stream object or mux channel. Also triggered when stream gets closed. The existing tls CleartextStream object is received as data.
 
 
 
