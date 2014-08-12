@@ -18,8 +18,6 @@ class BoltStream extends StormData
         @stream.setKeepAlive(true, 60 * 1000) #Send keep-alive every 60 seconds
         #@stream.setEncoding 'utf8'
 
-        @forwardingPorts = @config.allowedPorts
-
         @stream.on 'error', (err) =>
             @log "issue with underlying bolt stream...", err
             @destroy()
@@ -46,24 +44,25 @@ class BoltStream extends StormData
             @destroy()
             @emit 'error', err
 
-        @mux.on 'connection', (_stream) =>
-            @handleAction _stream, @forwardingPorts
+        @mux.on 'connection', @handleAction
 
         super @id,
             cname:  @id
             remote: @stream.remoteAddress
 
-    handleAction: (_stream, _forwardingPorts) =>
+    handleAction: (_stream) =>
         [ action, target ] = _stream.meta.split(':')
 
         @log "bolt-mux-connection: action=#{action} target=#{target}"
         _stream.on 'error', (err) =>
             @log "bolt-mux-connection: mux stream #{_stream.meta} encountered error:"+err
 
+        _forwardingPorts = @config?.allowedPorts or []
+
         switch action
             when 'capability'
                 @log 'sending capability information...'
-                _stream.write @config?.allowedPorts?.join(',')
+                _stream.write _forwardingPorts.join(',') if _forwardingPorts? and _forwardingPorts instanceof Array
                 _stream.end()
 
             when 'beacon'
