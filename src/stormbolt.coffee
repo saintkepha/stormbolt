@@ -413,6 +413,7 @@ class StormBolt extends StormAgent
         @log "making connection to bolt server at: "+host+':'+port
         #@log @inspect options
         calledReconnectOnce = false
+        gotBeaconReply = false
         stream = tls.connect(port, host, options, =>
             @uplink =
                 host: host
@@ -457,6 +458,7 @@ class StormBolt extends StormAgent
                         _stream.on 'data', (data) =>
                             breply++
                             @log "received beacon reply: #{data}"
+                            gotBeaconReply = true
 
                         @log 'sending beacons...'
                         async.whilst(
@@ -565,6 +567,11 @@ class StormBolt extends StormAgent
                         _stream.end()
 
         )
+
+        stream.setTimeout 4000, (err) =>
+            unless gotBeaconReply
+                @log "client stream to be destroyed as beacon reply not received from server"
+                stream.destroy()
 
         stream.on "error", (err) =>
             clearTimeout(@beaconTimer)
