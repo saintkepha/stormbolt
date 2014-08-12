@@ -7,6 +7,8 @@ class BoltStream extends StormData
 
     async = require('async')
     MuxDemux = require('mux-demux')
+    url = require('url')
+    http = require("http")
 
     constructor: (@id, @stream, @config) ->
         @ready = false
@@ -15,6 +17,8 @@ class BoltStream extends StormData
 
         @stream.setKeepAlive(true, 60 * 1000) #Send keep-alive every 60 seconds
         #@stream.setEncoding 'utf8'
+
+        @forwardingPorts = @config.allowedPorts
 
         @stream.on 'error', (err) =>
             @log "issue with underlying bolt stream...", err
@@ -42,13 +46,14 @@ class BoltStream extends StormData
             @destroy()
             @emit 'error', err
 
-        @mux.on 'connection', handleAction
+        @mux.on 'connection', (_stream) =>
+            @handleAction _stream, @forwardingPorts
 
         super @id,
             cname:  @id
             remote: @stream.remoteAddress
 
-    handleAction: (_stream) ->
+    handleAction: (_stream, _forwardingPorts) =>
         [ action, target ] = _stream.meta.split(':')
 
         @log "bolt-mux-connection: action=#{action} target=#{target}"
@@ -84,7 +89,7 @@ class BoltStream extends StormData
 
             when 'relay'
                 target = (Number) target
-                unless target in forwardingPorts
+                unless target in _forwardingPorts
                     @log "request for relay to unsupported target port: #{target}"
                     _stream.end()
                     break
