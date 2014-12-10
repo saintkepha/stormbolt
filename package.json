@@ -1,7 +1,7 @@
 {
 	"name": "stormbolt",
 	"description": "stormbolt provides secure messaging overlay networking",
-	"version": "0.4.2",
+	"version": "0.4.3",
 	"author": "Peter K. Lee",
 	"description": "Stormbolt is a web framework for cloud based automation connect bolt client.",
 	"repository": {
@@ -9,10 +9,10 @@
 		"url": "git://github.com/stormstack/stormbolt.git"
 	},
 	"dependencies": {
-		"stormagent": ">=0.3.0",
-		"request": "2.9.x",
+		"stormagent": "0.3.4",
+		"request": "2.9.203",
 		"json-schema": "0.2.0",	  
-		"node-uuid": "1.3.x",	  
+		"node-uuid": "1.3.3",	  
 		"optimist":"0.6.0",
 		"mux-demux":"3.7.8",
 		"async":"0.8.0"
