@@ -7,11 +7,16 @@ class BoltStream extends StormData
 
     async = require('async')
     MuxDemux = require('mux-demux')
+    url = require('url')
+    http = require("http")
 
-    constructor: (@id, @stream) ->
+    constructor: (@id, @stream, @config) ->
         @ready = false
         @capability = []
         @monitoring = false
+
+        @stream.setKeepAlive(true, 60 * 1000) #Send keep-alive every 60 seconds
+        #@stream.setEncoding 'utf8'
 
         @stream.on 'error', (err) =>
             @log "issue with underlying bolt stream...", err
@@ -39,9 +44,133 @@ class BoltStream extends StormData
             @destroy()
             @emit 'error', err
 
+        @mux.on 'connection', @handleAction
+
         super @id,
             cname:  @id
             remote: @stream.remoteAddress
+
+    handleAction: (_stream) =>
+        [ action, target ] = _stream.meta.split(':')
+
+        @log "bolt-mux-connection: action=#{action} target=#{target}"
+        _stream.on 'error', (err) =>
+            @log "bolt-mux-connection: mux stream #{_stream.meta} encountered error:"+err
+
+        _forwardingPorts = @config?.allowedPorts or []
+
+        switch action
+            when 'capability'
+                @log 'sending capability information...'
+                _stream.write _forwardingPorts.join(',') if _forwardingPorts? and _forwardingPorts instanceof Array
+                _stream.end()
+
+            when 'beacon'
+                [ bsent, breply ] = [ 0 , 0 ]
+                _stream.on 'data', (data) =>
+                    breply++
+                    @log "received beacon reply: #{data}"
+
+                @log 'sending beacons...'
+                async.whilst(
+                    () => # test to make sure deviation between sent and received does not exceed beaconRetry
+                        bsent - breply < @config?.beaconRetry
+                    (repeat) => # send some beacons
+                        @log "sending beacon..."
+                        _stream.write "Beacon"
+                        bsent++
+                        setTimeout(repeat, @config?.beaconInterval * 1000)
+                    (err) => # finally
+                        err ?= "beacon retry timeout, server no longer responding"
+                        @log "final call on sending beacons, exiting with: " + (err ? "no errors")
+                        @destroy()
+                )
+
+            when 'relay'
+                target = (Number) target
+                unless target in _forwardingPorts
+                    @log "request for relay to unsupported target port: #{target}"
+                    _stream.end()
+                    break
+
+                incoming = ''
+                request = null
+
+                _stream.on 'data', (chunk) =>
+                    unless request
+                        try
+                            @log "request received: "+chunk
+                            request = JSON.parse chunk
+                        catch err
+                            @log "invalid relay request!"
+                            _stream.end()
+                    else
+                        @log "received some data: "+chunk
+                        incoming += chunk
+
+                _stream.on 'end',  =>
+                    @log "relaying following request to localhost:#{target} - ", request
+
+                    if typeof request.url is 'object'
+                        roptions = url.format request.url
+                    else
+                        roptions = url.parse request.url
+                    roptions.method = request.method
+                    # hard coded the header option..
+                    roptions.headers =
+                        'Content-Type':'application/json'
+                    roptions.agent = false
+                    roptions.port ?= target
+
+                    #@log JSON.stringify roptions
+
+                    timeout = false
+                    relay = http.request roptions, (reply) =>
+                        unless timeout
+                            @log "sending back reply"
+                            reply.setEncoding 'utf8'
+                            try
+                                _stream.write JSON.stringify
+                                    statusCode: reply.statusCode,
+                                    headers: reply.headers
+                                reply.pipe(_stream, {end:true})
+                            catch err
+                                @log "unable to write response back to requestor upstream bolt! error: " + err
+
+                    relay.write JSON.stringify request.data if request.data?
+                    relay.end()
+
+                    relay.on 'end', =>
+                        @log "no more data"
+
+                    relay.setTimeout 20000, =>
+                        @log "error during performing relay action! request timedout."
+                        timeout = true
+                        try
+                            _stream.write JSON.stringify
+                                statusCode: 408,
+                                headers: null
+                            _stream.end()
+                        catch err
+                            @log "unable to write response code back to requestor upstream bolt! error: " + err
+
+                        @log "[relay request timed out, sending 408]"
+
+                    relay.on 'error', (err) =>
+                        @log "[relay request failed with following error]"
+                        @log err
+                        try
+                            _stream.write JSON.stringify
+                                statusCode: 500,
+                                headers: null
+                            _stream.end()
+                        catch err
+                            @log "unable to write response code back to requestor upstream bolt! error: " + err
+                        @log "[relay request error, sending 500]"
+
+            else
+                @log "unsupported action/target supplied by mux connection: #{action}/#{target}"
+                _stream.end()
 
     monitor: (interval, period) ->
         return if @monitoring
@@ -271,20 +400,19 @@ class StormBolt extends StormAgent
                         cert: @config.cert
                         ca: @config.ca
                         requestCert: true
-                        rejectUnauthorized: true
-                       , (bolt) =>
-                        bolt.once 'ready', =>
-                            # starts the bolt self-monitoring and initiates beacons request
-                            bolt.monitor @config.repeatdelay, @config.beaconValidity
-                            # after initialization complete, THEN we add to our clients!
-                            @clients.add bolt.id, bolt
-                            # we register for bolt close/error event only after it's ready and added...
-                            bolt.on 'close', (err) =>
-                                @log "bolt.close on #{bolt.id}:",err
-                                @clients.remove bolt.id
-                            bolt.on 'error', (err) =>
-                                @log "bolt.error on #{bolt.id}:",err
-                                @clients.remove bolt.id
+                        rejectUnauthorized: true, (bolt) =>
+                            bolt.once 'ready', =>
+                                # starts the bolt self-monitoring and initiates beacons request
+                                bolt.monitor @config.repeatdelay, @config.beaconValidity
+                                # after initialization complete, THEN we add to our clients!
+                                @clients.add bolt.id, bolt
+                                # we register for bolt close/error event only after it's ready and added...
+                                bolt.on 'close', (err) =>
+                                    @log "bolt.close on #{bolt.id}:",err
+                                    @clients.remove bolt.id
+                                bolt.on 'error', (err) =>
+                                    @log "bolt.error on #{bolt.id}:",err
+                                    @clients.remove bolt.id
 
                     server.on 'error', (err) =>
                         @log "fatal issue with bolt server: "+err
@@ -303,12 +431,6 @@ class StormBolt extends StormAgent
                     [ i, retries ] = [ 0, 0 ]
 
                     @connected = false
-                    @on 'client.connection', (stream) =>
-                        @connected = true
-                        retries = 0
-                    @on 'client.disconnect', (stream) =>
-                        @connected = false
-
                     async.forever(
                         (next) =>
                             next new Error "retry max exceeded, unable to establish bolt server connection" if retries > 30
@@ -323,9 +445,20 @@ class StormBolt extends StormAgent
                                         key: @config.key
                                         cert: @config.cert
                                         ca: @config.ca
-                                        requestCert: true
-                                    i = 0 unless i < @config.uplinks.length
-                                    setTimeout(repeat, 5000)
+                                        requestCert: true, (bolt) =>
+                                            unless bolt instanceof Error
+                                                bolt.once 'ready', =>
+                                                    @connected = true
+                                                    retries = 0
+                                                    bolt.once 'close', (err) =>
+                                                        @log "bolt.error on #{bolt.id}:",err
+                                                        @connected = false
+                                                    bolt.once 'error', (err) =>
+                                                        @log "bolt.error on #{bolt.id}:",err
+                                                        @connected = false
+
+                                            i = 0 unless i < @config.uplinks.length
+                                            setTimeout(repeat, 5000)
                                 (err) =>
                                     setTimeout(next, 5000)
                             )
@@ -383,7 +516,7 @@ class StormBolt extends StormAgent
                 cname = certObj.subject.CN
 
                 @log "server connected from #{cname}: " + stream.authorized ? 'unauthorized'
-                callback new BoltStream cname, stream if callback?
+                callback? new BoltStream cname, stream, @config
 
             catch error
                 @log 'unable to retrieve peer certificate and authorize connection!', error
@@ -417,166 +550,20 @@ class StormBolt extends StormAgent
             @uplink =
                 host: host
                 port: port
-            if stream.authorized
-                @log "Successfully connected to bolt server"
-#                @emit 'client.connection', stream
-            else
-                @log "Failed to authorize TLS connection. Could not connect to bolt server (ignored for now)"
 
-            @emit 'client.connection', stream
+            try
+                @log "TLS connection established with bolt server from: " + stream.remoteAddress
+                certObj = stream.getPeerCertificate()
+                cname = certObj.subject.CN
 
-            callback stream if callback?
+                @log "client connected to #{cname}: " + stream.authorized ? 'unauthorized'
+                callback? new BoltStream cname, stream, @config
 
-            stream.setKeepAlive(true, 60 * 1000) #Send keep-alive every 60 seconds
-            stream.setEncoding 'utf8'
-            stream.pipe(mx=MuxDemux()).pipe(stream)
-
-            forwardingPorts = @config.allowedPorts
-
-            mx.on "error", (err) =>
-                @log "MUX ERROR:", err
-                mx.destroy()
-                stream.destroy()
-                @emit 'client.disconnect', stream
-
-            mx.on "connection", (_stream) =>
-                [ action, target ] = _stream.meta.split(':')
-                @log "Client: action #{action}  target #{target}"
-
-                _stream.on 'error', (err) =>
-                    @log "Client: mux stream for #{_stream.meta} has error: "+err
-
-                switch action
-                    when 'capability'
-                        @log 'sending capability information...'
-                        _stream.write forwardingPorts.join(',')
-                        _stream.end()
-
-                    when 'beacon'
-                        [ bsent, breply ] = [ 0 , 0 ]
-                        _stream.on 'data', (data) =>
-                            breply++
-                            @log "received beacon reply: #{data}"
-
-                        @log 'sending beacons...'
-                        async.whilst(
-                            () => # test to make sure deviation between sent and received does not exceed beaconRetry
-                                bsent - breply < @config.beaconRetry
-                            (repeat) => # send some beacons
-                                @log "sending beacon..."
-                                _stream.write "Beacon"
-                                bsent++
-                                @beaconTimer = setTimeout(repeat, @config.beaconInterval * 1000)
-                            (err) => # finally
-                                err ?= "beacon retry timeout, server no longer responding"
-                                @log "final call on sending beacons, exiting with: " + (err ? "no errors")
-                                try
-                                    _stream.end()
-                                    mx.destroy()
-                                    stream.end()
-                                catch err
-                                    @log "error during client connection shutdown due to beacon timeout: "+err
-                        )
-
-                    when 'relay'
-                        target = (Number) target
-                        unless target in forwardingPorts
-                            @log "request for relay to unsupported target port: #{target}"
-                            _stream.end()
-                            break
-
-                        incoming = ''
-                        request = null
-
-                        _stream.on 'data', (chunk) =>
-                            unless request
-                                try
-                                    @log "request received: "+chunk
-                                    request = JSON.parse chunk
-                                catch err
-                                    @log "invalid relay request!"
-                                    _stream.end()
-                            else
-                                @log "received some data: "+chunk
-                                incoming += chunk
-
-                        _stream.on 'end',  =>
-                            @log "relaying following request to localhost:#{target} - ", request
-
-                            if typeof request.url is 'object'
-                                roptions = url.format request.url
-                            else
-                                roptions = url.parse request.url
-                            roptions.method = request.method
-                            # hard coded the header option..
-                            roptions.headers =
-                                'Content-Type':'application/json'
-                            roptions.agent = false
-                            roptions.port ?= target
-
-                            #@log JSON.stringify roptions
-
-                            timeout = false
-                            relay = http.request roptions, (reply) =>
-                                unless timeout
-                                    @log "sending back reply"
-                                    reply.setEncoding 'utf8'
-                                    try
-                                        _stream.write JSON.stringify
-                                            statusCode: reply.statusCode,
-                                            headers: reply.headers
-                                        reply.pipe(_stream, {end:true})
-                                    catch err
-                                        @log "unable to write response back to requestor upstream bolt! error: " + err
-
-                            relay.write JSON.stringify request.data if request.data?
-                            relay.end()
-
-                            relay.on 'end', =>
-                                @log "no more data"
-
-                            relay.setTimeout 20000, =>
-                                @log "error during performing relay action! request timedout."
-                                timeout = true
-                                try
-                                    _stream.write JSON.stringify
-                                        statusCode: 408,
-                                        headers: null
-                                    _stream.end()
-                                catch err
-                                    @log "unable to write response code back to requestor upstream bolt! error: " + err
-
-                                @log "[relay request timed out, sending 408]"
-
-                            relay.on 'error', (err) =>
-                                @log "[relay request failed with following error]"
-                                @log err
-                                try
-                                    _stream.write JSON.stringify
-                                        statusCode: 500,
-                                        headers: null
-                                    _stream.end()
-                                catch err
-                                    @log "unable to write response code back to requestor upstream bolt! error: " + err
-                                @log "[relay request error, sending 500]"
-
-                    else
-                        @log "unsupported action/target supplied by mux connection: #{action}/#{target}"
-                        _stream.end()
-
+            catch error
+                @log 'unable to retrieve peer certificate and authorize connection!', error
+                stream.end()
+                callback? new Error "unable to establish bolt connection to server"
         )
-
-        stream.on "error", (err) =>
-            clearTimeout(@beaconTimer)
-            @log "client error during connection to #{host}:#{port} with: " + err
-            @emit 'client.disconnect', stream
-
-        stream.on "close", =>
-            clearTimeout(@beaconTimer)
-            @log "client closed connection to: #{host}:#{port}"
-            @emit 'client.disconnect', stream
-
-        stream
 
 module.exports = StormBolt
 
